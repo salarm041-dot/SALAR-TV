@@ -1,1 +1,55 @@
 
+name: Build SALAR TV APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract project ZIP
+        run: |
+          mkdir project
+          unzip -q SALAR_TV_Source_Download.zip -d project
+          SETTINGS=$(find project -name settings.gradle.kts -print -quit)
+          if [ -z "$SETTINGS" ]; then
+            echo "settings.gradle.kts not found"
+            exit 1
+          fi
+          echo "PROJECT_DIR=$(dirname "$SETTINGS")" >> $GITHUB_ENV
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build APK
+        run: gradle -p "$PROJECT_DIR" :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-APK
+          path: project/**/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
