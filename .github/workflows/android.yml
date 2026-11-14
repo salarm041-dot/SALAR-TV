@@ -55,8 +55,8 @@ jobs:
           p = Path(sys.argv[1])
           s = p.read_text()
           s = s.replace('<uses-permission android:name="android.permission.INTERNET" />',
-              '<uses-permission android:name="android.permission.INTERNET" />\\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
-          s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\\n    </application>')
+              '<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
+          s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\n    </application>')
           p.write_text(s)
           PY
 
