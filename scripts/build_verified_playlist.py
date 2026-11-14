@@ -60,11 +60,12 @@ def main():
     if not MAIN.exists():
         raise SystemExit(f"Main playlist not found: {MAIN}")
     original = MAIN.read_text(encoding="utf-8-sig")
-    existing = set(re.findall(r"(?m)^https?://[^\\s]+", original))
+    existing = set(re.findall(r"(?m)^https?://\\S+", original))
     additions: list[str] = []
     promoted: dict[str, int] = {}
     skipped_scheduled = 0
     skipped_duplicate = 0
+    promoted_total = 0
 
     for source, report_path in report_files.items():
         healthy = read_report(report_path)
@@ -83,6 +84,7 @@ def main():
             additions.append(url)
             existing.add(url)
             count += 1
+            promoted_total += 1
         promoted[source.name] = count
 
     if additions:
