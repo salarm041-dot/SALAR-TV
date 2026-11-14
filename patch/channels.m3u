@@ -1,18 +1,18 @@
 #EXTM3U
 # Publicly listed HLS endpoints. Availability and territorial access can change.
-#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT 1
+#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trt1.png" group-title="ترکیه / تلویزیون",TRT 1
 https://tv-trt1.medya.trt.com.tr/master.m3u8
-#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Haber
+#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trthaber.png" group-title="ترکیه / تلویزیون",TRT Haber
 https://tv-trthaber.medya.trt.com.tr/master.m3u8
-#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT World
+#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtworld.png" group-title="ترکیه / تلویزیون",TRT World
 https://tv-trtworld.medya.trt.com.tr/master.m3u8
-#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Belgesel
+#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtbelgesel.png" group-title="ترکیه / تلویزیون",TRT Belgesel
 https://tv-trtbelgesel.medya.trt.com.tr/master.m3u8
-#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Çocuk
+#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtcocuk.png" group-title="ترکیه / تلویزیون",TRT Çocuk
 https://tv-trtcocuk.medya.trt.com.tr/master.m3u8
-#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Müzik
+#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtmuzik.png" group-title="ترکیه / تلویزیون",TRT Müzik
 https://tv-trtmuzik.medya.trt.com.tr/master.m3u8
-#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Avaz
+#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtavaz.png" group-title="ترکیه / تلویزیون",TRT Avaz
 https://tv-trtavaz.medya.trt.com.tr/master.m3u8
 #EXTINF:-1 group-title="آذربایجان / تلویزیون",İctimai TV
 https://live.itv.az/itv.m3u8
