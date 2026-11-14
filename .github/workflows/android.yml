@@ -54,7 +54,7 @@ jobs:
           install -D patch/ic_launcher_fallback.xml "$PROJECT_DIR/app/src/main/res/mipmap/ic_launcher.xml"
           install -D patch/ic_launcher_adaptive.xml "$PROJECT_DIR/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
           python3 - "$PROJECT_DIR/app/src/main/AndroidManifest.xml" <<'PY'
-          import sys
+          import sys, re
           from pathlib import Path
           p = Path(sys.argv[1])
           s = p.read_text()
@@ -62,6 +62,16 @@ jobs:
               '<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
           s = s.replace('android:icon="@drawable/ic_salar_tv"', 'android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"')
           s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\n    </application>')
+          activity_pattern = r'<activity\\b(?=[^>]*android:name="(?:\\.MainActivity|com\\.salar\\.tv\\.MainActivity)")[^>]*>'
+          match = re.search(activity_pattern, s)
+          if not match:
+              raise SystemExit("MainActivity declaration not found; cannot safely enable picture-in-picture")
+          tag = match.group(0)
+          if "android:supportsPictureInPicture=" not in tag:
+              tag = tag[:-1] + ' android:supportsPictureInPicture="true">'
+          if "android:configChanges=" not in tag:
+              tag = tag[:-1] + ' android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">'
+          s = s[:match.start()] + tag + s[match.end():]
           p.write_text(s)
           PY
 
