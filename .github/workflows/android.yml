@@ -254,15 +254,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="${{ github.workspace }}/SALAR-TV-debug.apk"; test -f "$APK" && adb install -r "$APK"
-            adb shell am start -n com.salar.tv/.MainActivity
-            sleep 20
-            adb shell dumpsys activity activities | grep -q "com.salar.tv"
-            if adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv"; then
-              echo "App crashed during startup smoke test"
-              exit 1
-            fi
-            echo "Android 11 emulator launch smoke test passed"
+            APK="${{ github.workspace }}/SALAR-TV-debug.apk"; test -f "$APK" && adb install -r "$APK" && adb shell am start -n com.salar.tv/.MainActivity && sleep 20 && adb shell dumpsys activity activities | grep -q "com.salar.tv" && (adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv" && { echo "App crashed during startup smoke test"; exit 1; } || echo "Android 11 emulator launch smoke test passed")
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
