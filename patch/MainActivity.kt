@@ -277,12 +277,23 @@ fun SalarTvApp() {
                     Text("صدای پخش", color = Gold, fontSize = 12.sp)
                     Slider(value = player.volume, onValueChange = { player.volume = it }, valueRange = 0f..1f)
                     LaunchedEffect(selected!!.url, useExternalPlayer) {
-                        if (useExternalPlayer) {
+                        val streamAddress = selected!!.url
+                        val officialWebPage = streamAddress.contains("ott.iranintl.com", ignoreCase = true) ||
+                            streamAddress.contains("iranintl.com/live", ignoreCase = true)
+                        if (officialWebPage) {
+                            player.pause()
+                            runCatching {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(streamAddress))
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                            }.onFailure {
+                                android.widget.Toast.makeText(context, "صفحه رسمی پخش ایران اینترنشنال باز نشد.", android.widget.Toast.LENGTH_LONG).show()
+                            }
+                        } else if (useExternalPlayer) {
                             player.pause()
                             runCatching {
                                 val mimeType = if (selected!!.kind == "رادیو") "audio/*" else "application/vnd.apple.mpegurl"
                                 val viewIntent = Intent(Intent.ACTION_VIEW).apply {
-                                    setDataAndType(Uri.parse(selected!!.url), mimeType)
+                                    setDataAndType(Uri.parse(streamAddress), mimeType)
                                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 }
                                 context.startActivity(Intent.createChooser(viewIntent, "انتخاب پخش‌کننده خارجی"))
@@ -291,21 +302,26 @@ fun SalarTvApp() {
                                 useExternalPlayer = false
                             }
                         } else {
-                            player.setMediaItem(MediaItem.fromUri(selected!!.url))
+                            player.setMediaItem(MediaItem.fromUri(streamAddress))
                             player.prepare()
                             player.playWhenReady = true
                         }
                     }
                     Text("در صورت پشتیبانی منبع، پخش زنده در این قسمت نمایش داده می‌شود.", color = Color.LightGray, fontSize = 12.sp)
                     Spacer(Modifier.height(10.dp))
-                    Button(
-                        onClick = { showSchedule = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Gold)
-                    ) {
-                        Icon(Icons.Default.CalendarMonth, null, tint = Color.Black)
-                        Spacer(Modifier.width(8.dp))
-                        Text("زمان‌بندی ضبط همین شبکه", color = Color.Black)
+                    if (!selected!!.url.contains("iranintl.com", ignoreCase = true)) {
+                        Button(
+                            onClick = { showSchedule = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Gold)
+                        ) {
+                            Icon(Icons.Default.CalendarMonth, null, tint = Color.Black)
+                            Spacer(Modifier.width(8.dp))
+                            Text("زمان‌بندی ضبط همین شبکه", color = Color.Black)
+                        }
+                    } else {
+                        Text("پخش ایران اینترنشنال از صفحه رسمی شبکه باز می‌شود؛ ضبط مستقیم این صفحه در برنامه فعال نیست.",
+                            color = Color.LightGray, fontSize = 12.sp)
                     }
                 } else when (page) {
                     "افزودن منابع" -> AddSourcesPage(
