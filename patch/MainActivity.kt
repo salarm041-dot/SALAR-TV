@@ -359,7 +359,7 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
             Text("موردی برای نمایش وجود ندارد.", color = Color.LightGray)
         }
     } else {
-        val sections = channels.groupBy { "${it.country} / ${it.kind}" }.toSortedMap()
+        val sections = channels.groupBy { "${it.country} / ${categoryForChannel(it)} / ${it.kind}" }.toSortedMap()
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             sections.forEach { (sectionTitle, sectionChannels) ->
                 item(key = "section_${sectionTitle}") {
@@ -500,6 +500,25 @@ fun AboutPage() {
         Text("ایمیل: Salar.m041@gmail.com", color = Color.LightGray)
         Text("اینستاگرام: Salar_mousavi_41", color = Color.LightGray)
         Text("نسخه 1.3.0", color = Color.Gray)
+    }
+}
+
+
+private fun categoryForChannel(channel: Channel): String {
+    if (channel.kind == "رادیو") return "رادیو"
+    val value = (channel.name + " " + channel.country).lowercase()
+    return when {
+        listOf("خبر", "news", "haber", "bbc", "cnn", "irinn").any { it in value } -> "خبری"
+        listOf("ورزش", "sport", "sports", "varzesh", "trt spor").any { it in value } -> "ورزشی"
+        listOf("کودک", "پویا", "نهال", "kids", "cocuk", "çocuk", "cartoon").any { it in value } -> "کودک"
+        listOf("مستند", "documentary", "belgesel").any { it in value } -> "مستند"
+        listOf("فیلم", "سریال", "تماشا", "film", "movie", "dizi").any { it in value } -> "فیلم و سریال"
+        listOf("موسیقی", "music", "muzik", "müzik").any { it in value } -> "موسیقی"
+        listOf("آموزش", "آموزشی", "آموزش", "edu", "education").any { it in value } -> "آموزشی"
+        listOf("سلامت", "health", "saglik", "sağlık").any { it in value } -> "سلامت"
+        listOf("قرآن", "معارف", "quran", "religion").any { it in value } -> "دینی و فرهنگی"
+        channel.country == "ایران" && listOf("استان", "شبکه آذربایجان غربی", "شبکه سهند", "شبکه سبلان").any { it in value } -> "استانی"
+        else -> "عمومی"
     }
 }
 
