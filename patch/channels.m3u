@@ -9,7 +9,7 @@ https://tv-trtworld.medya.trt.com.tr/master.m3u8
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtbelgesel.png" group-title="ترکیه / تلویزیون",TRT Belgesel
 https://tv-trtbelgesel.live.trt.com.tr/master.m3u8
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtcocuk.png" group-title="ترکیه / تلویزیون",TRT Çocuk
-https://tv-trtcocuk.live.trt.com.tr/master.m3u8
+https://tv-trtcocuk.medya.trt.com.tr/master.m3u8
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtmuzik.png" group-title="ترکیه / تلویزیون",TRT Müzik
 https://tv-trtmuzik.medya.trt.com.tr/master.m3u8
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtavaz.png" group-title="ترکیه / تلویزیون",TRT Avaz
