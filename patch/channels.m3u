@@ -155,6 +155,9 @@ https://gstream4.panet.co.il/edge/halaTV/chunks.m3u8
 #EXTINF:-1 tvg-id="TehranTV.ir" tvg-name="IRIB TV5 (Tehran)" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TehranTV.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",IRIB TV5 (Tehran) | شبکه پنج (تهران)
 https://live-aburayhan1108.telewebion.ir/ek/tehran/live/1080p/index.m3u8
 
+#EXTINF:-1 tvg-id="IRIBUHD.ir" tvg-name="IRIB Faratar UHD" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBUHD.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="UHD",IRIB Faratar UHD | شبکه فراتر
+https://ncdn.telewebion.ir/faratar/live/playlist.m3u8
+
 #EXTINF:-1 tvg-id="iFilmPersian.ir" tvg-name="iFilm" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/iFilmPersian.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",iFilm | آی‌فیلم
 https://live-aburayhan1113.telewebion.ir/ek/ifilm/live/1080p/index.m3u8
 
