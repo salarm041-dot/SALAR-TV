@@ -386,7 +386,7 @@ fun AboutPage() {
         Text("سازنده و مالک: سید سالار موسوی ملکی", color = TextMain)
         Text("ایمیل: Salar.m041@gmail.com", color = Color.LightGray)
         Text("اینستاگرام: Salar_mousavi_41", color = Color.LightGray)
-        Text("نسخه 1.0.0", color = Color.Gray)
+        Text("نسخه 1.1.0", color = Color.Gray)
     }
 }
 
