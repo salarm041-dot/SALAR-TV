@@ -352,8 +352,6 @@ https://live-aburayhan1106.telewebion.ir/ek/kish/live/576p/index.m3u8
 https://live-aburayhan1108.telewebion.ir/ek/kordestan/live/1080p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MahabadTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",مهاباد
 https://ncdn.telewebion.ir/mahabad/live/playlist.m3u8
-#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MakranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",مکران
-https://live-aburayhan1104.telewebion.ir/na/makran/live/1080p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NoorTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",نور (قم)
 https://live-aburayhan1107.telewebion.ir/ek/noor/live/1080p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QazvinTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",قزوین
@@ -367,7 +365,7 @@ https://live-aburayhan1106.telewebion.ir/ek/sahand/live/1080p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SemnanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سمنان
 https://live-aburayhan1107.telewebion.ir/ek/semnan/live/1080p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TabarestanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",تبرستان (مازندران)
-https://live-aburayhan1112.telewebion.ir/ek/tabarestan/live/1080p/index.m3u8
+https://ncdn.telewebion.ir/tabarestan/live/playlist.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/WestAzerbaijanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",آذربایجان غربی
 https://live-aburayhan1107.telewebion.ir/ek/azarbayjangharbi/live/576p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/YazdTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",تابان (یزد)
