@@ -152,6 +152,27 @@ jobs:
           print(f"APK package OK: {apks[0].name}, {apks[0].stat().st_size} bytes, 156 playlist entries")
           PY
 
+      - name: Android 11 emulator smoke test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: default
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            APK=$(find project -path "*/app/build/outputs/apk/debug/*.apk" -print -quit)
+            test -n "$APK"
+            adb install -r "$APK"
+            adb shell am start -n com.salar.tv/.MainActivity
+            sleep 20
+            adb shell dumpsys activity activities | grep -q "com.salar.tv"
+            if adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv"; then
+              echo "App crashed during startup smoke test"
+              exit 1
+            fi
+            echo "Android 11 emulator launch smoke test passed"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
