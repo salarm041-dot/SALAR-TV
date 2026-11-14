@@ -3,9 +3,6 @@ name: Build SALAR TV APK
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
