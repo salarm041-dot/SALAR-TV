@@ -50,6 +50,9 @@ jobs:
           install -D patch/HlsRecorderService.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HlsRecorderService.kt"
           install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
           install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
+          install -D patch/ic_salar_tv.xml "$PROJECT_DIR/app/src/main/res/drawable/ic_salar_tv.xml"
+          install -D patch/ic_launcher_fallback.xml "$PROJECT_DIR/app/src/main/res/mipmap/ic_launcher.xml"
+          install -D patch/ic_launcher_adaptive.xml "$PROJECT_DIR/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
           python3 - "$PROJECT_DIR/app/src/main/AndroidManifest.xml" <<'PY'
           import sys
           from pathlib import Path
@@ -57,19 +60,20 @@ jobs:
           s = p.read_text()
           s = s.replace('<uses-permission android:name="android.permission.INTERNET" />',
               '<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
+          s = s.replace('android:icon="@drawable/ic_salar_tv"', 'android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"')
           s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\n    </application>')
           p.write_text(s)
           PY
 
-      - name: Set app version to 1.1.0
+      - name: Set app version to 1.2.0
         run: |
           python3 - "$PROJECT_DIR/app/build.gradle.kts" <<'PY'
           import re, sys
           from pathlib import Path
           p = Path(sys.argv[1])
           s = p.read_text()
-          s, code_count = re.subn(r'versionCode *= *[0-9]+', 'versionCode = 11', s, count=1)
-          s, name_count = re.subn(r'versionName\s*=\s*"[^"]+"', 'versionName = "1.1.0"', s, count=1)
+          s, code_count = re.subn(r'versionCode *= *[0-9]+', 'versionCode = 12', s, count=1)
+          s, name_count = re.subn(r'versionName\s*=\s*"[^"]+"', 'versionName = "1.2.0"', s, count=1)
           if code_count != 1 or name_count != 1:
               raise SystemExit("Could not safely update app version in app/build.gradle.kts")
           p.write_text(s)
