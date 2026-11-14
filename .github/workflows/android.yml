@@ -114,14 +114,14 @@ jobs:
           urls = [url for _, url in entries]
           provincial = [meta for meta, _ in entries if "شبکه‌های استانی" in meta]
           logos = [meta for meta, _ in entries if "tvg-logo=" in meta]
-          if len(entries) < 150:
+          if len(entries) != 156:
               raise SystemExit(f"Unexpectedly small playlist: {len(entries)} entries")
           if len(urls) != len(set(urls)):
               raise SystemExit("Duplicate stream URLs found in bundled playlist")
           if len(provincial) != 34:
               raise SystemExit(f"Expected 34 provincial IRIB channels, found {len(provincial)}")
-          if len(logos) < 100:
-              raise SystemExit(f"Logo coverage regressed: only {len(logos)} entries have tvg-logo")
+          if len(logos) != 156:
+              raise SystemExit(f"Expected 156 channel logos, found {len(logos)}")
           print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
           PY
 
@@ -171,7 +171,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="/github/workspace/SALAR-TV-debug.apk"
+            APK="${{ github.workspace }}/SALAR-TV-debug.apk"
             test -f "$APK"
             adb install -r "$APK"
             adb shell am start -n com.salar.tv/.MainActivity
