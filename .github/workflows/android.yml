@@ -51,6 +51,26 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Enrich candidate channel logos
+        run: python scripts/enrich_candidate_logos.py
+
+      - name: Deep-validate candidate streams before packaging
+        timeout-minutes: 25
+        run: python scripts/deep_stream_check.py
+
+      - name: Add only verified live candidates to the app playlist
+        run: python scripts/build_verified_playlist.py
+
+      - name: Upload verified channel promotion report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Verified-Channel-Report
+          path: |
+            candidate-logo-report.json
+            deep-stream-reports/
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Apply corrected app source and recording module
         run: |
           install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
