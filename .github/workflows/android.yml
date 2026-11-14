@@ -125,6 +125,48 @@ jobs:
           print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
           PY
 
+      - name: Check live stream endpoints (non-blocking)
+        id: streamcheck
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, urllib.request, urllib.error, json, re, pathlib, time
+          p = pathlib.Path("patch/channels.m3u")
+          lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+          urls = [x.strip() for x in lines if re.match(r"^https?://", x.strip(), re.I)]
+          def check(item):
+              i, url = item
+              req = urllib.request.Request(url, headers={"User-Agent":"Mozilla/5.0 SALAR-TV-stream-check/1.0","Accept":"*/*","Range":"bytes=0-8191"})
+              try:
+                  with urllib.request.urlopen(req, timeout=12) as r:
+                      data = r.read(8192)
+                      status = r.status
+                      ctype = r.headers.get("Content-Type","")
+                      text = data.decode("utf-8", "ignore")
+                      ok = status == 200 and ("#EXTM3U" in text or "mpegurl" in ctype.lower())
+                      return {"index":i,"url":url,"status":status,"content_type":ctype,"playlist":ok,"detail":"HLS manifest received" if ok else "HTTP response is not a recognizable HLS manifest"}
+              except urllib.error.HTTPError as e:
+                  return {"index":i,"url":url,"status":e.code,"playlist":False,"detail":"HTTP error"}
+              except Exception as e:
+                  return {"index":i,"url":url,"status":None,"playlist":False,"detail":type(e).__name__+": "+str(e)[:180]}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
+              results = list(ex.map(check, enumerate(urls, 1)))
+          good = [x for x in results if x["playlist"]]
+          bad = [x for x in results if not x["playlist"]]
+          pathlib.Path("stream-check-report.json").write_text(json.dumps({"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"total":len(results),"reachable_hls":len(good),"failed_or_unverified":len(bad),"results":results},ensure_ascii=False,indent=2),encoding="utf-8")
+          print(f"STREAM CHECK: {len(good)}/{len(results)} returned recognizable HLS manifests")
+          for x in bad:
+              print(f"UNAVAILABLE/UNVERIFIED [{x.get('status')}] #{x['index']} {x['url']} :: {x['detail']}")
+          PY
+
+      - name: Upload stream check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Stream-Check-Report
+          path: stream-check-report.json
+          if-no-files-found: ignore
+
       - name: Build APK
         run: gradle -p "$PROJECT_DIR" :app:assembleDebug
 
