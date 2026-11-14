@@ -38,6 +38,12 @@ class HlsRecorderService : Service() {
                     val variant = lines.firstOrNull { !it.startsWith("#") && it.contains(".m3u8", true) }
                     val mediaUrl = if (variant != null) URL(playlistUrl, variant).toString() else streamUrl
                     val mediaText = if (variant != null) downloadText(mediaUrl) else playlistText
+                    if (mediaText.contains("#EXT-X-KEY") && !mediaText.contains("METHOD=NONE")) {
+                        error("این منبع HLS رمزگذاری شده است و ضبط مستقیم آن پشتیبانی نمی‌شود.")
+                    }
+                    if (mediaText.contains("#EXT-X-MAP") || mediaText.contains("#EXT-X-BYTERANGE")) {
+                        error("این قالب HLS از نوع قطعه‌بندی‌شده خاص است؛ ضبط امن این نوع هنوز پشتیبانی نمی‌شود.")
+                    }
                     val base = URL(mediaUrl)
                     val segments = mediaText.lineSequence().map { it.trim() }
                         .filter { it.isNotEmpty() && !it.startsWith("#") }
