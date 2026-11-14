@@ -23,6 +23,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,10 +50,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONArray
 import org.json.JSONObject
 
-private val Gold = Color(0xFFD6AD62)
-private val Background = Color(0xFF0B0D13)
-private val Panel = Color(0xFF171B26)
-private val TextMain = Color(0xFFF5F1E8)
+private var Gold by mutableStateOf(Color(0xFFD6AD62))
+private var Background by mutableStateOf(Color(0xFF0B0D13))
+private var Panel by mutableStateOf(Color(0xFF171B26))
+private var TextMain by mutableStateOf(Color(0xFFF5F1E8))
+private var SecondaryText by mutableStateOf(Color.LightGray)
+private var MutedText by mutableStateOf(Color.Gray)
 
 data class Channel(
     val name: String,
@@ -118,6 +121,24 @@ fun SalarTvApp() {
     var useExternalPlayer by remember { mutableStateOf(prefs.getBoolean("external_player_default", false)) }
     var rememberPlayerChoice by remember { mutableStateOf(false) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
+    var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "dark") ?: "dark") }
+    val systemDark = isSystemInDarkTheme()
+    val useDarkTheme = when (themeMode) { "light" -> false; "system" -> systemDark; else -> true }
+
+    SideEffect {
+        val nextGold = if (useDarkTheme) Color(0xFFD6AD62) else Color(0xFF9A6818)
+        val nextBackground = if (useDarkTheme) Color(0xFF0B0D13) else Color(0xFFF5F3EE)
+        val nextPanel = if (useDarkTheme) Color(0xFF171B26) else Color(0xFFFFFFFF)
+        val nextText = if (useDarkTheme) Color(0xFFF5F1E8) else Color(0xFF20232A)
+        val nextSecondary = if (useDarkTheme) Color.LightGray else Color(0xFF555B66)
+        val nextMuted = if (useDarkTheme) Color.Gray else Color(0xFF707782)
+        if (Gold != nextGold) Gold = nextGold
+        if (Background != nextBackground) Background = nextBackground
+        if (Panel != nextPanel) Panel = nextPanel
+        if (TextMain != nextText) TextMain = nextText
+        if (SecondaryText != nextSecondary) SecondaryText = nextSecondary
+        if (MutedText != nextMuted) MutedText = nextMuted
+    }
 
     val player = remember { ExoPlayer.Builder(context).build() }
     DisposableEffect(Unit) { onDispose { player.release() } }
@@ -154,6 +175,7 @@ fun SalarTvApp() {
                 .put("channels", JSONArray(prefs.getString("channels", "[]") ?: "[]"))
                 .put("schedules", prefs.getString("schedules", "") ?: "")
                 .put("external_player_default", prefs.getBoolean("external_player_default", false))
+                .put("theme_mode", prefs.getString("theme_mode", "dark") ?: "dark")
             context.contentResolver.openOutputStream(uri)?.use { it.write(backup.toString(2).toByteArray(Charsets.UTF_8)) }
                 ?: error("ساخت فایل پشتیبان ممکن نشد.")
             android.widget.Toast.makeText(context, "نسخه پشتیبان ذخیره شد.", android.widget.Toast.LENGTH_LONG).show()
@@ -178,7 +200,9 @@ fun SalarTvApp() {
             prefs.edit()
                 .putString("schedules", backup.optString("schedules", ""))
                 .putBoolean("external_player_default", backup.optBoolean("external_player_default", false))
+                .putString("theme_mode", backup.optString("theme_mode", "dark"))
                 .apply()
+            themeMode = backup.optString("theme_mode", "dark")
             android.widget.Toast.makeText(context, "شبکه‌ها و تنظیمات پشتیبان بازیابی شدند.", android.widget.Toast.LENGTH_LONG).show()
         }.onFailure { error ->
             android.widget.Toast.makeText(context, error.message ?: "بازیابی پشتیبان ناموفق بود.", android.widget.Toast.LENGTH_LONG).show()
@@ -186,9 +210,12 @@ fun SalarTvApp() {
     }
 
     MaterialTheme(
-        colorScheme = darkColorScheme(
+        colorScheme = if (useDarkTheme) darkColorScheme(
             primary = Gold, background = Background, surface = Panel,
             onPrimary = Color.Black, onBackground = TextMain, onSurface = TextMain
+        ) else lightColorScheme(
+            primary = Gold, background = Background, surface = Panel,
+            onPrimary = Color.White, onBackground = TextMain, onSurface = TextMain
         )
     ) {
         Scaffold(
@@ -335,10 +362,18 @@ fun SalarTvApp() {
                         onSources = { page = "افزودن منابع" },
                         onRecordings = { page = "ضبط‌ها" },
                         onLiveDubbing = { page = "دوبله هوشمند زنده" },
+                        onSettings = { page = "تنظیمات" },
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
+                    "تنظیمات" -> SettingsPage(
+                        themeMode = themeMode,
+                        onThemeModeChange = { mode ->
+                            themeMode = mode
+                            prefs.edit().putString("theme_mode", mode).apply()
+                        }
+                    )
                     "ضبط‌ها" -> RecordingsPage(
                         files = (context.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES)
                             ?: context.filesDir).listFiles()?.filter { it.isFile && it.extension.lowercase() in setOf("ts", "mp4", "m4v", "mkv") }
@@ -640,10 +675,11 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
-             onRecordings: () -> Unit, onLiveDubbing: () -> Unit,
+             onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
@@ -653,6 +689,39 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
         Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی",
             color = Color.LightGray, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("تنظیمات ظاهری", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("حالت نمایش برنامه", color = TextMain, fontWeight = FontWeight.SemiBold)
+        Text("ظاهر برنامه را مطابق سلیقه یا تنظیمات دستگاه انتخاب کنید.", color = SecondaryText, fontSize = 12.sp)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("dark" to "حالت شب", "light" to "حالت روز", "system" to "حالت خودکار").forEach { (value, label) ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { onThemeModeChange(value) },
+                    colors = CardDefaults.cardColors(containerColor = Panel),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            when (value) {
+                                "dark" -> Icons.Default.DarkMode
+                                "light" -> Icons.Default.LightMode
+                                else -> Icons.Default.SettingsSuggest
+                            }, null, tint = Gold
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(label, color = TextMain, modifier = Modifier.weight(1f))
+                        RadioButton(selected = themeMode == value, onClick = { onThemeModeChange(value) })
+                    }
+                }
+            }
+        }
+        Text("انتخاب شما ذخیره می‌شود و پس از اجرای دوباره برنامه نیز باقی می‌ماند.",
+            color = MutedText, fontSize = 11.sp)
     }
 }
 
