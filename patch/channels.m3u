@@ -1,0 +1,24 @@
+#EXTM3U
+# Publicly listed HLS endpoints. Availability and territorial access can change.
+#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT 1
+https://tv-trt1.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Haber
+https://tv-trthaber.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT World
+https://tv-trtworld.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Belgesel
+https://tv-trtbelgesel.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Çocuk
+https://tv-trtcocuk.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Müzik
+https://tv-trtmuzik.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="ترکیه / تلویزیون",TRT Avaz
+https://tv-trtavaz.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="آذربایجان / تلویزیون",İctimai TV
+https://live.itv.az/itv.m3u8
+#EXTINF:-1 group-title="آذربایجان / تلویزیون",ATV Azərbaycan
+https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
+#EXTINF:-1 group-title="ایران / رادیو",رادیو ایران
+http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
+#EXTINF:-1 group-title="ایران / رادیو",رادیو انگلیسی ایران
+http://s1.cdn1.iranseda.ir:1935/liveedge/radio-english/playlist.m3u8
