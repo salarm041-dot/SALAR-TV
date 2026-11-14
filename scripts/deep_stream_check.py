@@ -119,24 +119,30 @@ def check_hls(url):
     maps, segments = parse_media(media_text)
     if not segments:
         raise ValueError("manifest received but contains no media segment URI")
-    sample_uris = (maps[:1] + segments[:SEGMENTS_TO_SAMPLE])
+    map_results = []
     segment_results = []
     errors = []
-    for uri in sample_uris:
+    for uri in maps[:1]:
+        try:
+            map_results.append(check_segment(variant_url, uri))
+        except Exception as e:
+            errors.append("init map: " + str(e)[:200])
+    for uri in segments[:SEGMENTS_TO_SAMPLE]:
         try:
             segment_results.append(check_segment(variant_url, uri))
         except Exception as e:
-            errors.append(str(e)[:240])
+            errors.append("media segment: " + str(e)[:200])
     required = min(2, len(segments))
     if len(segment_results) < required:
-        raise ValueError("media playlist received but too few sample segments validated: " + "; ".join(errors))
+        raise ValueError("media playlist received but too few actual media segments validated: " + "; ".join(errors))
     return {
         "protocol": "HLS", "manifest_http": status, "manifest_mime": ctype,
         "master_playlist": bool(variants), "child_playlist_http": variant_http,
         "media_playlist_url": variant_url, "segments_listed": len(segments),
-        "segments_checked": segment_results, "segment_errors": errors,
-        "status": "healthy" if len(segment_results) >= required else "unverified",
-        "detail": "manifest, media playlist and sample segments fetched"
+        "init_maps_checked": map_results, "segments_checked": segment_results,
+        "segment_errors": errors,
+        "status": "healthy",
+        "detail": "manifest, media playlist and actual sample media segments fetched"
     }
 
 def check_audio(url):
