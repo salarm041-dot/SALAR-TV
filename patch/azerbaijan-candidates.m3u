@@ -41,3 +41,11 @@ https://stream.dunyatv.az/live/dunyatv.m3u8
 https://raw.githubusercontent.com/UzunMuhalefet/streams/refs/heads/main/myvideo-az/dunya-tv.m3u8
 #EXTINF:-1 group-title="شبکه‌های آذربایجانی خارج از کشور",GünAz TV
 https://tv.gunaz.tv/hls/live.m3u8
+#EXTINF:-1 tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB (منبع جایگزین ۲)
+http://85.132.81.184:8080/arb/live/index.m3u8
+#EXTINF:-1 tvg-id="ARB24.az" group-title="جمهوری آذربایجان / خبری",ARB 24 (منبع جایگزین ۲)
+https://arb24.tvstream.az/hls/stream/stream.m3u8
+#EXTINF:-1 tvg-id="ARB24.az" group-title="جمهوری آذربایجان / خبری",ARB 24 (منبع جایگزین ۳)
+http://85.132.81.184:8080/arb24/live1/index.m3u8
+#EXTINF:-1 tvg-id="IctimaiTV.az" group-title="جمهوری آذربایجان / عمومی",İctimai TV (منبع جایگزین)
+https://node19.connect.az:9081/tv/live/playlist.m3u8
