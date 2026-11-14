@@ -10,6 +10,10 @@ OUTPUT=ROOT/"patch/radio-directory-candidates.m3u"
 BASE="https://de1.api.radio-browser.info/json/stations/"
 HEADERS={"User-Agent":"SALAR-TV/1.4 (radio directory validation)","Accept":"application/json"}
 GENERIC={"go","امبدد","parsa","faz","caltexmusic"}
+NATIONAL_STATIONS=("radio iran","radioiran","رادیو ایران","radio javan","radiojavan","رادیو جوان","radio ava","radioava","رادیو آوا","radio payam","radiopayam","رادیو پیام","radio quran","radioquran","رادیو قرآن","radio varzesh","radiovarzesh","رادیو ورزش","radio tehran","radiotehran","رادیو تهران","radio farhang","radiofarhang","رادیو فرهنگ","radio eghtesad","radioeghtesad","رادیو اقتصاد","radio salamat","radiosalamat","رادیو سلامت","radio saba","radiosaba","رادیو صبا","radio namayesh","radionamayesh","رادیو نمایش","radio goftogu","radiogoftogo","رادیو گفتگو","radio maaref","radiomaaref","رادیو معارف","radio ziarat","radioziarat","رادیو زیارت","radio tartil","radiotartil","رادیو ترتیل")
+PROVINCIAL_STATIONS={
+"آبادان":("abadan","آبادان"),"آذربایجان شرقی":("tabriz","تبریز"),"آذربایجان غربی":("urmia","ارومیه"),"اردبیل":("ardabil","اردبیل"),"اصفهان":("isfahan","اصفهان"),"البرز":("alborz","کرج"),"ایلام":("ilam","ایلام"),"بوشهر":("bushehr","بوشهر"),"چهارمحال و بختیاری":("shahrekord","شهرکرد"),"خراسان جنوبی":("birjand","بیرجند"),"خراسان رضوی":("mashhad","مشهد"),"خراسان شمالی":("bojnurd","بجنورد"),"خوزستان":("ahvaz","اهواز"),"زنجان":("zanjan","زنجان"),"سمنان":("semnan","سمنان"),"سیستان و بلوچستان":("zahedan","زاهدان"),"فارس":("shiraz","شیراز"),"قزوین":("qazvin","قزوین"),"قم":("qom","قم"),"کردستان":("sanandaj","سنندج"),"کرمان":("kerman","کرمان"),"کرمانشاه":("kermanshah","کرمانشاه"),"کهگیلویه و بویراحمد":("yasuj","یاسوج"),"کیش":("kish","کیش"),"گلستان":("gorgan","گرگان"),"گیلان":("rasht","رشت"),"لرستان":("khorramabad","خرم‌آباد"),"مازندران":("sari","ساری","tabarestan","تبرستان"),"مرکزی":("arak","اراک","آفتاب"),"مهاباد":("mahabad","مهاباد"),"هرمزگان":("bandar abbas","بندرعباس"),"همدان":("hamedan","همدان"),"یزد":("yazd","یزد")
+}
 
 def fetch_json(path):
     req=urllib.request.Request(BASE+path,headers=HEADERS)
@@ -78,14 +82,23 @@ def main():
         name=clean(row.get("name","")); country=(row.get("country") or "").lower(); lang=(row.get("language") or "").lower()
         if not name or name.lower() in GENERIC: continue
         if any(w in country or w in name.lower() for w in ("afghanistan","tajikistan","افغان","تاجیک")): continue
-        if "persian" not in lang and "فارسی" not in lang and "iran" not in country and "iranian" not in lang: continue
+        is_iran = "iran" in country or "ایران" in country
+        is_persian = any(token in lang for token in ("persian","farsi","fas","fa","فارسی"))
+        lower_name = name.lower()
+        province = next((province for province, terms in PROVINCIAL_STATIONS.items()
+                         if any(term.lower() in lower_name for term in terms)), None)
+        is_national = any(term.lower() in lower_name for term in NATIONAL_STATIONS)
+        # A station being listed in Iran is not enough: non-Persian streams are excluded.
+        if is_iran and not (is_persian or province or is_national): continue
+        if not is_iran and not is_persian: continue
         url=(row.get("url") or "").strip()
         if not url or url in seen_urls or name.lower() in seen_names: continue
         logo=(row.get("favicon") or "").strip()
         if not logo.startswith(("http://","https://")):
             host=urllib.parse.urlsplit(row.get("homepage") or url).hostname
             logo=f"https://www.google.com/s2/favicons?domain={host}&sz=128" if host else ""
-        group="ایران / رادیو" if "iran" in country else "عراق / رادیو فارسی" if "iraq" in country else "فارسی‌زبان خارج از ایران / رادیو"
+        group=(f"ایران / استانی / {province}" if province else "ایران / سراسری" if is_iran and is_national else
+               "ایران / سراسری / سایر" if is_iran else "فارسی‌زبان خارج از ایران")
         logo_attr=f' tvg-logo="{clean(logo)}"' if logo else ""
         lines.extend((f'#EXTINF:-1 tvg-name="{name}"{logo_attr} group-title="{group}" tvg-language="fas" tvg-quality="Audio",{name}',url))
         seen_urls.add(url); seen_names.add(name.lower()); count+=1
