@@ -31,3 +31,7 @@ https://lives.atv.az:5443/KANAL-S/streams/kanals.m3u8
 https://live.eltv.az/live/eltv/playlist.m3u8
 #EXTINF:-1 group-title="جمهوری آذربایجان / منطقه‌ای",Kapaz TV
 http://85.132.78.122:8050/hls/stream/index.m3u8
+#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",ARB
+http://109.205.166.68/server124/arb/index.m3u8
+#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",ARB (منبع جایگزین)
+https://raw.githubusercontent.com/UzunMuhalefet/streams/main/myvideo-az/arb.m3u8
