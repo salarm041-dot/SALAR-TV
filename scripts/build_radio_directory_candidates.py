@@ -93,7 +93,8 @@ def main():
         # Mixed-language stations are excluded; Iranian stations with missing language metadata
         # are admitted only when their names match a known Persian IRIB national/provincial station.
         if is_iran and not (is_persian_only or (not language_tags and (province or is_national))): continue
-        if not is_iran and not is_persian_only: continue
+        # Overseas stations must have an explicit non-Iran country and Persian-only metadata.
+        if not is_iran and (not country or not is_persian_only): continue
         url=(row.get("url") or "").strip()
         if not url or url in seen_urls or name.lower() in seen_names: continue
         logo=(row.get("favicon") or "").strip()
