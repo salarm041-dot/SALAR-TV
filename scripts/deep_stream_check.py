@@ -24,13 +24,18 @@ MAX_MANIFEST = 1024 * 1024
 MAX_SEGMENT = 384 * 1024
 SEGMENTS_TO_SAMPLE = 3
 
-def fetch(url: str, limit: int):
-    req = urllib.request.Request(url, headers={
+def fetch(url: str, limit: int, use_range: bool = False):
+    headers = {
         "User-Agent": UA,
         "Accept": "application/vnd.apple.mpegurl, application/x-mpegURL, audio/*, video/*, */*",
         "Icy-MetaData": "1",
-        "Range": f"bytes=0-{limit-1}",
-    })
+    }
+    # Do not send Range for manifests: several broadcasters answer 206 with
+    # a truncated or non-zero-offset playlist. Range is useful only for media
+    # samples where bounded transfer matters.
+    if use_range:
+        headers["Range"] = f"bytes=0-{limit-1}"
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
         data = r.read(limit)
         return r.status, r.headers.get("Content-Type", ""), r.geturl(), data
@@ -85,7 +90,7 @@ def parse_media(text):
 
 def check_segment(base_url, uri):
     url = urllib.parse.urljoin(base_url, uri)
-    status, ctype, final_url, data = fetch(url, MAX_SEGMENT)
+    status, ctype, final_url, data = fetch(url, MAX_SEGMENT, use_range=True)
     if status not in (200, 206) or len(data) < 32:
         raise RuntimeError(f"segment response invalid: HTTP {status}, {len(data)} bytes")
     # Recognize common MPEG-TS and fragmented MP4 signatures; for other valid
@@ -134,6 +139,11 @@ def check_hls(url):
             errors.append("media segment: " + str(e)[:200])
     required = min(2, len(segments))
     if len(segment_results) < required:
+        # A 451 response indicates a legal/geographic restriction, not a dead
+        # stream. Preserve that distinction instead of downgrading it to a
+        # generic malformed/incomplete playlist.
+        if any("HTTP Error 451" in e for e in errors):
+            raise PermissionError("HTTP 451 on media segments; geographic/legal restriction possible: " + "; ".join(errors))
         raise ValueError("media playlist received but too few actual media segments validated: " + "; ".join(errors))
     return {
         "protocol": "HLS", "manifest_http": status, "manifest_mime": ctype,
@@ -146,7 +156,7 @@ def check_hls(url):
     }
 
 def check_audio(url):
-    status, ctype, final_url, data = fetch(url, 8192)
+    status, ctype, final_url, data = fetch(url, 8192, use_range=True)
     ct = ctype.lower()
     sigs = (b"ID3", b"\xff\xfb", b"\xff\xf3", b"\xff\xf2", b"OggS", b"fLaC", b"\x1aE\xdf\xa3")
     signature = any(data.startswith(s) for s in sigs)
@@ -188,7 +198,9 @@ def run_group(name, items, mode):
             return {**item, **result, "checked_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
         except Exception as e:
             status, detail = classify_exception(e)
-            if isinstance(e, ValueError):
+            if isinstance(e, PermissionError):
+                status, detail = "restricted_or_forbidden", str(e)[:300]
+            elif isinstance(e, ValueError):
                 status, detail = "invalid_or_incomplete_stream", str(e)[:300]
             return {**item, "status": status, "detail": detail,
                     "checked_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
