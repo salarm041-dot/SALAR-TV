@@ -1122,7 +1122,8 @@ private fun EpgPage(channels: List<Channel>) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     val iranGuide = "https://iptv-org.github.io/epg/guides/ir/tva.tv.epg.xml.gz"
-    val israelGuide = "https://iptv-org.github.io/epg/guides/il/i24news.tv.epg.xml.gz"
+    val turkeyGuide = "https://iptv-epg.org/files/epg-tr.xml"
+    val israelGuide = "https://iptv-epg.org/files/epg-il.xml"
     val savedGuide = (prefs.getString("xmltv_url", iranGuide) ?: iranGuide).ifBlank { iranGuide }
     var xmlUrl by remember { mutableStateOf(savedGuide) }
     var loadedUrl by remember { mutableStateOf(savedGuide) }
@@ -1227,6 +1228,7 @@ private fun EpgPage(channels: List<Channel>) {
             color = SecondaryText, fontSize = 12.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = { addGuide(iranGuide) }) { Text("راهنمای ایران") }
+            OutlinedButton(onClick = { addGuide(turkeyGuide) }) { Text("راهنمای ترکیه") }
             OutlinedButton(onClick = { addGuide(israelGuide) }) { Text("راهنمای اسرائیل") }
         }
         OutlinedTextField(
