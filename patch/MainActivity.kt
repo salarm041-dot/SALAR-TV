@@ -292,22 +292,49 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
         Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
             Text("موردی برای نمایش وجود ندارد.", color = Color.LightGray)
         }
-    } else LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(channels) { c ->
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable { onSelect(c) },
-                colors = CardDefaults.cardColors(containerColor = Panel),
-                shape = RoundedCornerShape(14.dp)
-            ) {
-                Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(if (c.kind == "رادیو") Icons.Default.Radio else Icons.Default.Tv, null, tint = Gold)
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
-                        Text("${c.country} • ${c.kind}", color = Color.Gray, fontSize = 11.sp)
+    } else {
+        val sections = channels.groupBy { "${it.country} / ${it.kind}" }.toSortedMap()
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            sections.forEach { (sectionTitle, sectionChannels) ->
+                item(key = "section_${sectionTitle}") {
+                    Row(
+                        Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            if (sectionTitle.endsWith("رادیو")) Icons.Default.Radio else Icons.Default.Tv,
+                            null, tint = Gold, modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(sectionTitle, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Spacer(Modifier.weight(1f))
+                        Text("${sectionChannels.size} شبکه", color = Color.Gray, fontSize = 11.sp)
                     }
-                    IconButton(onClick = { onFavorite(c) }) {
-                        Icon(Icons.Default.Favorite, null, tint = if (c.favorite) Gold else Color.Gray)
+                    Divider(color = Gold.copy(alpha = 0.28f))
+                }
+                items(sectionChannels, key = { it.url }) { c ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth().clickable { onSelect(c) },
+                        colors = CardDefaults.cardColors(containerColor = Panel),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                if (c.kind == "رادیو") Icons.Default.Radio else Icons.Default.Tv,
+                                null, tint = Gold
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
+                                Text("${c.country} • ${c.kind}", color = Color.Gray, fontSize = 11.sp)
+                            }
+                            IconButton(onClick = { onFavorite(c) }) {
+                                Icon(
+                                    Icons.Default.Favorite, null,
+                                    tint = if (c.favorite) Gold else Color.Gray
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -386,7 +413,7 @@ fun AboutPage() {
         Text("سازنده و مالک: سید سالار موسوی ملکی", color = TextMain)
         Text("ایمیل: Salar.m041@gmail.com", color = Color.LightGray)
         Text("اینستاگرام: Salar_mousavi_41", color = Color.LightGray)
-        Text("نسخه 1.1.0", color = Color.Gray)
+        Text("نسخه 1.2.0", color = Color.Gray)
     }
 }
 
