@@ -8,7 +8,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import java.net.URL
+import java.net.HttpURLConnection
+import java.net.URLEncoder
 import android.app.Activity
 import java.io.File
 import android.os.Bundle
@@ -624,53 +627,96 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
 
 @Composable
 fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: () -> Unit) {
+    var mode by remember { mutableStateOf("url") }
     var name by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("") }
+    var server by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("ایران") }
     var kind by remember { mutableStateOf("تلویزیون") }
+    var busy by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("مدیریت منابع پخش", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        OutlinedTextField(name, { name = it }, label = { Text("نام شبکه / ایستگاه") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(url, { url = it }, label = { Text("آدرس پخش یا سرور") },
-            placeholder = { Text("https://example.com/live.m3u8") }, modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
-        Text("کشور", color = Gold)
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            items(listOf("ایران", "ترکیه", "آذربایجان", "عربستان", "امارات", "قطر", "کویت", "بحرین",
-                "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر",
-                "تونس", "لیبی", "یمن", "سودان", "اسرائیل", "فارسی‌زبان خارج از ایران", "سایر")) { option ->
-                FilterChip(selected = country == option, onClick = { country = option }, label = { Text(option) })
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            FilterChip(selected = mode == "url", onClick = { mode = "url" }, label = { Text("لینک مستقیم") })
+            FilterChip(selected = mode == "xtream", onClick = { mode = "xtream" }, label = { Text("سرور IPTV") })
+            FilterChip(selected = mode == "file", onClick = { mode = "file" }, label = { Text("فایل M3U") })
+        }
+        when (mode) {
+            "url" -> {
+                OutlinedTextField(name, { name = it }, label = { Text("نام شبکه / ایستگاه") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                OutlinedTextField(url, { url = it }, label = { Text("آدرس مستقیم پخش") }, placeholder = { Text("https://example.com/live.m3u8") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
+                Button(onClick = {
+                    val clean = url.trim()
+                    if (name.isNotBlank() && (clean.startsWith("https://") || clean.startsWith("http://"))) {
+                        onAdd(Channel(name.trim(), clean, country, kind)); name = ""; url = ""; status = "لینک شبکه ذخیره شد."
+                    } else status = "نام شبکه و آدرس معتبر http/https را وارد کنید."
+                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) { Text("ذخیره لینک شبکه", color = Color.Black) }
+            }
+            "xtream" -> {
+                OutlinedTextField(server, { server = it }, label = { Text("آدرس سرور (با پورت در صورت نیاز)") }, placeholder = { Text("http://example.com:8080") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
+                OutlinedTextField(username, { username = it }, label = { Text("نام کاربری") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                OutlinedTextField(password, { password = it }, label = { Text("رمز عبور") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                Text("اطلاعات ورود برای دریافت فهرست استفاده می‌شود و در تنظیمات ذخیره نمی‌شود.", color = MutedText, fontSize = 11.sp)
+                Button(enabled = !busy, onClick = {
+                    val base = server.trim().trimEnd('/')
+                    if (!(base.startsWith("http://") || base.startsWith("https://")) || username.isBlank() || password.isBlank()) status = "آدرس سرور، نام کاربری و رمز عبور را کامل وارد کنید."
+                    else {
+                        busy = true; status = "در حال اتصال و دریافت شبکه‌های زنده…"
+                        scope.launch {
+                            val result = withContext(Dispatchers.IO) { runCatching {
+                                val u = URLEncoder.encode(username.trim(), "UTF-8")
+                                val p = URLEncoder.encode(password, "UTF-8")
+                                fun request(action: String): JSONArray {
+                                    val conn = (URL("$base/player_api.php?username=$u&password=$p&action=$action").openConnection() as HttpURLConnection)
+                                    conn.connectTimeout = 12000; conn.readTimeout = 20000
+                                    try {
+                                        val code = conn.responseCode
+                                        val body = (if (code in 200..299) conn.inputStream else conn.errorStream)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
+                                        if (code !in 200..299) error("پاسخ سرور: HTTP $code")
+                                        JSONArray(body)
+                                    } finally { conn.disconnect() }
+                                }
+                                val categories = request("get_live_categories")
+                                val categoryNames = mutableMapOf<String, String>()
+                                for (i in 0 until categories.length()) { val c = categories.optJSONObject(i) ?: continue; categoryNames[c.optString("category_id")] = c.optString("category_name") }
+                                val streams = request("get_live_streams")
+                                val imported = mutableListOf<Channel>()
+                                for (i in 0 until streams.length()) {
+                                    val item = streams.optJSONObject(i) ?: continue
+                                    val id = item.optString("stream_id")
+                                    if (id.isBlank() || id == "null") continue
+                                    val streamName = item.optString("name", "شبکه $id")
+                                    val streamUrl = "$base/live/$u/$p/$id.m3u8"
+                                    imported.add(Channel(streamName, streamUrl, country, "تلویزیون", logoUrl = item.optString("stream_icon"), groupTitle = categoryNames[item.optString("category_id")].orEmpty().ifBlank { "سرور IPTV" }))
+                                }
+                                if (imported.isEmpty()) error("فهرست شبکه زنده‌ای از سرور دریافت نشد.")
+                                imported
+                            } }
+                            result.onSuccess { imported -> imported.forEach(onAdd); status = "تعداد ${imported.size} شبکه زنده دریافت و اضافه شد." }
+                            result.onFailure { err -> status = "اتصال ناموفق: ${err.message ?: "خطای ناشناخته"}" }
+                            busy = false
+                        }
+                    }
+                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) { Text(if (busy) "در حال دریافت…" else "اتصال و دریافت شبکه‌های زنده", color = Color.Black) }
+            }
+            else -> {
+                Text("فایل M3U یا M3U8 را از حافظه گوشی انتخاب کنید.", color = SecondaryText)
+                OutlinedButton(onClick = onImport, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.FileOpen, null); Spacer(Modifier.width(8.dp)); Text("انتخاب فایل M3U / M3U8") }
+                OutlinedTextField(value = selectedM3uName, onValueChange = {}, readOnly = true, label = { Text("فایل انتخاب‌شده و نتیجه واردکردن") }, placeholder = { Text("نام فایل و تعداد شبکه‌ها اینجا نمایش داده می‌شود") }, modifier = Modifier.fillMaxWidth(), singleLine = false)
             }
         }
-        Text("نوع منبع", color = Gold)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = kind == "تلویزیون", onClick = { kind = "تلویزیون" }, label = { Text("تلویزیون") })
-            FilterChip(selected = kind == "رادیو", onClick = { kind = "رادیو" }, label = { Text("رادیو") })
+        if (mode != "xtream") {
+            Text("کشور", color = Gold)
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) { items(listOf("ایران", "ترکیه", "آذربایجان", "عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی", "یمن", "سودان", "اسرائیل", "فارسی‌زبان خارج از ایران", "سایر")) { option -> FilterChip(selected = country == option, onClick = { country = option }, label = { Text(option) }) } }
+            Text("نوع منبع", color = Gold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { FilterChip(selected = kind == "تلویزیون", onClick = { kind = "تلویزیون" }, label = { Text("تلویزیون") }); FilterChip(selected = kind == "رادیو", onClick = { kind = "رادیو" }, label = { Text("رادیو") }) }
         }
-        Button(
-            onClick = {
-                if (name.isNotBlank() && (url.startsWith("https://") || url.startsWith("http://"))) {
-                    onAdd(Channel(name.trim(), url.trim(), country, kind))
-                    name = ""; url = ""
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Gold)
-        ) { Text("ذخیره شبکه", color = Color.Black) }
-        OutlinedButton(onClick = onImport, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Default.FileOpen, null); Spacer(Modifier.width(8.dp)); Text("انتخاب فایل M3U / M3U8")
-        }
-        OutlinedTextField(
-            value = selectedM3uName,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("فایل انتخاب‌شده و نتیجه واردکردن") },
-            placeholder = { Text("پس از انتخاب فایل، نام آن و تعداد شبکه‌ها اینجا نمایش داده می‌شود") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = false
-        )
-        Text("فقط منابع رسمی یا لینک‌هایی را وارد کنید که مجوز استفاده از آن‌ها را دارید.",
-            color = MutedText, fontSize = 11.sp)
+        if (status.isNotBlank()) Text(status, color = if (status.startsWith("اتصال ناموفق")) Color(0xFFFFCC80) else Gold, fontSize = 12.sp)
+        Text("فقط منابع رسمی یا لینک‌هایی را وارد کنید که مجوز استفاده از آن‌ها را دارید.", color = MutedText, fontSize = 11.sp)
     }
 }
 
