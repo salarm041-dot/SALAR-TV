@@ -225,7 +225,7 @@ fun SalarTvApp() {
                     title = {
                         Column {
                             Text("SALAR TV", color = Gold, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
-                            Text("تلویزیون و رادیوی جهان", color = Color.LightGray, fontSize = 10.sp)
+                            Text("تلویزیون و رادیوی جهان", color = SecondaryText, fontSize = 10.sp)
                         }
                     },
                     actions = {
@@ -248,7 +248,7 @@ fun SalarTvApp() {
                             label = { Text(label, fontSize = 10.sp) },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = Gold, selectedTextColor = Gold,
-                                indicatorColor = Color(0xFF343020), unselectedIconColor = Color.Gray
+                                indicatorColor = Color(0xFF343020), unselectedIconColor = MutedText
                             )
                         )
                     }
@@ -269,7 +269,7 @@ fun SalarTvApp() {
                             leadingIcon = { Icon(Icons.Default.OpenInNew, null) })
                     }
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text("ذخیره به‌عنوان انتخاب پیش‌فرض", color = Color.LightGray, fontSize = 12.sp,
+                        Text("ذخیره به‌عنوان انتخاب پیش‌فرض", color = SecondaryText, fontSize = 12.sp,
                             modifier = Modifier.weight(1f))
                         Switch(checked = rememberPlayerChoice,
                             onCheckedChange = {
@@ -334,7 +334,7 @@ fun SalarTvApp() {
                             player.playWhenReady = true
                         }
                     }
-                    Text("در صورت پشتیبانی منبع، پخش زنده در این قسمت نمایش داده می‌شود.", color = Color.LightGray, fontSize = 12.sp)
+                    Text("در صورت پشتیبانی منبع، پخش زنده در این قسمت نمایش داده می‌شود.", color = SecondaryText, fontSize = 12.sp)
                     Spacer(Modifier.height(10.dp))
                     if (!selected!!.url.contains("iranintl.com", ignoreCase = true)) {
                         Button(
@@ -348,7 +348,7 @@ fun SalarTvApp() {
                         }
                     } else {
                         Text("پخش ایران اینترنشنال از صفحه رسمی شبکه باز می‌شود؛ ضبط مستقیم این صفحه در برنامه فعال نیست.",
-                            color = Color.LightGray, fontSize = 12.sp)
+                            color = SecondaryText, fontSize = 12.sp)
                     }
                 } else when (page) {
                     "افزودن منابع" -> AddSourcesPage(
@@ -463,7 +463,7 @@ fun SalarTvApp() {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                     if (scheduleError.isNotBlank()) Text(scheduleError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
                     Text("برای ضبط خودکار، لینک HLS قابل دسترس و اتصال اینترنت پایدار لازم است.",
-                        color = Color.Gray, fontSize = 11.sp)
+                        color = MutedText, fontSize = 11.sp)
                 }
             },
             confirmButton = {
@@ -505,7 +505,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(18.dp)) {
             Column(Modifier.fillMaxWidth().padding(18.dp)) {
                 Text("دنیای تلویزیون و رادیو", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text("ایران • ترکیه • جمهوری آذربایجان • جهان", color = Color.LightGray)
+                Text("ایران • ترکیه • جمهوری آذربایجان • جهان", color = SecondaryText)
                 Spacer(Modifier.height(12.dp))
                 Button(onClick = onAdd, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
                     Icon(Icons.Default.Add, null); Text("افزودن شبکه یا سرور", color = Color.Black)
@@ -515,7 +515,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
         Text("شبکه‌های شما", color = Gold, fontWeight = FontWeight.Bold)
         if (channels.isEmpty()) {
             Text("هنوز شبکه‌ای اضافه نشده است. از بخش افزودن منابع، لینک مجاز یا فایل M3U وارد کنید.",
-                color = Color.LightGray)
+                color = SecondaryText)
         } else ChannelList(channels, onSelect, {}, onEdit, onDelete)
     }
 }
@@ -557,7 +557,7 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
     var searchQuery by remember { mutableStateOf("") }
     if (channels.isEmpty()) {
         Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-            Text("موردی برای نمایش وجود ندارد.", color = Color.LightGray)
+            Text("موردی برای نمایش وجود ندارد.", color = SecondaryText)
         }
     } else {
         val visibleChannels = channels.filter {
@@ -577,7 +577,7 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                     leadingIcon = { Icon(Icons.Default.Search, null) }
                 )
             }
-            if (visibleChannels.isEmpty()) item { Text("شبکه‌ای با این عبارت پیدا نشد.", color = Color.LightGray) }
+            if (visibleChannels.isEmpty()) item { Text("شبکه‌ای با این عبارت پیدا نشد.", color = SecondaryText) }
             sections.forEach { (sectionTitle, sectionChannels) ->
                 item(key = "section_${sectionTitle}") {
                     Row(
@@ -591,7 +591,7 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                         Spacer(Modifier.width(8.dp))
                         Text(sectionTitle, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         Spacer(Modifier.weight(1f))
-                        Text("${sectionChannels.size} شبکه", color = Color.Gray, fontSize = 11.sp)
+                        Text("${sectionChannels.size} شبکه", color = MutedText, fontSize = 11.sp)
                     }
                     Divider(color = Gold.copy(alpha = 0.28f))
                 }
@@ -606,12 +606,12 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
-                                Text("${c.country} • ${c.kind}", color = Color.Gray, fontSize = 11.sp)
+                                Text("${c.country} • ${c.kind}", color = MutedText, fontSize = 11.sp)
                             }
                             IconButton(onClick = { onFavorite(c) }) {
-                                Icon(Icons.Default.Favorite, null, tint = if (c.favorite) Gold else Color.Gray)
+                                Icon(Icons.Default.Favorite, null, tint = if (c.favorite) Gold else MutedText)
                             }
-                            IconButton(onClick = { onEdit(c) }) { Icon(Icons.Default.Edit, "ویرایش", tint = Color.LightGray) }
+                            IconButton(onClick = { onEdit(c) }) { Icon(Icons.Default.Edit, "ویرایش", tint = SecondaryText) }
                             IconButton(onClick = { onDelete(c) }) { Icon(Icons.Default.Delete, "حذف", tint = Color(0xFFE57373)) }
                         }
                     }
@@ -669,7 +669,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
             singleLine = false
         )
         Text("فقط منابع رسمی یا لینک‌هایی را وارد کنید که مجوز استفاده از آن‌ها را دارید.",
-            color = Color.Gray, fontSize = 11.sp)
+            color = MutedText, fontSize = 11.sp)
     }
 }
 
@@ -688,7 +688,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         MoreButton("بازیابی نسخه پشتیبان", Icons.Default.Restore, onBackupImport)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
         Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی",
-            color = Color.LightGray, fontSize = 12.sp)
+            color = SecondaryText, fontSize = 12.sp)
     }
 }
 
@@ -742,13 +742,13 @@ fun LiveDubbingPage() {
                 Text("هنوز به سرویس تشخیص گفتار، ترجمه و تولید صدای زنده متصل نشده است.",
                     color = Color(0xFFFFCC80), fontSize = 12.sp)
                 Text("این صفحه تنظیمات قابلیت را نگه می‌دارد؛ دوبله واقعی پس از اتصال موتور پردازش صدا فعال می‌شود.",
-                    color = Color.LightGray, fontSize = 12.sp)
+                    color = SecondaryText, fontSize = 12.sp)
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("زیرنویس هوشمند فارسی", color = TextMain)
-                Text("تشخیص گفتار و نمایش ترجمه؛ مستقل از صدای دوبله", color = Color.Gray, fontSize = 11.sp)
+                Text("تشخیص گفتار و نمایش ترجمه؛ مستقل از صدای دوبله", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = subtitleEnabled, onCheckedChange = {
                 subtitleEnabled = it
@@ -759,7 +759,7 @@ fun LiveDubbingPage() {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("دوبله هوشمند فارسی", color = TextMain)
-                Text("ترجمه صوتی؛ قابل استفاده مستقل یا همراه زیرنویس", color = Color.Gray, fontSize = 11.sp)
+                Text("ترجمه صوتی؛ قابل استفاده مستقل یا همراه زیرنویس", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = enabled, onCheckedChange = {
                 enabled = it
@@ -778,7 +778,7 @@ fun LiveDubbingPage() {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("حفظ صدای اصلی شبکه", color = TextMain)
-                Text("برای شنیدن صدای اصلی همراه دوبله", color = Color.Gray, fontSize = 11.sp)
+                Text("برای شنیدن صدای اصلی همراه دوبله", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = keepOriginal, onCheckedChange = {
                 keepOriginal = it
@@ -791,7 +791,7 @@ fun LiveDubbingPage() {
             prefs.edit().putFloat("live_dubbing_volume", it).apply()
         }, valueRange = 0f..1f)
         Text("زبان‌های ورودی موردنظر: انگلیسی، ترکی استانبولی و ترکی آذربایجانی؛ خروجی فارسی.",
-            color = Color.LightGray, fontSize = 12.sp)
+            color = SecondaryText, fontSize = 12.sp)
     }
 }
 
@@ -799,14 +799,14 @@ fun LiveDubbingPage() {
 fun RecordingsPage(files: List<File>, onPlay: (File) -> Unit, onDelete: (File) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("فایل‌های ضبط‌شده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text("برای پخش هر فایل، دکمه اجرا را بزنید.", color = Color.LightGray, fontSize = 12.sp)
-        if (files.isEmpty()) Text("هنوز فایلی ضبط نشده است.", color = Color.LightGray)
+        Text("برای پخش هر فایل، دکمه اجرا را بزنید.", color = SecondaryText, fontSize = 12.sp)
+        if (files.isEmpty()) Text("هنوز فایلی ضبط نشده است.", color = SecondaryText)
         files.forEach { file ->
             Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
                 Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(file.name, color = TextMain, fontSize = 12.sp)
-                        Text("${file.length() / 1_048_576} مگابایت", color = Color.Gray, fontSize = 11.sp)
+                        Text("${file.length() / 1_048_576} مگابایت", color = MutedText, fontSize = 11.sp)
                     }
                     IconButton(onClick = { onPlay(file) }) {
                         Icon(Icons.Default.PlayArrow, "پخش فایل ضبط‌شده", tint = Gold)
@@ -836,9 +836,9 @@ fun AboutPage() {
         Icon(Icons.Default.Tv, null, tint = Gold, modifier = Modifier.size(64.dp))
         Text("SALAR TV", color = Gold, fontSize = 28.sp, fontWeight = FontWeight.Black)
         Text("سازنده و مالک: سید سالار موسوی ملکی", color = TextMain)
-        Text("ایمیل: Salar.m041@gmail.com", color = Color.LightGray)
-        Text("اینستاگرام: Salar_mousavi_41", color = Color.LightGray)
-        Text("نسخه 1.3.0", color = Color.Gray)
+        Text("ایمیل: Salar.m041@gmail.com", color = SecondaryText)
+        Text("اینستاگرام: Salar_mousavi_41", color = SecondaryText)
+        Text("نسخه 1.3.0", color = MutedText)
     }
 }
 
