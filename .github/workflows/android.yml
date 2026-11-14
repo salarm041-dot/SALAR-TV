@@ -149,7 +149,10 @@ jobs:
                   raise SystemExit(f"APK bundled playlist mismatch: expected 156 entries, found {len(entries)}")
               if not any("شبکه‌های استانی" in line for line in playlist.splitlines()):
                   raise SystemExit("Provincial channels metadata missing from APK")
-          print(f"APK package OK: {apks[0].name}, {apks[0].stat().st_size} bytes, 156 playlist entries")
+          apk_path = apks[0].resolve()
+          with open(__import__("os").environ["GITHUB_ENV"], "a") as env:
+              env.write(f"SALAR_TV_APK_PATH={apk_path}\\n")
+          print(f"APK package OK: {apk_path}, {apks[0].stat().st_size} bytes, 156 playlist entries")
           PY
 
       - name: Stage APK for emulator container
