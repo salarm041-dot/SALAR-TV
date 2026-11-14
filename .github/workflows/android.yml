@@ -44,6 +44,17 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Inspect project source
+        run: |
+          echo "=== PROJECT FILES ==="
+          find "$PROJECT_DIR/app/src/main" -type f -maxdepth 8 -print
+          echo "=== APP GRADLE ==="
+          cat "$PROJECT_DIR/app/build.gradle.kts"
+          echo "=== MANIFEST ==="
+          cat "$PROJECT_DIR/app/src/main/AndroidManifest.xml"
+          echo "=== MAIN ACTIVITY ==="
+          cat "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
+
       - name: Build APK
         run: gradle -p "$PROJECT_DIR" :app:assembleDebug
 
