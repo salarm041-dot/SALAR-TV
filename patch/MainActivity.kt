@@ -223,7 +223,7 @@ fun SalarTvApp() {
             for (i in 0 until restored.length()) {
                 val o = restored.getJSONObject(i)
                 channels.add(Channel(o.optString("name"), o.optString("url"), o.optString("country", "سایر"),
-                    o.optString("kind", "تلویزیون"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle")))
+                    o.optString("kind", "تلویزیون"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"), o.optString("tvgId")))
             }
             saveChannels()
             prefs.edit()
