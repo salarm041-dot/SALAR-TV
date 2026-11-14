@@ -1147,7 +1147,7 @@ private fun EpgPage() {
                     setRequestProperty("User-Agent", "SALAR-TV/1.3 Android")
                 }
                 try {
-                    if (connection.responseCode !in 200..299) error("HTTP \${connection.responseCode}")
+                    if (connection.responseCode !in 200..299) error("HTTP ${connection.responseCode}")
                     connection.inputStream.use { readXmlTv(it) }
                 } finally { connection.disconnect() }
             }
@@ -1161,10 +1161,10 @@ private fun EpgPage() {
             }.sortedBy { it.channelName.lowercase(Locale.ROOT) }
             rows = result
             status = if (result.isEmpty()) "فایل دریافت شد، اما برنامه جاری/بعدی قابل نمایش پیدا نشد."
-                else "\${result.size} شبکه دارای برنامه جاری یا بعدی هستند."
+                else "${result.size} شبکه دارای برنامه جاری یا بعدی هستند."
         } catch (e: Exception) {
             rows = emptyList()
-            status = "دریافت راهنما ناموفق بود: \${e.message ?: "خطای نامشخص"}"
+            status = "دریافت راهنما ناموفق بود: ${e.message ?: "خطای نامشخص"}"
         } finally { loading = false }
     }
 
@@ -1198,14 +1198,14 @@ private fun EpgPage() {
                         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Text(row.channelName, color = Gold, fontWeight = FontWeight.Bold)
                             row.current?.let { p ->
-                                Text("اکنون: \${p.title}", color = TextMain, fontWeight = FontWeight.SemiBold)
-                                Text("\${clock.format(Date(p.startMillis))} تا \${clock.format(Date(p.stopMillis))}",
+                                Text("اکنون: ${p.title}", color = TextMain, fontWeight = FontWeight.SemiBold)
+                                Text("${clock.format(Date(p.startMillis))} تا ${clock.format(Date(p.stopMillis))}",
                                     color = MutedText, fontSize = 10.sp)
                                 if (p.description.isNotBlank()) Text(p.description, color = SecondaryText, fontSize = 11.sp, maxLines = 3)
                             }
                             row.next?.let { p ->
-                                Text("بعدی: \${p.title}", color = SecondaryText)
-                                Text("شروع: \${clock.format(Date(p.startMillis))}", color = MutedText, fontSize = 10.sp)
+                                Text("بعدی: ${p.title}", color = SecondaryText)
+                                Text("شروع: ${clock.format(Date(p.startMillis))}", color = MutedText, fontSize = 10.sp)
                             }
                         }
                     }
