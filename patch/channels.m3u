@@ -302,3 +302,74 @@ https://familyhls.4utv.live/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="4Kurd.fr" tvg-name="4 Kurd" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/4Kurd.fr.png" group-title="کردی و فارسی / موسیقی",4 Kurd | فور کورد
 https://4kuhls.persiana.live/hls/stream.m3u8
+
+# شبکه‌های استانی صداوسیما — فهرست عمومی؛ منبع فهرست هشدار داده که دسترسی برخی/همه جریان‌ها ممکن است به IP ایران محدود باشد.
+# این دسته عمداً جدا از شبکه‌های سراسری قرار گرفته است.
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",آبادان
+https://live-aburayhan1113.telewebion.ir/ek/abadan/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",افلاک (لرستان)
+https://live-aburayhan1101.telewebion.ir/ek/aflak/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",آفتاب (مرکزی)
+https://live-aburayhan1101.telewebion.ir/ek/aftab/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",البرز
+https://live-aburayhan1106.telewebion.ir/ek/alborz/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",اترک (خراسان شمالی)
+https://live-aburayhan1104.telewebion.ir/ek/atrak/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",باران (گیلان)
+https://live-aburayhan1109.telewebion.ir/ek/baran/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",بوشهر
+https://live-aburayhan1111.telewebion.ir/ek/bushehr/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",دنا (کهگیلویه و بویراحمد)
+https://live-aburayhan1109.telewebion.ir/ek/dena/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",اشراق (زنجان)
+https://live-aburayhan1112.telewebion.ir/ek/eshragh/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",فارس
+https://live-aburayhan1107.telewebion.ir/ek/fars/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",همدان
+https://live-aburayhan1110.telewebion.ir/ek/sina/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",هامون (سیستان و بلوچستان)
+https://live-aburayhan1102.telewebion.ir/ek/hamoon/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",ایلام
+https://live-aburayhan1103.telewebion.ir/ek/ilam/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",اصفهان
+https://live-aburayhan1113.telewebion.ir/ek/esfahan/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",جهانبین (چهارمحال و بختیاری)
+https://live-aburayhan1102.telewebion.ir/ek/jahanbin/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",کرمان
+https://live-aburayhan1104.telewebion.ir/ek/kerman/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خلیج فارس (هرمزگان)
+https://live-aburayhan1102.telewebion.ir/ek/khalijefars/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خاوران (خراسان جنوبی)
+https://live-aburayhan1112.telewebion.ir/ek/khavaran/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خراسان رضوی
+https://live-aburayhan1108.telewebion.ir/ek/khorasanrazavi/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خوزستان
+https://live-aburayhan1104.telewebion.ir/ek/khoozestan/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",کیش
+https://live-aburayhan1106.telewebion.ir/ek/kish/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",کردستان
+https://live-aburayhan1108.telewebion.ir/ek/kordestan/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",مهاباد
+https://live-aburayhan1110.telewebion.ir/ek/mahabad/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",مکران
+https://live-aburayhan1104.telewebion.ir/na/makran/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",نور (مازندران)
+https://live-aburayhan1107.telewebion.ir/ek/noor/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",قزوین
+https://live-aburayhan1113.telewebion.ir/ek/qazvin/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سبلان (اردبیل)
+https://live-aburayhan1111.telewebion.ir/ek/sabalan/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سبز (خراسان رضوی)
+https://live-aburayhan1111.telewebion.ir/ek/sabz/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سهند (آذربایجان شرقی)
+https://live-aburayhan1106.telewebion.ir/ek/sahand/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سمنان
+https://live-aburayhan1107.telewebion.ir/ek/semnan/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",تبرستان (مازندران)
+https://live-aburayhan1112.telewebion.ir/ek/tabarestan/live/1080p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",آذربایجان غربی
+https://live-aburayhan1107.telewebion.ir/ek/azarbayjangharbi/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",تابان (یزد)
+https://live-aburayhan1104.telewebion.ir/ek/taban/live/576p/index.m3u8
+#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",زاگرس (کرمانشاه)
+https://live-aburayhan1109.telewebion.ir/ek/zagros/live/576p/index.m3u8
