@@ -83,14 +83,17 @@ def main():
         if not name or name.lower() in GENERIC: continue
         if any(w in country or w in name.lower() for w in ("afghanistan","tajikistan","افغان","تاجیک")): continue
         is_iran = "iran" in country or "ایران" in country
-        is_persian = any(token in lang for token in ("persian","farsi","fas","fa","فارسی"))
+        language_tags = {part.strip() for part in __import__("re").split(r"[,;/|]+", lang) if part.strip()}
+        persian_tags = {"persian","farsi","fas","fa","فارسی"}
+        is_persian_only = bool(language_tags) and language_tags.issubset(persian_tags)
         lower_name = name.lower()
         province = next((province for province, terms in PROVINCIAL_STATIONS.items()
                          if any(term.lower() in lower_name for term in terms)), None)
         is_national = any(term.lower() in lower_name for term in NATIONAL_STATIONS)
-        # A station being listed in Iran is not enough: non-Persian streams are excluded.
-        if is_iran and not (is_persian or province or is_national): continue
-        if not is_iran and not is_persian: continue
+        # Mixed-language stations are excluded; Iranian stations with missing language metadata
+        # are admitted only when their names match a known Persian IRIB national/provincial station.
+        if is_iran and not (is_persian_only or (not language_tags and (province or is_national))): continue
+        if not is_iran and not is_persian_only: continue
         url=(row.get("url") or "").strip()
         if not url or url in seen_urls or name.lower() in seen_names: continue
         logo=(row.get("favicon") or "").strip()
