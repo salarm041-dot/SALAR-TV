@@ -403,7 +403,10 @@ jobs:
           disable-animations: true
           script: |
             set -e
-            APK="${{ github.workspace }}/SALAR-TV-debug.apk"
+            APK="$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+            echo "Emulator workspace: $GITHUB_WORKSPACE"
+            pwd
+            ls -lah "$GITHUB_WORKSPACE"
             test -f "$APK"
             adb install -r "$APK"
             adb shell am start -n com.salar.tv/.MainActivity
