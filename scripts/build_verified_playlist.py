@@ -16,6 +16,7 @@ SOURCES = [
     ROOT / "patch/endpoint-replacement-candidates.m3u",
     ROOT / "patch/irib-national-candidates.m3u",
     ROOT / "patch/turkey-candidates.m3u",
+    ROOT / "patch/radio-directory-candidates.m3u",
 ]
 
 
@@ -60,11 +61,21 @@ def main():
         SOURCES[3]: REPORTS / "endpoint-replacement-candidates.json",
         SOURCES[4]: REPORTS / "irib-national-candidates.json",
         SOURCES[5]: REPORTS / "turkey-candidates.json",
+        SOURCES[6]: REPORTS / "radio-directory-candidates.json",
     }
     if not MAIN.exists():
         raise SystemExit(f"Main playlist not found: {MAIN}")
     original = MAIN.read_text(encoding="utf-8-sig")
     existing = set(re.findall(r"(?m)^https?://\S+", original))
+    logo_report_path = ROOT / "candidate-logo-report.json"
+    if not logo_report_path.exists():
+        raise SystemExit("Missing candidate-logo-report.json; refusing to promote unverified logos")
+    logo_report = json.loads(logo_report_path.read_text(encoding="utf-8"))
+    verified_logos = {
+        (row.get("playlist"), row.get("channel")): row.get("logo")
+        for row in logo_report.get("results", [])
+        if row.get("status") == "verified" and row.get("logo", "").startswith(("http://", "https://"))
+    }
     additions: list[str] = []
     promoted: dict[str, int] = {}
     skipped_scheduled = 0
@@ -82,9 +93,14 @@ def main():
             if "پخش زمان‌بندی‌شده" in joined or "scheduled" in joined.lower():
                 skipped_scheduled += 1
                 continue
-            if not re.search(r'tvg-logo="https?://[^"]+"', metadata[0], re.IGNORECASE):
+            verified_logo = verified_logos.get((source.name, url))
+            if not verified_logo:
                 skipped_missing_logo += 1
                 continue
+            if re.search(r'tvg-logo="[^"]*"', metadata[0], re.IGNORECASE):
+                metadata[0] = re.sub(r'tvg-logo="[^"]*"', f'tvg-logo="{verified_logo}"', metadata[0], count=1, flags=re.IGNORECASE)
+            else:
+                metadata[0] = metadata[0].replace("#EXTINF:-1", f'#EXTINF:-1 tvg-logo="{verified_logo}"', 1)
             if url in existing:
                 skipped_duplicate += 1
                 continue

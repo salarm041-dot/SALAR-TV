@@ -32,7 +32,7 @@ class HlsRecorderService : Service() {
             running = true
             recordingGeneration
         }
-        worker = Thread {
+        val recordingWorker = Thread {
             val folder = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: filesDir
             if (!folder.exists()) folder.mkdirs()
             val safeName = name.replace(Regex("[^\\p{L}\\p{N}_-]"), "_").take(40)
@@ -101,14 +101,23 @@ class HlsRecorderService : Service() {
                     updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
                 }
             } finally {
-                if (isCurrent(myGeneration)) {
-                    running = false
-                    worker = null
+                val shouldStop = synchronized(this) {
+                    if (recordingGeneration == myGeneration) {
+                        running = false
+                        worker = null
+                        true
+                    } else false
+                }
+                if (shouldStop) {
                     stopForeground(STOP_FOREGROUND_DETACH)
                     stopSelfResult(startId)
                 }
             }
-        }.also { it.start() }
+        }
+        synchronized(this) {
+            if (recordingGeneration == myGeneration) worker = recordingWorker
+        }
+        if (isCurrent(myGeneration)) recordingWorker.start()
         return START_NOT_STICKY
     }
 
@@ -144,16 +153,23 @@ class HlsRecorderService : Service() {
         val result = mutableListOf<MediaPart>()
         var pendingRange: ByteRange? = null
         var previousRangeEnd: Long? = null
+        var previousRangeUri: String? = null
         for (line in text.lineSequence().map { it.trim() }) {
             if (line.startsWith("#EXT-X-BYTERANGE:", true)) {
-                pendingRange = parseRange(line.substringAfter(":"), previousRangeEnd)
+                pendingRange = parseRange(line.substringAfter(":"), null)
             } else if (line.isNotEmpty() && !line.startsWith("#")) {
-                result += MediaPart(line, pendingRange)
-                if (pendingRange != null) {
-                    val start = pendingRange!!.offset ?: previousRangeEnd ?: 0L
-                    previousRangeEnd = start + pendingRange!!.length
+                val resolvedRange = pendingRange?.let { range ->
+                    if (range.offset != null) range
+                    else if (previousRangeUri == line && previousRangeEnd != null) range.copy(offset = previousRangeEnd)
+                    else range
+                }
+                result += MediaPart(line, resolvedRange)
+                if (resolvedRange != null) {
+                    previousRangeEnd = resolvedRange.offset?.plus(resolvedRange.length)
+                    previousRangeUri = line
                 } else {
                     previousRangeEnd = null
+                    previousRangeUri = null
                 }
                 pendingRange = null
             }
@@ -199,7 +215,17 @@ class HlsRecorderService : Service() {
         try {
             val code = connection.responseCode
             if (code !in 200..299) error("HTTP $code")
-            if (range != null && code != 206) error("سرور درخواست محدوده بایت را نپذیرفت (HTTP $code).")
+            if (range != null) {
+                if (code != 206) error("سرور درخواست محدوده بایت را نپذیرفت (HTTP $code).")
+                val requested = Regex("bytes=(\\d+)-(\\d+)", RegexOption.IGNORE_CASE)
+                    .matchEntire(range.trim()) ?: error("درخواست محدوده بایت نامعتبر است.")
+                val returned = connection.getHeaderField("Content-Range") ?: error("سرور Content-Range را برنگرداند.")
+                val actual = Regex("bytes\\s+(\\d+)-(\\d+)/(?:\\d+|\\*)", RegexOption.IGNORE_CASE)
+                    .matchEntire(returned.trim()) ?: error("هدر Content-Range نامعتبر است.")
+                if (actual.groupValues[1] != requested.groupValues[1] || actual.groupValues[2] != requested.groupValues[2]) {
+                    error("محدوده بایت دریافتی با درخواست ضبط مطابقت ندارد.")
+                }
+            }
             val out = java.io.ByteArrayOutputStream()
             connection.inputStream.use {
                 val buffer = ByteArray(16 * 1024)

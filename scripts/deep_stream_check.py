@@ -187,7 +187,12 @@ def run_group(name, items, mode):
     def one(item):
         url = item["url"]
         try:
-            if mode == "audio":
+            if mode == "auto":
+                path = row.get("url", "").lower().split("?", 1)[0]
+                mode_for_row = "hls" if path.endswith(".m3u8") else "audio"
+            else:
+                mode_for_row = mode
+            if mode_for_row == "audio":
                 result = check_audio(url)
             elif mode == "hls":
                 result = check_hls(url)
@@ -222,6 +227,7 @@ def main():
     replacements = parse_m3u(ROOT / "patch/endpoint-replacement-candidates.m3u")
     irib_national = parse_m3u(ROOT / "patch/irib-national-candidates.m3u")
     turkey = parse_m3u(ROOT / "patch/turkey-candidates.m3u")
+    radio_directory = parse_m3u(ROOT / "patch/radio-directory-candidates.m3u") if (ROOT / "patch/radio-directory-candidates.m3u").exists() else []
     # TRT candidate URLs are checked separately from the main playlist.
     trt = [
         {"name": "TRT Belgesel candidate 1", "category": "ترکیه / نامزد", "url": "https://tv-trtbelgesel.medya.trt.com.tr/master.m3u8", "source_file": "workflow candidate"},
@@ -236,6 +242,7 @@ def main():
         run_group("endpoint-replacement-candidates", replacements, "hls"),
         run_group("irib-national-candidates", irib_national, "hls"),
         run_group("turkey-candidates", turkey, "hls"),
+        run_group("radio-directory-candidates", radio_directory, "auto"),
         run_group("trt-candidates", trt, "hls"),
     ]
     summary = {"checked_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),

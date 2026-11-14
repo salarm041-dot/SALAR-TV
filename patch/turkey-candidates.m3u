@@ -2,7 +2,7 @@
 # Candidate Turkish general, entertainment, drama, children's, music and news channels. Only deeply validated entries with verified raster logos are promoted to the app playlist.
 #EXTINF:-1 tvg-id="A2TV.tr@SD" tvg-name="A2TV" group-title="ترکیه / عمومی" tvg-language="tur" tvg-quality="1080p",A2TV
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/a2tv/a2tv.m3u8
-#EXTINF:-1 tvg-id="AHaber.tr@SD" tvg-name="A Haber" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="1080p",A Haber
+#EXTINF:-1 tvg-logo="https://www.tvlogo.org/turkey/a-haber-tr.png" tvg-id="AHaber.tr@SD" tvg-name="A Haber" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="1080p",A Haber
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/ahaber/ahaber.m3u8
 #EXTINF:-1 tvg-id="ASpor.tr@SD" tvg-name="A Spor" group-title="ترکیه / ورزشی" tvg-language="tur" tvg-quality="1080p",A Spor
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/aspor/aspor.m3u8
@@ -36,7 +36,7 @@ https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago_cocuk/minikago_cocuk.m3
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago/minikago.m3u8
 #EXTINF:-1 tvg-id="NOW.tr@SD" tvg-name="NOW" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="720p",NOW
 https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv_720p.m3u8
-#EXTINF:-1 tvg-id="NTV.tr@SD" tvg-name="NTV" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="HD",NTV
+#EXTINF:-1 tvg-logo="https://www.tvlogo.org/turkey/ntv-tr.png" tvg-id="NTV.tr@SD" tvg-name="NTV" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="HD",NTV
 https://dogus.daioncdn.net/ntv/ntv.m3u8?app=ntv_web
 #EXTINF:-1 tvg-id="Number1TV.tr@SD" tvg-name="Number 1 TV" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="720p",Number 1 TV
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e17cd59e8b.smil/playlist.m3u8
@@ -56,13 +56,13 @@ https://livetv.powerapp.com.tr/powerTV/powerhd.smil/playlist.m3u8
 https://raw.githubusercontent.com/bnyusuf67-crypto/streams/refs/heads/main/streams/shturk.m3u8
 #EXTINF:-1 tvg-id="StarTV.tr@SD" tvg-name="Star TV" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="720p",Star TV
 https://dogus.daioncdn.net/startv/startv_720p.m3u8?app=a20ac41e-bdc3-4aa1-934d-26b484480ac9&ce=3&sid=8l4w3lst4co5
-#EXTINF:-1 tvg-id="Tele1.tr@SD" tvg-name="Tele 1" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="1080p",Tele 1
+#EXTINF:-1 tvg-logo="https://www.tvlogo.org/turkey/tele1-tr.png" tvg-id="Tele1.tr@SD" tvg-name="Tele 1" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="1080p",Tele 1
 https://tele1-live.ercdn.net/tele1/tele1.m3u8
 #EXTINF:-1 tvg-id="TGRTHaber.tr@SD" tvg-name="TGRT Haber" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="720p",TGRT Haber
 https://canli.tgrthaber.com/tgrt.m3u8
 #EXTINF:-1 tvg-id="Tivi6.tr@SD" tvg-name="Tivi 6" group-title="ترکیه / عمومی" tvg-language="tur" tvg-quality="720p",Tivi 6
 https://live.artidijitalmedya.com/artidijital_tivi6/tivi6/playlist.m3u8
-#EXTINF:-1 tvg-id="TV8.tr@SD" tvg-name="TV 8" group-title="ترکیه / سرگرمی" tvg-language="tur" tvg-quality="1080p",TV 8
+#EXTINF:-1 tvg-logo="https://www.tvlogo.org/turkey/tv8-tr.png" tvg-id="TV8.tr@SD" tvg-name="TV 8" group-title="ترکیه / سرگرمی" tvg-language="tur" tvg-quality="1080p",TV 8
 https://tv8.daioncdn.net/tv8/tv8.m3u8?app=7ddc255a-ef47-4e81-ab14-c0e5f2949788&ce=3
 #EXTINF:-1 tvg-id="24TV.tr@SD" tvg-name="TV 24" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="720p",TV 24
 https://turkmedya-live.ercdn.net/tv24/tv24.m3u8

@@ -54,6 +54,10 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Discover and prepare Persian radio candidates
+        if: steps.localtime.outputs.skip != 'true'
+        run: python3 scripts/build_radio_directory_candidates.py
+
       - name: Enrich Israel, Arab and Azerbaijan candidates with verified raster logos
         if: steps.localtime.outputs.skip != 'true'
         continue-on-error: true
