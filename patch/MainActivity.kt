@@ -114,6 +114,7 @@ fun SalarTvApp() {
     var editingChannel by remember { mutableStateOf<Channel?>(null) }
     var brightness by remember { mutableFloatStateOf(0.75f) }
     var useExternalPlayer by remember { mutableStateOf(prefs.getBoolean("external_player_default", false)) }
+    var rememberPlayerChoice by remember { mutableStateOf(false) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
 
     val player = remember { ExoPlayer.Builder(context).build() }
@@ -178,18 +179,22 @@ fun SalarTvApp() {
                     Text(selected!!.name, color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Text("انتخاب پخش‌کننده", color = Gold, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(selected = !useExternalPlayer, onClick = { useExternalPlayer = false },
+                        FilterChip(selected = !useExternalPlayer, onClick = { useExternalPlayer = false; if (rememberPlayerChoice) prefs.edit().putBoolean("external_player_default", false).apply() },
                             label = { Text("پخش‌کننده داخلی") },
                             leadingIcon = { Icon(Icons.Default.PlayCircle, null) })
-                        FilterChip(selected = useExternalPlayer, onClick = { useExternalPlayer = true },
+                        FilterChip(selected = useExternalPlayer, onClick = { useExternalPlayer = true; if (rememberPlayerChoice) prefs.edit().putBoolean("external_player_default", true).apply() },
                             label = { Text("پخش‌کننده خارجی") },
                             leadingIcon = { Icon(Icons.Default.OpenInNew, null) })
                     }
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text("ذخیره به‌عنوان انتخاب پیش‌فرض", color = Color.LightGray, fontSize = 12.sp,
                             modifier = Modifier.weight(1f))
-                        Switch(checked = prefs.getBoolean("external_player_default", false) == useExternalPlayer,
-                            onCheckedChange = { prefs.edit().putBoolean("external_player_default", useExternalPlayer).apply() })
+                        Switch(checked = rememberPlayerChoice,
+                            onCheckedChange = {
+                                rememberPlayerChoice = it
+                                if (it) prefs.edit().putBoolean("external_player_default", useExternalPlayer).apply()
+                                else prefs.edit().remove("external_player_default").apply()
+                            })
                     }
                     if (!useExternalPlayer) {
                         AndroidView(
