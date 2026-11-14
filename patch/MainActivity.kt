@@ -55,6 +55,13 @@ import androidx.media3.ui.PlayerView
 import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONArray
 import org.json.JSONObject
+import android.util.Xml
+import org.xmlpull.v1.XmlPullParser
+import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 private var Gold by mutableStateOf(Color(0xFFD6AD62))
 private var Background by mutableStateOf(Color(0xFF0B0D13))
@@ -392,11 +399,13 @@ fun SalarTvApp() {
                         onSources = { page = "افزودن منابع" },
                         onRecordings = { page = "ضبط‌ها" },
                         onLiveDubbing = { page = "دوبله هوشمند زنده" },
+                        onEpg = { page = "راهنمای برنامه‌ها" },
                         onSettings = { page = "تنظیمات" },
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
+                    "راهنمای برنامه‌ها" -> EpgPage()
                     "تنظیمات" -> SettingsPage(
                         themeMode = themeMode,
                         onThemeModeChange = { mode ->
@@ -763,12 +772,13 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
-             onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
+             onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onEpg: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
+        MoreButton("راهنمای برنامه‌ها (EPG)", Icons.Default.CalendarMonth, onEpg)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
         MoreButton("فایل‌های ضبط‌شده", Icons.Default.VideoLibrary, onRecordings)
@@ -1007,4 +1017,202 @@ private fun parseM3u(text: String): List<Channel> {
         }
     }
     return result.distinctBy { it.url }
+}
+
+
+private data class EpgProgram(
+    val channelId: String,
+    val title: String,
+    val description: String,
+    val startMillis: Long,
+    val stopMillis: Long
+)
+private data class EpgRow(val channelName: String, val current: EpgProgram?, val next: EpgProgram?)
+
+private fun parseXmlTvDate(value: String): Long? {
+    for (pattern in listOf("yyyyMMddHHmmss Z", "yyyyMMddHHmmss")) {
+        try {
+            return SimpleDateFormat(pattern, Locale.US).apply {
+                isLenient = false
+                timeZone = TimeZone.getTimeZone("UTC")
+            }.parse(value.trim())?.time
+        } catch (_: Exception) { }
+    }
+    return null
+}
+
+private fun readXmlTv(input: InputStream): Pair<Map<String, String>, List<EpgProgram>> {
+    val parser = Xml.newPullParser()
+    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
+    parser.setInput(input, "UTF-8")
+    val channelNames = linkedMapOf<String, String>()
+    val programs = mutableListOf<EpgProgram>()
+    val now = System.currentTimeMillis()
+    var event = parser.eventType
+    while (event != XmlPullParser.END_DOCUMENT) {
+        if (event == XmlPullParser.START_TAG) {
+            when (parser.name) {
+                "channel" -> {
+                    val id = parser.getAttributeValue(null, "id").orEmpty()
+                    var displayName = ""
+                    var depth = 1
+                    while (depth > 0) {
+                        when (parser.next()) {
+                            XmlPullParser.START_TAG -> {
+                                depth++
+                                if (parser.name == "display-name") {
+                                    val candidate = runCatching { parser.nextText() }.getOrDefault("")
+                                    if (displayName.isBlank()) displayName = candidate.trim()
+                                    depth--
+                                }
+                            }
+                            XmlPullParser.END_TAG -> depth--
+                            XmlPullParser.END_DOCUMENT -> depth = 0
+                        }
+                    }
+                    if (id.isNotBlank()) channelNames[id] = displayName.ifBlank { id }
+                }
+                "programme" -> {
+                    val id = parser.getAttributeValue(null, "channel").orEmpty()
+                    val start = parseXmlTvDate(parser.getAttributeValue(null, "start").orEmpty())
+                    val stop = parseXmlTvDate(parser.getAttributeValue(null, "stop").orEmpty())
+                    var title = ""
+                    var description = ""
+                    var depth = 1
+                    while (depth > 0) {
+                        when (parser.next()) {
+                            XmlPullParser.START_TAG -> {
+                                depth++
+                                when (parser.name) {
+                                    "title" -> {
+                                        title = runCatching { parser.nextText() }.getOrDefault("").trim()
+                                        depth--
+                                    }
+                                    "desc" -> {
+                                        description = runCatching { parser.nextText() }.getOrDefault("").trim()
+                                        depth--
+                                    }
+                                }
+                            }
+                            XmlPullParser.END_TAG -> depth--
+                            XmlPullParser.END_DOCUMENT -> depth = 0
+                        }
+                    }
+                    if (id.isNotBlank() && start != null && stop != null &&
+                        stop > now - 2 * 60 * 60 * 1000L &&
+                        start < now + 24 * 60 * 60 * 1000L && title.isNotBlank()) {
+                        programs.add(EpgProgram(id, title, description, start, stop))
+                    }
+                }
+            }
+        }
+        event = parser.next()
+        if (programs.size >= 20000) break
+    }
+    return channelNames to programs
+}
+
+@Composable
+private fun EpgPage() {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
+    var xmlUrl by remember { mutableStateOf(prefs.getString("xmltv_url", "") ?: "") }
+    var loadedUrl by remember { mutableStateOf("") }
+    var reloadKey by remember { mutableIntStateOf(0) }
+    var rows by remember { mutableStateOf<List<EpgRow>>(emptyList()) }
+    var loading by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf("آدرس فایل XMLTV را وارد و ذخیره کنید.") }
+
+    fun loadGuide() {
+        val target = xmlUrl.trim()
+        if (!target.startsWith("https://") && !target.startsWith("http://")) {
+            status = "آدرس باید با http:// یا https:// شروع شود."
+            return
+        }
+        prefs.edit().putString("xmltv_url", target).apply()
+        loadedUrl = target
+        reloadKey++
+    }
+
+    LaunchedEffect(loadedUrl, reloadKey) {
+        if (loadedUrl.isBlank()) return@LaunchedEffect
+        loading = true
+        status = "در حال دریافت و پردازش راهنمای برنامه‌ها…"
+        try {
+            val parsed = withContext(Dispatchers.IO) {
+                val connection = (URL(loadedUrl).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 15000
+                    readTimeout = 25000
+                    requestMethod = "GET"
+                    setRequestProperty("User-Agent", "SALAR-TV/1.3 Android")
+                }
+                try {
+                    if (connection.responseCode !in 200..299) error("HTTP \${connection.responseCode}")
+                    connection.inputStream.use { readXmlTv(it) }
+                } finally { connection.disconnect() }
+            }
+            val now = System.currentTimeMillis()
+            val result = parsed.second.groupBy { it.channelId }.mapNotNull { (id, list) ->
+                val ordered = list.sortedBy { it.startMillis }
+                val current = ordered.firstOrNull { it.startMillis <= now && it.stopMillis > now }
+                val next = ordered.firstOrNull { it.startMillis > now }
+                if (current == null && next == null) null
+                else EpgRow(parsed.first[id] ?: id, current, next)
+            }.sortedBy { it.channelName.lowercase(Locale.ROOT) }
+            rows = result
+            status = if (result.isEmpty()) "فایل دریافت شد، اما برنامه جاری/بعدی قابل نمایش پیدا نشد."
+                else "\${result.size} شبکه دارای برنامه جاری یا بعدی هستند."
+        } catch (e: Exception) {
+            rows = emptyList()
+            status = "دریافت راهنما ناموفق بود: \${e.message ?: "خطای نامشخص"}"
+        } finally { loading = false }
+    }
+
+    val clock = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("راهنمای برنامه‌ها (EPG)", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("نشانی XMLTV را وارد کنید؛ برنامه جاری و برنامه بعدی هر شبکه نمایش داده می‌شود.",
+            color = SecondaryText, fontSize = 12.sp)
+        OutlinedTextField(
+            value = xmlUrl, onValueChange = { xmlUrl = it }, modifier = Modifier.fillMaxWidth(),
+            label = { Text("آدرس فایل XMLTV") },
+            placeholder = { Text("https://example.com/guide.xml") }, singleLine = true
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { loadGuide() }, enabled = !loading,
+                colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
+                Text("دریافت / به‌روزرسانی", color = Color.Black)
+            }
+            if (loadedUrl.isNotBlank()) {
+                TextButton(onClick = { reloadKey++ }, enabled = !loading) { Text("تلاش دوباره", color = Gold) }
+            }
+        }
+        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Gold)
+        Text(status, color = if (status.contains("ناموفق") || status.contains("باید")) Color(0xFFFFCC80) else SecondaryText,
+            fontSize = 12.sp)
+        if (rows.isNotEmpty()) {
+            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(rows) { row ->
+                    Card(colors = CardDefaults.cardColors(containerColor = Panel),
+                        shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Text(row.channelName, color = Gold, fontWeight = FontWeight.Bold)
+                            row.current?.let { p ->
+                                Text("اکنون: \${p.title}", color = TextMain, fontWeight = FontWeight.SemiBold)
+                                Text("\${clock.format(Date(p.startMillis))} تا \${clock.format(Date(p.stopMillis))}",
+                                    color = MutedText, fontSize = 10.sp)
+                                if (p.description.isNotBlank()) Text(p.description, color = SecondaryText, fontSize = 11.sp, maxLines = 3)
+                            }
+                            row.next?.let { p ->
+                                Text("بعدی: \${p.title}", color = SecondaryText)
+                                Text("شروع: \${clock.format(Date(p.startMillis))}", color = MutedText, fontSize = 10.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Text("برنامه‌ها فقط برای شبکه‌هایی نمایش داده می‌شوند که شناسه آن‌ها در فایل XMLTV وجود داشته باشد.",
+            color = MutedText, fontSize = 10.sp)
+    }
 }
