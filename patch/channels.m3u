@@ -18,9 +18,9 @@ https://tv-trtavaz.medya.trt.com.tr/master.m3u8
 https://live.itv.az/itv.m3u8
 #EXTINF:-1 tvg-logo="https://atv.az/assets/images/logo_white.png" group-title="آذربایجان / تلویزیون",ATV Azərbaycan
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
-#EXTINF:-1 group-title="ایران / رادیو",رادیو ایران
+#EXTINF:-1 tvg-logo="https://www.oonternet.com/_panel/upload/content/oonternet-8883943415280.jpeg" group-title="ایران / رادیو",رادیو ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
-#EXTINF:-1 group-title="ایران / رادیو",رادیو انگلیسی ایران
+#EXTINF:-1 tvg-logo="https://radiospinner.com/media/logos/180/83710/logo_ZTropL1kFU.png" group-title="ایران / رادیو",رادیو انگلیسی ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-english/playlist.m3u8
 # Iran TV endpoints from a public playlist updated 2026-11-09; may require an Iranian IP.
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1.ir.png" group-title="ایران / تلویزیون",شبکه یک
@@ -79,7 +79,7 @@ https://voa-ingest.akamaized.net/hls/live/2033876/tvmc07/playlist.m3u8
 https://oitnhls.wns.live/hls/stream.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NationalIranianCongressTV.us.png" group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",National Iranian Congress TV
 https://tv.iraniancongress.com/stream/tv.m3u8
-#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",Iran National Revolution TV
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranNationalRevolutionTV.us.png" group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",Iran National Revolution TV
 https://hls.irannrtv.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="IranInternational.fa" tvg-name="ایران اینترنشنال" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranInternational.uk.png" group-title="فارسی‌زبان خارج از ایران / خبری",ایران اینترنشنال
 https://hlspackager.akamaized.net/live/DB/IRAN_INTERNATIONAL/HLS/IRAN_INTERNATIONAL.m3u8
@@ -144,11 +144,11 @@ https://mako-streaming.akamaized.net/direct/hls/live/2035340/ch24live/video_1080
 https://live.wcdn.co.il/news/prog_index.m3u8
 #EXTINF:-1 tvg-logo="https://i.ibb.co/93bQz4t/kabalah.png" group-title="اسرائیل / دینی و فرهنگی",Kabbalah 96
 https://edge3.uk.kab.tv/live/tv66-heb-high/playlist.m3u8
-#EXTINF:-1 group-title="اسرائیل / خبری",Kan 11 | כאן 11
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Kan11Logo.svg/512px-Kan11Logo.svg.png" group-title="اسرائیل / خبری",Kan 11 | כאן 11
 https://kan11.media.kan.org.il/hls/live/2024514/2024514/master.m3u8
-#EXTINF:-1 group-title="اسرائیل / خبری به زبان عربی",Makan 33 | مكان 33
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/en/5/56/MeKan_33_logo_2017.png" group-title="اسرائیل / خبری به زبان عربی",Makan 33 | مكان 33
 https://makan.media.kan.org.il/hls/live/2024680/2024680/source1_1.2k/chunklist.m3u8
-#EXTINF:-1 group-title="اسرائیل / شبکه عربی",Hala TV
+#EXTINF:-1 tvg-logo="https://i.imgur.com/028M4Ew.png" group-title="اسرائیل / شبکه عربی",Hala TV
 https://gstream4.panet.co.il/edge/halaTV/chunks.m3u8
 
 # Salin TV public catalogue additions; direct streams from a community-maintained playlist.
@@ -261,25 +261,25 @@ https://hls.nejat.live/hls/stream.m3u8
 https://toonixhls.wns.live/hls/stream.m3u8
 
 # Additional Persian channels found in public community playlists; not sourced from Salin TV's private server.
-#EXTINF:-1 tvg-id="PersianaTwo.fr" tvg-name="Persiana Two" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Persiana Two | پرشیانا دو
+#EXTINF:-1 tvg-logo="https://images.persianagroup.cloud/channels/smallThumbnail/persiana-two.jpg" tvg-id="PersianaTwo.fr" tvg-name="Persiana Two" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Persiana Two | پرشیانا دو
 https://twohls.persiana.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="SL1.ir" tvg-name="SL 1" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",SL 1 | اس‌ال ۱
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SL1.ir.png" tvg-id="SL1.ir" tvg-name="SL 1" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",SL 1 | اس‌ال ۱
 https://slonehls.wns.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="SL2.ir" tvg-name="SL 2" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",SL 2 | اس‌ال ۲
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SL2.ir.png" tvg-id="SL2.ir" tvg-name="SL 2" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",SL 2 | اس‌ال ۲
 https://sltwohls.wns.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="AfraSeries.ir" tvg-name="Afra Series" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Afra Series | افرا سریال
+#EXTINF:-1 tvg-logo="https://www.afratv.com/images/Logo3.png" tvg-id="AfraSeries.ir" tvg-name="Afra Series" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Afra Series | افرا سریال
 https://afrashls.wns.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="CaltexMusic.ir" tvg-name="Caltex Music" group-title="فارسی‌زبان خارج از ایران / موسیقی",Caltex Music | کلتکس موزیک
+#EXTINF:-1 tvg-logo="https://www.livefarsi.com/uploads/tv_image/caltex-music-tv.png" tvg-id="CaltexMusic.ir" tvg-name="Caltex Music" group-title="فارسی‌زبان خارج از ایران / موسیقی",Caltex Music | کلتکس موزیک
 https://vid1.caltexmusic.com/hls/caltextv.m3u8
 
-#EXTINF:-1 tvg-id="HomePlus.ir" tvg-name="Home Plus" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Home Plus | هوم پلاس
+#EXTINF:-1 tvg-logo="https://homeplustv.com/image/catalog/homeplus/homeplus-logo.png" tvg-id="HomePlus.ir" tvg-name="Home Plus" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Home Plus | هوم پلاس
 https://homeplushls.wns.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="CafeTradeTV.ir" tvg-name="Cafe Trade TV" group-title="فارسی‌زبان خارج از ایران / اقتصادی و آموزشی",Cafe Trade TV | کافه ترید
+#EXTINF:-1 tvg-logo="https://i.ibb.co/GW4cMfc/cafe-trade-tv.png" tvg-id="CafeTradeTV.ir" tvg-name="Cafe Trade TV" group-title="فارسی‌زبان خارج از ایران / اقتصادی و آموزشی",Cafe Trade TV | کافه ترید
 https://cafetradehls.wns.live/hls/stream.m3u8
 
 # Additional entries matched to Salin TV public gallery; public HLS endpoints from community listings or Salin TV channel pages.
@@ -292,7 +292,7 @@ https://iran613hls.wns.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="ICCPlus.ir" tvg-name="iCC+" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ICCPlus.ir.png" group-title="فارسی‌زبان خارج از ایران / سرگرمی",iCC+ | آی‌سی‌سی پلاس
 https://icchls.wns.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="RaheNejatTV.ir" tvg-name="Rahe Nejat" group-title="فارسی‌زبان خارج از ایران / مذهبی",Rahe Nejat | راه نجات
+#EXTINF:-1 tvg-logo="https://www.parsatv.com/index_files/channels/rahenejat.jpg" tvg-id="RaheNejatTV.ir" tvg-name="Rahe Nejat" group-title="فارسی‌زبان خارج از ایران / مذهبی",Rahe Nejat | راه نجات
 https://hls.rahenejat.live/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="4UFamily.tr" tvg-name="4U Family" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/4UFamily.tr.png" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",4U Family | فور یو خانواده
@@ -303,71 +303,71 @@ https://4kuhls.persiana.live/hls/stream.m3u8
 
 # شبکه‌های استانی صداوسیما — فهرست عمومی؛ منبع فهرست هشدار داده که دسترسی برخی/همه جریان‌ها ممکن است به IP ایران محدود باشد.
 # این دسته عمداً جدا از شبکه‌های سراسری قرار گرفته است.
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",آبادان
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AbadanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",آبادان
 https://live-aburayhan1113.telewebion.ir/ek/abadan/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",افلاک (لرستان)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AflakTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",افلاک (لرستان)
 https://live-aburayhan1101.telewebion.ir/ek/aflak/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",آفتاب (مرکزی)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AftabTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",آفتاب (مرکزی)
 https://live-aburayhan1101.telewebion.ir/ek/aftab/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",البرز
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AlborzTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",البرز
 https://live-aburayhan1106.telewebion.ir/ek/alborz/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",اترک (خراسان شمالی)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AtrakTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",اترک (خراسان شمالی)
 https://live-aburayhan1104.telewebion.ir/ek/atrak/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",باران (گیلان)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/BaranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",باران (گیلان)
 https://live-aburayhan1109.telewebion.ir/ek/baran/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",بوشهر
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/BoushehrTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",بوشهر
 https://live-aburayhan1111.telewebion.ir/ek/bushehr/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",دنا (کهگیلویه و بویراحمد)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/DenaTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",دنا (کهگیلویه و بویراحمد)
 https://live-aburayhan1109.telewebion.ir/ek/dena/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",اشراق (زنجان)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/EshraghNetwork.ir.jpg" group-title="صداوسیما / شبکه‌های استانی",اشراق (زنجان)
 https://live-aburayhan1112.telewebion.ir/ek/eshragh/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",فارس
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/FarsTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",فارس
 https://live-aburayhan1107.telewebion.ir/ek/fars/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",همدان
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HamedanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",همدان
 https://live-aburayhan1110.telewebion.ir/ek/sina/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",هامون (سیستان و بلوچستان)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HamoonTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",هامون (سیستان و بلوچستان)
 https://live-aburayhan1102.telewebion.ir/ek/hamoon/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",ایلام
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IlamTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",ایلام
 https://live-aburayhan1103.telewebion.ir/ek/ilam/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",اصفهان
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IsfahanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",اصفهان
 https://live-aburayhan1113.telewebion.ir/ek/esfahan/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",جهانبین (چهارمحال و بختیاری)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/JahanbinTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",جهانبین (چهارمحال و بختیاری)
 https://live-aburayhan1102.telewebion.ir/ek/jahanbin/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",کرمان
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KermanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",کرمان
 https://live-aburayhan1104.telewebion.ir/ek/kerman/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خلیج فارس (هرمزگان)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhalijeFarsTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خلیج فارس (هرمزگان)
 https://live-aburayhan1102.telewebion.ir/ek/khalijefars/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خاوران (خراسان جنوبی)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhavaranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خاوران (خراسان جنوبی)
 https://live-aburayhan1112.telewebion.ir/ek/khavaran/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خراسان رضوی
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhorasanRazaviTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خراسان رضوی
 https://live-aburayhan1108.telewebion.ir/ek/khorasanrazavi/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",خوزستان
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhozestanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خوزستان
 https://live-aburayhan1104.telewebion.ir/ek/khoozestan/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",کیش
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KishTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",کیش
 https://live-aburayhan1106.telewebion.ir/ek/kish/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",کردستان
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KordestanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",کردستان
 https://live-aburayhan1108.telewebion.ir/ek/kordestan/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",مهاباد
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MahabadTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",مهاباد
 https://live-aburayhan1110.telewebion.ir/ek/mahabad/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",مکران
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MakranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",مکران
 https://live-aburayhan1104.telewebion.ir/na/makran/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",نور (مازندران)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NoorTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",نور (مازندران)
 https://live-aburayhan1107.telewebion.ir/ek/noor/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",قزوین
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QazvinTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",قزوین
 https://live-aburayhan1113.telewebion.ir/ek/qazvin/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سبلان (اردبیل)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabalanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سبلان (اردبیل)
 https://live-aburayhan1111.telewebion.ir/ek/sabalan/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سبز (خراسان رضوی)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabzTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سبز (خراسان رضوی)
 https://live-aburayhan1111.telewebion.ir/ek/sabz/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سهند (آذربایجان شرقی)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SahandTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سهند (آذربایجان شرقی)
 https://live-aburayhan1106.telewebion.ir/ek/sahand/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",سمنان
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SemnanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سمنان
 https://live-aburayhan1107.telewebion.ir/ek/semnan/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",تبرستان (مازندران)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TabarestanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",تبرستان (مازندران)
 https://live-aburayhan1112.telewebion.ir/ek/tabarestan/live/1080p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",آذربایجان غربی
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/WestAzerbaijanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",آذربایجان غربی
 https://live-aburayhan1107.telewebion.ir/ek/azarbayjangharbi/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",تابان (یزد)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/YazdTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",تابان (یزد)
 https://live-aburayhan1104.telewebion.ir/ek/taban/live/576p/index.m3u8
-#EXTINF:-1 group-title="صداوسیما / شبکه‌های استانی",زاگرس (کرمانشاه)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ZagrosTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",زاگرس (کرمانشاه)
 https://live-aburayhan1109.telewebion.ir/ek/zagros/live/576p/index.m3u8
