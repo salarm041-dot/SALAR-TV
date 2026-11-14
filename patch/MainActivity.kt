@@ -956,7 +956,15 @@ fun AboutPage() {
 
 
 private fun categoryForChannel(channel: Channel): String {
-    if (channel.kind == "رادیو") return "رادیو"
+    if (channel.kind == "رادیو") {
+        val radioGroup = channel.groupTitle.lowercase()
+        return when {
+            "استانی" in radioGroup -> "استانی / " + channel.groupTitle.substringAfterLast("/").trim()
+            "خارج از ایران" in radioGroup || "خارج از کشور" in radioGroup -> "فارسی‌زبان خارج از کشور"
+            "سراسری" in radioGroup || "ایران / رادیو" in radioGroup -> "سراسری"
+            else -> "فارسی‌زبان خارج از کشور"
+        }
+    }
     val value = (channel.name + " " + channel.country + " " + channel.groupTitle).lowercase()
     return when {
         "اسرائیل / شبکه‌های عربی" in value -> "اسرائیل - عربی"
