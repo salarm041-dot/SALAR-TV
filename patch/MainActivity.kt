@@ -26,6 +26,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -582,9 +583,11 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
             placeholder = { Text("https://example.com/live.m3u8") }, modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
         Text("کشور", color = Gold)
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("ایران", "ترکیه", "آذربایجان", "سایر").forEach {
-                FilterChip(selected = country == it, onClick = { country = it }, label = { Text(it) })
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            items(listOf("ایران", "ترکیه", "آذربایجان", "عربستان", "امارات", "قطر", "کویت", "بحرین",
+                "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر",
+                "تونس", "لیبی", "یمن", "سودان", "اسرائیل", "فارسی‌زبان خارج از ایران", "سایر")) { option ->
+                FilterChip(selected = country == option, onClick = { country = option }, label = { Text(option) })
             }
         }
         Text("نوع منبع", color = Gold)
@@ -801,6 +804,25 @@ private fun parseM3u(text: String): List<Channel> {
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
                 "iran" in meta || "ایران" in meta || "ir/" in meta -> "ایران"
+                "saudi" in meta || "عربستان" in meta || "sa/" in meta -> "عربستان"
+                "uae" in meta || "emirates" in meta || "امارات" in meta || "ae/" in meta -> "امارات"
+                "qatar" in meta || "قطر" in meta || "qa/" in meta -> "قطر"
+                "kuwait" in meta || "کویت" in meta || "kw/" in meta -> "کویت"
+                "bahrain" in meta || "بحرین" in meta || "bh/" in meta -> "بحرین"
+                "oman" in meta || "عمان" in meta || "om/" in meta -> "عمان"
+                "iraq" in meta || "عراق" in meta || "iq/" in meta -> "عراق"
+                "jordan" in meta || "اردن" in meta || "jo/" in meta -> "اردن"
+                "lebanon" in meta || "لبنان" in meta || "lb/" in meta -> "لبنان"
+                "syria" in meta || "سوریه" in meta || "sy/" in meta -> "سوریه"
+                "palestine" in meta || "فلسطین" in meta || "ps/" in meta -> "فلسطین"
+                "egypt" in meta || "مصر" in meta || "eg/" in meta -> "مصر"
+                "morocco" in meta || "مراکش" in meta || "ma/" in meta -> "مراکش"
+                "algeria" in meta || "الجزایر" in meta || "dz/" in meta -> "الجزایر"
+                "tunisia" in meta || "تونس" in meta || "tn/" in meta -> "تونس"
+                "libya" in meta || "لیبی" in meta || "ly/" in meta -> "لیبی"
+                "yemen" in meta || "یمن" in meta || "ye/" in meta -> "یمن"
+                "sudan" in meta || "سودان" in meta || "sd/" in meta -> "سودان"
+                "israel" in meta || "اسرائیل" in meta || "il/" in meta -> "اسرائیل"
                 else -> "سایر"
             }
             kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
