@@ -604,19 +604,19 @@ https://stream.ads.ottera.tv/playlist.m3u8?network_id=5616
 https://live.kwikmotion.com/alaraby2live/alaraby2.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="AlArabyTV2.qa@SD" tvg-logo="https://i.imgur.com/Gp5mNea.png" group-title="شبکه‌های عربی / قطر",Al Araby TV 2 (1080p)
 https://stream.ads.ottera.tv/playlist.m3u8?network_id=5617
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-apps-aja-fa.getaj.net/AJA/01.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-apps-aja-fa.getaj.net/AJA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-apps-aja-v3-fa.getaj.net/AJA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-web-aja-fa.thehlive.com/AJA/index.m3u8
 #EXTINF:-1 tvg-id="AlJazeera2.qa@HD" tvg-logo="https://i.imgur.com/miq8O1Q.png" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera 2 (1080p)
 https://live-hls-web-aja2-gcp.thehlive.com/AJA2/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Arabic (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Arabic (1080p)
 https://live-hls-v3-aja.getaj.net/AJA-V3/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Arabic (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Arabic (1080p)
 https://live-hls-web-aja.getaj.net/AJA/index.m3u8
 #EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" tvg-logo="https://i.imgur.com/5dNJlLo.png" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Documentary (1080p) [Geo-blocked]
 https://live-hls-apps-ajd-fa.getaj.net/AJD/index.m3u8
@@ -626,21 +626,21 @@ https://live-hls-apps-ajd-v3-fa.getaj.net/AJD/index.m3u8
 https://live-hls-web-ajd-fa.thehlive.com/AJD/index.m3u8
 #EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" tvg-logo="https://i.imgur.com/5dNJlLo.png" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Documentary (1080p) [Geo-blocked]
 https://live-hls-web-ajd.getaj.net/AJD/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
 https://live-hls-apps-aje-fa.getaj.net/AJE/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
 https://live-hls-apps-aje-v3-fa.getaj.net/AJE/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
 https://live-hls-web-aje-fa.thehlive.com/AJE/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (720p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (720p)
 http://170.83.16.50/ALJAZEERA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (576p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (576p)
 https://fta.ektv.in/live/318/master.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (576p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (576p)
 https://streams.tangotv.in/ALJAZEERAHD/ORIGIN/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English
 https://cdn-7.pishow.tv/live/429/master.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@EnglishHD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English HD (576p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@EnglishHD" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English HD (576p)
 http://stream.mcquack.net/131/index.m3u8
 #EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" tvg-logo="https://i.imgur.com/DfJI4t5.png" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher (1080p)
 https://live-hls-apps-ajm-fa.getaj.net/AJM/index.m3u8
@@ -696,11 +696,11 @@ https://qatartv.akamaized.net/hls/live/20000612/qtvquran/master.m3u8
 https://googlecdn1.alkassdigital.net/livestream/qbc4/main.m3u8
 #EXTINF:-1 tvg-id="QBC.qa@HD" tvg-logo="https://www.qbc.news/_next/static/media/logo.0~2x9wpd284~a.svg" group-title="شبکه‌های عربی / قطر",QBC (1080p)
 https://live.kwikmotion.com/qbusinesslive/qbusiness.smil/playlist.m3u8
-#EXTINF:-1 tvg-id="beINSports1.qa@MENA" group-title="شبکه‌های عربی / قطر",beIN Sports 1
+#EXTINF:-1 tvg-id="beINSports1.qa@MENA" tvg-logo="https://i.imgur.com/Vtk2cGI.png" group-title="شبکه‌های عربی / قطر",beIN Sports 1
 https://vg162.adcdsd123321.shop/7.m3u8
-#EXTINF:-1 tvg-id="" group-title="شبکه‌های عربی / کویت",Ch4Teen (1080i)
+#EXTINF:-1 tvg-id="Ch4Teen.kw" tvg-logo="https://i.imgur.com/pHpFGeg.png" group-title="شبکه‌های عربی / کویت",Ch4Teen (1080i)
 https://ch14.tv/live/ch4teen1/playlist.m3u8
-#EXTINF:-1 tvg-id="" group-title="شبکه‌های عربی / کویت",Ch4Teen (1080p)
+#EXTINF:-1 tvg-id="Ch4Teen.kw" tvg-logo="https://i.imgur.com/pHpFGeg.png" group-title="شبکه‌های عربی / کویت",Ch4Teen (1080p)
 https://ch14.tv/live/ch4teenclip/playlist.m3u8
 #EXTINF:-1 tvg-id="Ch4TeenDocumentary.kw@SD" tvg-logo="https://i.imgur.com/pHpFGeg.png" group-title="شبکه‌های عربی / کویت",Ch4Teen Documentary (1080p)
 https://ch14.tv/live/ch4teendoc/playlist.m3u8
@@ -850,7 +850,7 @@ https://video.yementdy.tv/hls/yementoday.m3u8
 http://185.9.2.18/chid_218/index.m3u8
 #EXTINF:-1 tvg-id="2MMonde.ma@SD" tvg-logo="https://i.imgur.com/MvpntzA.png" group-title="شبکه‌های عربی / مراکش",2M Monde (360p)
 https://cdn-globecast.akamaized.net/live/eds/2m_monde/hls_video_ts_tuhawxpiemz257adfc/2m_monde.m3u8
-#EXTINF:-1 tvg-id="2MMonde.ma@Plus1" group-title="شبکه‌های عربی / مراکش",2M Monde +1 (1080p)
+#EXTINF:-1 tvg-id="2MMonde.ma@Plus1" tvg-logo="https://i.imgur.com/MvpntzA.png" group-title="شبکه‌های عربی / مراکش",2M Monde +1 (1080p)
 https://d2qh3gh0k5vp3v.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-n6pess5lwbghr/2M_ES.m3u8
 #EXTINF:-1 tvg-id="AlMaghribia.ma@SD" tvg-logo="https://i.imgur.com/7GaahYh.png" group-title="شبکه‌های عربی / مراکش",Al Maghribia (1080p)
 http://185.9.2.18/chid_205/index.m3u8
