@@ -90,6 +90,41 @@ jobs:
           echo "=== MAIN ACTIVITY ==="
           cat "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
 
+      - name: Validate bundled M3U playlist
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path("patch/channels.m3u")
+          lines = [line.strip() for line in p.read_text(encoding="utf-8-sig").splitlines() if line.strip()]
+          entries = []
+          pending = None
+          for line in lines:
+              if line.startswith("#EXTINF"):
+                  if pending is not None:
+                      raise SystemExit("Invalid M3U: an EXTINF entry has no stream URL")
+                  pending = line
+              elif line.startswith(("http://", "https://")):
+                  if pending is None:
+                      raise SystemExit("Invalid M3U: stream URL without EXTINF metadata")
+                  entries.append((pending, line))
+                  pending = None
+          if pending is not None:
+              raise SystemExit("Invalid M3U: final EXTINF entry has no stream URL")
+          urls = [url for _, url in entries]
+          provincial = [meta for meta, _ in entries if "شبکه‌های استانی" in meta]
+          logos = [meta for meta, _ in entries if "tvg-logo=" in meta]
+          if len(entries) < 150:
+              raise SystemExit(f"Unexpectedly small playlist: {len(entries)} entries")
+          if len(urls) != len(set(urls)):
+              raise SystemExit("Duplicate stream URLs found in bundled playlist")
+          if len(provincial) != 34:
+              raise SystemExit(f"Expected 34 provincial IRIB channels, found {len(provincial)}")
+          if len(logos) < 100:
+              raise SystemExit(f"Logo coverage regressed: only {len(logos)} entries have tvg-logo")
+          print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
+          PY
+
       - name: Build APK
         run: gradle -p "$PROJECT_DIR" :app:assembleDebug
 
