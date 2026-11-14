@@ -1,6 +1,5 @@
 #EXTM3U
-# Candidate-only country playlists sourced from IPTV-Org. Not merged into the live channel list until independently stream-validated.
-# Israel and Arab-country candidates; 24/7-only, duplicate URLs removed.
+# Candidate-only; not promoted into the live playlist until deep stream validation.
 #EXTINF:-1 tvg-id="5Plus.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",5Plus (1080p)
 http://89.33.29.115:8080/sportplus/index.m3u8
 #EXTINF:-1 tvg-id="5Stars.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",5Stars (1080p)
@@ -17,6 +16,8 @@ http://stream.mcquack.net/42/index.m3u8
 https://d15ds134q59udk.cloudfront.net/out/v1/fbba879221d045598540ee783b140fe2/index.m3u8
 #EXTINF:-1 tvg-id="GoodLife.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Good Life (576p)
 http://stream.mcquack.net/47/index.m3u8
+#EXTINF:-1 tvg-id="HalaTV.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Hala TV (1080p) (پخش زمان‌بندی‌شده)
+https://stream.panet.com/edge/halaTV/playlist.m3u8
 #EXTINF:-1 tvg-id="HealthChannel.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Health Channel (1080p)
 http://89.33.29.115:8080/Health/index.m3u8
 #EXTINF:-1 tvg-id="Hidabroot.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Hidabroot (1080p)
@@ -41,6 +42,8 @@ https://i24newsfrench-cdn.encoders.immergo.tv/master.m3u8
 https://bcovlive-a.akamaihd.net/41814196d97e433fb401c5e632d985e9/eu-central-1/5377161796001/playlist.m3u8
 #EXTINF:-1 tvg-id="i24NEWSHebrew.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",I24 News Hebrew (1080p)
 https://i24newshebrew-cdn.encoders.immergo.tv/master.m3u8
+#EXTINF:-1 tvg-id="KabbalahforthePeopleIsrael.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Kabbalah for the People (Israel) (504p) (پخش زمان‌بندی‌شده)
+https://edge3.uk.kab.tv/live/tv66-heb-high/playlist.m3u8
 #EXTINF:-1 tvg-id="Kan11.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Kan 11 (1080p)
 https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8
 #EXTINF:-1 tvg-id="KanEducational.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Kan Educational (720p)
@@ -49,8 +52,12 @@ http://stream.mcquack.net/378/index.m3u8
 http://stream.mcquack.net/294/index.m3u8
 #EXTINF:-1 tvg-id="KnessetChannel.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Knesset Channel (576p)
 http://stream.mcquack.net/48/index.m3u8
+#EXTINF:-1 tvg-id="KnessetChannel.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Knesset Channel (480p) (پخش زمان‌بندی‌شده)
+https://contact.gostreaming.tv/Knesset/myStream/playlist.m3u8
 #EXTINF:-1 tvg-id="Makan33.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Makan 33 (1080p)
 https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/makan/live.livx/playlist.m3u8
+#EXTINF:-1 tvg-id="" group-title="اسرائیل / شبکه‌های تلویزیونی",Musayof (Israel) (240p) (پخش زمان‌بندی‌شده)
+http://wowza.media-line.co.il/Musayof-Live/livestream.sdp/playlist.m3u8
 #EXTINF:-1 tvg-id="Now14.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Now 14 (1080p)
 https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8
 #EXTINF:-1 tvg-id="RealityChannel.il@SD" group-title="اسرائیل / شبکه‌های تلویزیونی",Reality Channel
@@ -77,6 +84,8 @@ https://mediaserver.abnvideos.com/streams/abnsat.m3u8
 https://stream.afaq.iq/live/channel/afaqtv/playlist.m3u8
 #EXTINF:-1 tvg-id="AfarinBaxcha.iq@SD" group-title="شبکه‌های عربی / عراق",Afarin Baxcha (1080p)
 https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8
+#EXTINF:-1 tvg-id="AfarinTV.iq@SD" group-title="شبکه‌های عربی / عراق",Afarin TV (720p) (پخش زمان‌بندی‌شده)
+https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8
 #EXTINF:-1 tvg-id="AlIraqia.iq@SD" group-title="شبکه‌های عربی / عراق",Al Iraqia (1080p)
 https://imn-live.esite-lab.com/hls/iraqia-general.m3u8
 #EXTINF:-1 tvg-id="AlIraqiaKurdish.iq@HD" group-title="شبکه‌های عربی / عراق",Al Iraqia Kurdish (720p)
@@ -87,6 +96,10 @@ https://imn-live.esite-lab.com/hls/iraqia-news.m3u8
 https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8
 #EXTINF:-1 tvg-id="AlJanoubTV.iq@SD" group-title="شبکه‌های عربی / عراق",Al Janoub TV
 https://live.alissahost.net/hls/test.m3u8
+#EXTINF:-1 tvg-id="AlRafidainTV.tr@SD" group-title="شبکه‌های عربی / عراق",Al Rafidain (720p) (پخش زمان‌بندی‌شده)
+https://arrafidain.tvplayer.online/arrafidaintv/source/playlist.m3u8
+#EXTINF:-1 tvg-id="AlRasheedTV.iq@SD" group-title="شبکه‌های عربی / عراق",Al Rasheed TV (1080p) (پخش زمان‌بندی‌شده)
+https://media1.livaat.com/static/AL-RASHEED-HD/playlist.m3u8
 #EXTINF:-1 tvg-id="AlSharqiya.iq@SD" group-title="شبکه‌های عربی / عراق",Al Sharqiya (1080p)
 http://185.9.2.18/chid_144/index.m3u8
 #EXTINF:-1 tvg-id="AlSharqiya.iq@SD" group-title="شبکه‌های عربی / عراق",Al Sharqiya (1080p)
@@ -95,6 +108,8 @@ https://indexforce.com/tvhighres/mystream/playlist.m3u8
 https://indexforce.com/newshighres/mystream/playlist.m3u8
 #EXTINF:-1 tvg-id="AlAimmaTV.iq@SD" group-title="شبکه‌های عربی / عراق",Al-Aimma TV (1080p)
 https://alaimma.tv/live/index.m3u8
+#EXTINF:-1 tvg-id="AlJawadainTV.iq@SD" group-title="شبکه‌های عربی / عراق",Al-Jawadain TV (1080p) (پخش زمان‌بندی‌شده)
+https://live.aljawadain.org/live/aljawadaintv/playlist.m3u8
 #EXTINF:-1 tvg-id="AlNaeemTV.iq@SD" group-title="شبکه‌های عربی / عراق",Al-Naeem TV
 http://37.238.136.61/hls/stream.m3u8
 #EXTINF:-1 tvg-id="AlabbassiaTV.iq@HD" group-title="شبکه‌های عربی / عراق",Alabbassia TV (1080p)
@@ -129,12 +144,20 @@ https://avr.host247.net/live/emantv/playlist.m3u8
 https://avr.host247.net/live/FarmodaTV/playlist.m3u8
 #EXTINF:-1 tvg-id="ImamHusseinTV1.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 1 (1080p)
 http://fa.imamhossaintv.com/live/ih1.m3u8
+#EXTINF:-1 tvg-id="ImamHusseinTV1.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 1 (1080p) (پخش زمان‌بندی‌شده)
+https://live.imamhossaintv.com/live/ih1.m3u8
 #EXTINF:-1 tvg-id="ImamHusseinTV2.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 2 (1080p)
 http://ar.imamhossaintv.com/live/ih2.m3u8
+#EXTINF:-1 tvg-id="ImamHusseinTV2.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 2 (1080p) (پخش زمان‌بندی‌شده)
+https://live.imamhossaintv.com/live/ih2.m3u8
 #EXTINF:-1 tvg-id="ImamHusseinTV3.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 3 (1080p)
 http://en.imamhossaintv.com/live/ih3.m3u8
+#EXTINF:-1 tvg-id="ImamHusseinTV3.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 3 (1080p) (پخش زمان‌بندی‌شده)
+https://live.imamhossaintv.com/live/ih3.m3u8
 #EXTINF:-1 tvg-id="ImamHusseinTV4.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 4 (1080p)
 http://ur.imamhossaintv.com/live/ih4.m3u8
+#EXTINF:-1 tvg-id="ImamHusseinTV4.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 4 (1080p) (پخش زمان‌بندی‌شده)
+https://live.imamhossaintv.com/live/ih4.m3u8
 #EXTINF:-1 tvg-id="ImamHusseinTV5.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 5 (720p)
 http://live.al-zahratv.com/live/playlist.m3u8
 #EXTINF:-1 tvg-id="ImamHusseinTV6.iq@SD" group-title="شبکه‌های عربی / عراق",Imam Hussein TV 6 (1080p)
@@ -149,6 +172,8 @@ https://stream.ishtartv.com/live/iShtarHD/playlist.m3u8
 https://ktvlive.online/stream/hls/ch3.m3u8
 #EXTINF:-1 tvg-id="Kurdistan24.iq@SD" group-title="شبکه‌های عربی / عراق",Kurdistan 24 (1080p)
 https://hlspackager.akamaized.net/live/DB/K24/HLS/K24.m3u8
+#EXTINF:-1 tvg-id="KurdistanTV.iq@SD" group-title="شبکه‌های عربی / عراق",Kurdistan TV (720p) (پخش زمان‌بندی‌شده)
+https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="Kurdsat.iq@SD" group-title="شبکه‌های عربی / عراق",Kurdsat (1080p)
 https://hlspackager.akamaized.net/live/DB/KURDSAT_HD/HLS/KURDSAT_HD.m3u8
 #EXTINF:-1 tvg-id="Kurdsat.iq@SD" group-title="شبکه‌های عربی / عراق",Kurdsat (576p)
@@ -163,12 +188,18 @@ https://vmi747311.contaboserver.net/hls/livetv.m3u8
 https://livefa.marjaeyattv.com/mtv_ar/playlist.m3u8
 #EXTINF:-1 tvg-id="MarjaeyatTVEnglish.iq@SD" group-title="شبکه‌های عربی / عراق",Marjaeyat TV English (1080p)
 https://livefa.marjaeyattv.com/mtv_en/playlist.m3u8
+#EXTINF:-1 tvg-id="MarjaeyatTVPersian.iq@SD" group-title="شبکه‌های عربی / عراق",Marjaeyat TV Persian (240p) (پخش زمان‌بندی‌شده)
+https://livefa.marjaeyattv.com/mtv_fa/playlist.m3u8
 #EXTINF:-1 tvg-id="MBCIraq.iq@SD" group-title="شبکه‌های عربی / عراق",MBC Iraq (1080p)
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-iraq/e38c44b1b43474e1c39cb5b90203691e/index.m3u8
 #EXTINF:-1 tvg-id="Mixkurdy.iq@HD" group-title="شبکه‌های عربی / عراق",Mixkurdy (1080p)
 https://avr.host247.net/live/Mix-kurdy/playlist.m3u8
+#EXTINF:-1 tvg-id="NRTTV.iq@SD" group-title="شبکه‌های عربی / عراق",NRT TV (720p) (پخش زمان‌بندی‌شده)
+https://media.streambrothers.com:1936/8226/8226/playlist.m3u8
 #EXTINF:-1 tvg-id="PayamTV.iq@SD" group-title="شبکه‌های عربی / عراق",Payam TV (1080p)
 https://hlspackager.akamaized.net/live/DB/PAYAM_TV/HLS/PAYAM_TV.m3u8
+#EXTINF:-1 tvg-id="PayamTV.iq@SD" group-title="شبکه‌های عربی / عراق",Payam TV (720p) (پخش زمان‌بندی‌شده)
+https://media2.streambrothers.com:1936/8218/8218/playlist.m3u8
 #EXTINF:-1 tvg-id="RudawTV.iq@SD" group-title="شبکه‌های عربی / عراق",Rudaw TV (1080p)
 https://hlspackager.akamaized.net/live/DB/RUDAW/HLS/RUDAW.m3u8
 #EXTINF:-1 tvg-id="RudawTV.iq@SD" group-title="شبکه‌های عربی / عراق",Rudaw TV (1080p)
@@ -185,6 +216,8 @@ https://utviraqi-live.lg.mncdn.com/utviraqi-live/64c80359/index.m3u8
 https://hlspackager.akamaized.net/live/DB/WAAR_HD/HLS/WAAR_HD.m3u8
 #EXTINF:-1 tvg-id="WaarTV.iq@SD" group-title="شبکه‌های عربی / عراق",Waar TV (1080p)
 https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8
+#EXTINF:-1 tvg-id="ZagrosTV.iq@SD" group-title="شبکه‌های عربی / عراق",Zagros (720p) (پخش زمان‌بندی‌شده)
+https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="ZagrosTV.iq@SD" group-title="شبکه‌های عربی / عراق",Zagros TV (1080p)
 https://hlspackager.akamaized.net/live/DB/ZAGROS_TV/HLS/ZAGROS_TV.m3u8
 #EXTINF:-1 tvg-id="" group-title="شبکه‌های عربی / عراق",Zarok TV Sorani (720p)
@@ -195,9 +228,11 @@ https://d2hng5r56zpsbw.cloudfront.net/out/v1/9c4c990f44bb4767bb46271f326dd574/in
 https://shd-amg-fast.edgenextcdn.net/tx001/playlist.m3u8
 #EXTINF:-1 tvg-id="AlAlamAlYawm.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Alam Al Yawm
 https://mn-nl.mncdn.com/mekameleen/smil:mekameleentv.smil/chunklist_b928000.m3u8
-#EXTINF:-1 tvg-id="AlArabiyaEnglish.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Arabiya English (1080p)
+#EXTINF:-1 tvg-id="AlHadath.sa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Arabiya Al Hadath (1080p) (پخش زمان‌بندی‌شده)
+https://av.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="AlArabiyaEnglish.sa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Arabiya English (1080p)
 https://live.alarabiya.net/alarabiapublish/english/playlist_dvr.m3u8
-#EXTINF:-1 tvg-id="AlArabiyaEnglish.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Arabiya English (1080p)
+#EXTINF:-1 tvg-id="AlArabiyaEnglish.sa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Arabiya English (1080p)
 https://shls-live-enc.edgenextcdn.net/out/v1/07a6ab2d57b2453a91bbdd2d46b5865a/index.m3u8
 #EXTINF:-1 tvg-id="AlEkhbariya.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Ekhbariya (1080p)
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-ekhbaria/297b3ef1cd0633ad9cfba7473a686a06/index.m3u8
@@ -205,10 +240,14 @@ https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-ekhbaria/297b3ef1cd0633ad9
 https://cdn-globecast.akamaized.net/live/eds/al_ekhbariya/hls_roku/index.m3u8
 #EXTINF:-1 tvg-id="AlHadath.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Hadath (1080p)
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-hadath/2ff87ec4c2f3ede35295a20637d9f8fd/index.m3u8
+#EXTINF:-1 tvg-id="AlHadath.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Hadath TV (1080p) (پخش زمان‌بندی‌شده)
+https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="AlQuranAlKareemTV.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Quran Al Kareem TV (720p)
 http://m.live.net.sa:1935/live/quran/gmswf.m3u8
 #EXTINF:-1 tvg-id="AlQuranAlKareemTV.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Quran Al Kareem TV (720p)
 http://m.live.net.sa:1935/live/quran/playlist.m3u8
+#EXTINF:-1 tvg-id="AlQuranAlKareemTV.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Quran Al Kareem TV (360p) (پخش زمان‌بندی‌شده)
+https://cdn-globecast.akamaized.net/live/eds/saudi_quran/hls_roku/index.m3u8
 #EXTINF:-1 tvg-id="AlResalah.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Resalah (1080p) [Geo-blocked]
 https://rotana.hibridcdn.net/rotananet/risala_net-7Y83PP5adWixDF93/playlist.m3u8
 #EXTINF:-1 tvg-id="AlRiyadhRadio.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Al Riyadh Radio (1080p)
@@ -259,6 +298,8 @@ https://stream.cisk.tech/drpal/index.m3u8
 https://shd-amg-fast.edgenextcdn.net/tx029/playlist.m3u8
 #EXTINF:-1 tvg-id="IqraaAfricaEurope.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Iqraa Africa & Europe (1080p)
 https://playlist.fasttvcdn.com/pl/dlkqw1ftuvuuzkcb4pxdcg/Iqraafasttv1/playlist.m3u8
+#EXTINF:-1 tvg-id="IqraaArabic.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Iqraa Arabic (1080p) (پخش زمان‌بندی‌شده)
+https://playlist.fasttvcdn.com/pl/dlkqw1ftuvuuzkcb4pxdcg/Iqraafasttv3/playlist.m3u8
 #EXTINF:-1 tvg-id="IqraaQuran.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Iqraa Quran (1080p)
 https://playlist.fasttvcdn.com/pl/dlkqw1ftuvuuzkcb4pxdcg/Iqraafasttv2/playlist.m3u8
 #EXTINF:-1 tvg-id="JeddahRadio.sa@SD" group-title="شبکه‌های عربی / عربستان سعودی",Jeddah Radio (1080p)
@@ -323,11 +364,11 @@ https://shd-amg-fast.edgenextcdn.net/tx002/playlist.m3u8
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-thikrayat/8cfa8fe0c96275735745b89c683b27e3/index.m3u8
 #EXTINF:-1 tvg-id="AjmanTV.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Ajman TV (1080p)
 https://cdn1.logichost.in/ajmantv/live/playlist.m3u8
-#EXTINF:-1 tvg-id="Alarabiya.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Al Arabiya (1080p)
+#EXTINF:-1 tvg-id="Alarabiya.ae@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Arabiya (1080p)
 https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8
-#EXTINF:-1 tvg-id="AlArabiyaBusiness.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Al Arabiya Business (1080p)
+#EXTINF:-1 tvg-id="AlArabiyaBusiness.ae@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Arabiya Business (1080p)
 https://live.alarabiya.net/alarabiapublish/aswaaq.smil/playlist.m3u8
-#EXTINF:-1 tvg-id="AlArabiyaPrograms.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Al Arabiya Programs (1280p)
+#EXTINF:-1 tvg-id="AlArabiyaPrograms.ae@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Arabiya Programs (1280p)
 https://live.alarabiya.net/alarabiapublish/aaprograms.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="AlMashhad.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Al Mashhad (1080p)
 https://amg30483-amg30483c23-amgplt0794.playout.now3.amagi.tv/ts-ap-s1-n1/playlist/amg30483-amg30483c23-amgplt0794/playlist.m3u8?ads.appname=[APP_NAME]&ads.appstoreurl=[APP_STOREURL]&ads.appversion=[APP_VERSION]&ads.bundleid=[APP_BUNDLE]&ads.coppa=0&ads.country=[COUNTRY]&ads.deviceid=[DEVICE_ID]&ads.devicemake=[DEVICE_MAKE]&ads.devicemodel=[DEVICE_MODEL]&ads.devicetype=[DEVICE_TYPE]&ads.donotsell=[DNS]&ads.fck=[FCK]&ads.gdpr=[GDPR]&ads.gdprconsent=[GDPR_CONSENT]&ads.givn=[NONCE]&ads.ic=[IC]&ads.ifa=[IFA]&ads.ifatype=[IFA_TYPE]&ads.ip=[IP]&ads.lat=[LMT]&ads.network_name=[networkname]&ads.targetad=[TARGETAD_ALLOWED]&ads.ua=[UA]&ads.usprivacy=[US_PRIVACY]&ads.viewsize=[VIEWSIZE]
@@ -403,6 +444,12 @@ https://live.kwikmotion.com/smc1live/smc1tv.smil/playlist.m3u8
 https://cdn-globecast.akamaized.net/live/eds/sharjah_tv/hls_roku/index.m3u8
 #EXTINF:-1 tvg-id="SkyNewsArabia.ae@HD" group-title="شبکه‌های عربی / امارات متحده عربی",Sky News Arabia (1080p)
 https://live-stream.skynewsarabia.com/c-horizontal-channel/horizontal-stream/index.m3u8
+#EXTINF:-1 tvg-id="SkyNewsArabia.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Sky News Arabia (1080p) (پخش زمان‌بندی‌شده)
+https://stream.skynewsarabia.com/ott/ott.m3u8
+#EXTINF:-1 tvg-id="SkyNewsArabia.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Sky News Arabia (720p) (پخش زمان‌بندی‌شده)
+https://stream.skynewsarabia.com/hls/sna.m3u8
+#EXTINF:-1 tvg-id="SkyNewsArabiaVertical.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Sky News Arabia (Portrait) (1280p) (پخش زمان‌بندی‌شده)
+https://stream.skynewsarabia.com/vertical/vertical.m3u8
 #EXTINF:-1 tvg-id="SkyNewsArabiaVertical.ae@HD" group-title="شبکه‌های عربی / امارات متحده عربی",Sky News Arabia Vertical (1080p)
 https://live-stream.skynewsarabia.com/c-vertical-channel/vertical-stream/index.m3u8
 #EXTINF:-1 tvg-id="SpacetoonArabic.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Spacetoon Arabic (576p)
@@ -411,12 +458,22 @@ https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8
 https://svs.itworkscdn.net/smcwatarlive/smcwatar/playlist.m3u8
 #EXTINF:-1 tvg-id="PeaceTVBangla.ae@SD" group-title="شبکه‌های عربی / امارات متحده عربی",Peace TV Bangla (1080p)
 http://103.135.253.32:8080/Pace-TV-Bangla/index.m3u8
+#EXTINF:-1 tvg-id="AghapyTV.eg@SD" group-title="شبکه‌های عربی / مصر",Aghapy TV (1080p) (پخش زمان‌بندی‌شده)
+https://5b622f07944df.streamlock.net/aghapy.tv/aghapy.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="AlGhadTV.eg@SD" group-title="شبکه‌های عربی / مصر",Al Ghad TV (1080p)
 https://eazyvwqssi.erbvr.com/alghadtv/alghadtv.m3u8
 #EXTINF:-1 tvg-id="AlMasriyah.eg@SD" group-title="شبکه‌های عربی / مصر",Al Masriyah (1080p)
 http://185.9.2.18/chid_247/index.m3u8
+#EXTINF:-1 tvg-id="ATVSat.us@SD" group-title="شبکه‌های عربی / مصر",ATVSat (1080p) (پخش زمان‌بندی‌شده)
+https://stream.atvsat.com/atvsatlive/smil:atvsatlive.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="CopticTV.eg@SD" group-title="شبکه‌های عربی / مصر",Coptic TV (720p) (پخش زمان‌بندی‌شده)
+https://ctv.icopts.app/CTV/index.fmp4.m3u8
 #EXTINF:-1 tvg-id="ElRadio9090FM.eg@SD" group-title="شبکه‌های عربی / مصر",El Radio 9090 FM (480p)
 https://9090video.mobtada.com/hls/stream.m3u8
+#EXTINF:-1 tvg-id="ElsharqTV.tr@SD" group-title="شبکه‌های عربی / مصر",Elsharq TV (1080p) (پخش زمان‌بندی‌شده)
+https://mn-nl.mncdn.com/elsharq_live/live/playlist.m3u8
+#EXTINF:-1 tvg-id="HudaTV.eg@SD" group-title="شبکه‌های عربی / مصر",Huda TV (720p) (پخش زمان‌بندی‌شده)
+https://cdn.bestream.io:19360/elfaro1/elfaro1.m3u8
 #EXTINF:-1 tvg-id="HyaTV.eg@SD" group-title="شبکه‌های عربی / مصر",Hya TV (1080p)
 https://freem3u.xyz/api/live/play.m3u8?vid=187
 #EXTINF:-1 tvg-id="KoogiTV.eg@SD" group-title="شبکه‌های عربی / مصر",Koogi TV (1080p)
@@ -431,22 +488,34 @@ https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr/956eac069c78a35d4724
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8
 #EXTINF:-1 tvg-id="MixHollywood.eg@SD" group-title="شبکه‌های عربی / مصر",Mix Hollywood (1080p)
 https://ml-pull-hwc.myco.io/MixTV/hls/index.m3u8
+#EXTINF:-1 tvg-id="NogoumFMTV.eg@SD" group-title="شبکه‌های عربی / مصر",NogoumFMTV (672p) (پخش زمان‌بندی‌شده)
+https://nogoumtv.nrpstream.com/hls/stream.m3u8
 #EXTINF:-1 tvg-id="RotanaCinemaEgypt.eg@SD" group-title="شبکه‌های عربی / مصر",Rotana Cinema Egypt (1080p) [Geo-blocked]
 https://rotana.hibridcdn.net/rotananet/cinemamasr_net-7Y83PP5adWixDF93/playlist.m3u8
 #EXTINF:-1 tvg-id="WatanTV.eg@SD" group-title="شبکه‌های عربی / مصر",Watan TV (1080p)
 https://rp.tactivemedia.com/watantv_source/live/playlist.m3u8
 #EXTINF:-1 tvg-id="AghaniAghaniTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Aghani Aghani TV (1080p)
 https://cdn.streamlane.tv/hls/aghanitv/index.m3u8
+#EXTINF:-1 tvg-id="AlIttihadTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Al Ittihad (552p) (پخش زمان‌بندی‌شده)
+http://185.105.4.151:8080/_defapp_/ittihad/index.m3u8
+#EXTINF:-1 tvg-id="AlIttihadTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Al Ittihad (552p) (پخش زمان‌بندی‌شده)
+https://live.alittihad.tv:444/ittihad/index.m3u8
 #EXTINF:-1 tvg-id="AlJadeed.lb@SD" group-title="شبکه‌های عربی / لبنان",Al Jadeed (1080p)
 http://185.9.2.18/chid_391/mono.m3u8
-#EXTINF:-1 tvg-id="AlMayadeenTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Al Mayadeen (576p)
+#EXTINF:-1 tvg-id="AlManar.lb@SD" group-title="شبکه‌های عربی / لبنان",Al Manar (576p) (پخش زمان‌بندی‌شده)
+https://edge.fastpublish.me/live/index.m3u8
+#EXTINF:-1 tvg-id="AlMayadeenTV.lb@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Mayadeen (576p)
 https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="AlImanTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Aliman TV (240p) (پخش زمان‌بندی‌شده)
+https://svs.itworkscdn.net/alimanlive/imantv.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="ALWifakNewsTV.lb@SD" group-title="شبکه‌های عربی / لبنان",ALWifak News TV (720p)
 http://alwifaklive.info:1935/live/myStream/playlist.m3u8
 #EXTINF:-1 tvg-id="ArabicaTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Arabica TV (720p)
 http://istream.binarywaves.com:8081/hls/arabica/playlist.m3u8
 #EXTINF:-1 tvg-id="CharityTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Charity TV
 https://652930de05533.streamlock.net/live/ngrp:livestream_all/playlist.m3u8
+#EXTINF:-1 tvg-id="CharityTV.lb@SD" group-title="شبکه‌های عربی / لبنان",CharityTV (1080p) (پخش زمان‌بندی‌شده)
+http://185.105.4.236:1935/live/ngrp:livestream_all/live.m3u8
 #EXTINF:-1 tvg-id="FutureTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Future TV (1080p)
 https://live.kwikmotion.com/futurelive/ftv.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="LanaTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Lana TV (576p)
@@ -459,6 +528,14 @@ http://185.9.2.18/chid_521/index.m3u8
 https://hms.pfs.gdn/hms/v1/broadcast/hlmvmp2hfriode891/playlist.m3u8
 #EXTINF:-1 tvg-id="MTVLebanon.lb@SD" group-title="شبکه‌های عربی / لبنان",MTV Lebanon (1080p)
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mtv-lebanon/b8ebb2a5affb812f1541712adde10e26/index.m3u8
+#EXTINF:-1 tvg-id="NabaaTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Nabaa TV (720p) (پخش زمان‌بندی‌شده)
+http://31.14.40.237:1935/live/Nabaa/playlist.m3u8
+#EXTINF:-1 tvg-id="NabaaTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Nabaa TV (720p) (پخش زمان‌بندی‌شده)
+https://5dc7d824154d0.streamlock.net/live/Nabaa/playlist.m3u8
+#EXTINF:-1 tvg-id="NabaaTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Nabaa TV (720p) (پخش زمان‌بندی‌شده)
+https://655ca86f46b1f.streamlock.net/live/Nabaa/playlist.m3u8
+#EXTINF:-1 tvg-id="NourAlKoddass.lb@SD" group-title="شبکه‌های عربی / لبنان",Nour Al Koddas (406p) (پخش زمان‌بندی‌شده)
+https://svs.itworkscdn.net/nour1satlive/livestream/playlist.m3u8
 #EXTINF:-1 tvg-id="NourAlSharq.lb@SD" group-title="شبکه‌های عربی / لبنان",Nour Al Sharq (576p)
 https://svs.itworkscdn.net/nour8satlive/livestream/playlist.m3u8
 #EXTINF:-1 tvg-id="NourElShabeb.lb@SD" group-title="شبکه‌های عربی / لبنان",Nour El Shabeb (720p)
@@ -469,6 +546,10 @@ https://svs.itworkscdn.net/nour9satlive/livestream/playlist.m3u8
 https://svs.itworkscdn.net/nour4satlive/livestream/playlist.m3u8
 #EXTINF:-1 tvg-id="NoursatEnglish.lb@SD" group-title="شبکه‌های عربی / لبنان",Noursat English (576p)
 https://svs.itworkscdn.net/noursatenglive/noursateng.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="OneTV.lb@SD" group-title="شبکه‌های عربی / لبنان",One TV (720p) (پخش زمان‌بندی‌شده)
+https://hms.pfs.gdn/v1/broadcast/one/playlist.m3u8
+#EXTINF:-1 tvg-id="OneFM.lb@SD" group-title="شبکه‌های عربی / لبنان",OneFM (720p) (پخش زمان‌بندی‌شده)
+https://hms.pfs.gdn/v1/broadcast/onefm/playlist.m3u8
 #EXTINF:-1 tvg-id="OTV.lb@SD" group-title="شبکه‌های عربی / لبنان",OTV (1080p)
 https://otv.hibridcdn.net/otv/tv_abr/playlist.m3u8
 #EXTINF:-1 tvg-id="PalestineAlYawm.lb@SD" group-title="شبکه‌های عربی / لبنان",Palestine Al Yawm (720p)
@@ -479,6 +560,8 @@ https://live.kwikmotion.com/redtvlive/redtv.smil/playlist.m3u8
 http://31.14.41.69:8080/hls/sensesonline/index.m3u8
 #EXTINF:-1 tvg-id="TahaTV.lb@SD" group-title="شبکه‌های عربی / لبنان",Taha TV (576p)
 https://stream.starmenajo.com/hls/app/live/ts:fhd.m3u8
+#EXTINF:-1 tvg-id="TeleLiban.lb@SD" group-title="شبکه‌های عربی / لبنان",Tele Liban (720p) (پخش زمان‌بندی‌شده)
+https://cdn.catiacast.video/abr/ed8f807e2548db4507d2a6f4ba0c4a06/playlist.m3u8
 #EXTINF:-1 tvg-id="UNews.lb@SD" group-title="شبکه‌های عربی / لبنان",UNews (1080p)
 https://cdn.catiacast.video/abr/9436b5ab3c1171ab04a59af11951292f/playlist.m3u8
 #EXTINF:-1 tvg-id="VoiceofLebanon.lb@SD" group-title="شبکه‌های عربی / لبنان",Voice of Lebanon (1080p)
@@ -521,63 +604,63 @@ https://stream.ads.ottera.tv/playlist.m3u8?network_id=5616
 https://live.kwikmotion.com/alaraby2live/alaraby2.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="AlArabyTV2.qa@SD" group-title="شبکه‌های عربی / قطر",Al Araby TV 2 (1080p)
 https://stream.ads.ottera.tv/playlist.m3u8?network_id=5617
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های عربی / قطر",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-apps-aja-fa.getaj.net/AJA/01.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های عربی / قطر",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-apps-aja-fa.getaj.net/AJA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های عربی / قطر",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-apps-aja-v3-fa.getaj.net/AJA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های عربی / قطر",Al Jazeera (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera (1080p)
 https://live-hls-web-aja-fa.thehlive.com/AJA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera2.qa@HD" group-title="شبکه‌های عربی / قطر",Al Jazeera 2 (1080p)
+#EXTINF:-1 tvg-id="AlJazeera2.qa@HD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera 2 (1080p)
 https://live-hls-web-aja2-gcp.thehlive.com/AJA2/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های عربی / قطر",Al Jazeera Arabic (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Arabic (1080p)
 https://live-hls-v3-aja.getaj.net/AJA-V3/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های عربی / قطر",Al Jazeera Arabic (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@Arabic" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Arabic (1080p)
 https://live-hls-web-aja.getaj.net/AJA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Documentary (1080p) [Geo-blocked]
+#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Documentary (1080p) [Geo-blocked]
 https://live-hls-apps-ajd-fa.getaj.net/AJD/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Documentary (1080p) [Geo-blocked]
+#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Documentary (1080p) [Geo-blocked]
 https://live-hls-apps-ajd-v3-fa.getaj.net/AJD/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Documentary (1080p) [Geo-blocked]
+#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Documentary (1080p) [Geo-blocked]
 https://live-hls-web-ajd-fa.thehlive.com/AJD/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Documentary (1080p) [Geo-blocked]
+#EXTINF:-1 tvg-id="AlJazeeraDocumentary.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Documentary (1080p) [Geo-blocked]
 https://live-hls-web-ajd.getaj.net/AJD/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های عربی / قطر",Al Jazeera English (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
 https://live-hls-apps-aje-fa.getaj.net/AJE/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های عربی / قطر",Al Jazeera English (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
 https://live-hls-apps-aje-v3-fa.getaj.net/AJE/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های عربی / قطر",Al Jazeera English (1080p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (1080p)
 https://live-hls-web-aje-fa.thehlive.com/AJE/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های عربی / قطر",Al Jazeera English (720p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (720p)
 http://170.83.16.50/ALJAZEERA/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های عربی / قطر",Al Jazeera English (576p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (576p)
 https://fta.ektv.in/live/318/master.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های عربی / قطر",Al Jazeera English (576p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English (576p)
 https://streams.tangotv.in/ALJAZEERAHD/ORIGIN/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های عربی / قطر",Al Jazeera English
+#EXTINF:-1 tvg-id="AlJazeera.qa@English" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English
 https://cdn-7.pishow.tv/live/429/master.m3u8
-#EXTINF:-1 tvg-id="AlJazeera.qa@EnglishHD" group-title="شبکه‌های عربی / قطر",Al Jazeera English HD (576p)
+#EXTINF:-1 tvg-id="AlJazeera.qa@EnglishHD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera English HD (576p)
 http://stream.mcquack.net/131/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher (1080p)
 https://live-hls-apps-ajm-fa.getaj.net/AJM/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher (1080p)
 https://live-hls-apps-ajm-v3-fa.getaj.net/AJM/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher (1080p)
 https://live-hls-web-ajm-fa.thehlive.com/AJM/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher (1080p)
 https://live-hls-web-ajm.getaj.net/AJM/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasher24.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher 24 (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasher24.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher 24 (1080p)
 https://live-hls-apps-ajm24-fa.getaj.net/AJM24/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasher24.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher 24 (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasher24.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher 24 (1080p)
 https://live-hls-web-ajm24-fa.getaj.net/AJM24/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasher24.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher 24 (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasher24.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher 24 (1080p)
 https://live-hls-web-ajm24-fa.thehlive.com/AJM24/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasherBroadcast2.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher Broadcast 2 (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasherBroadcast2.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher Broadcast 2 (1080p)
 https://live-hls-apps-ajm2-fa.getaj.net/AJM2/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasherBroadcast2.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher Broadcast 2 (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasherBroadcast2.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher Broadcast 2 (1080p)
 https://live-hls-web-ajm2-fa.getaj.net/AJM2/index.m3u8
-#EXTINF:-1 tvg-id="AlJazeeraMubasherBroadcast2.qa@SD" group-title="شبکه‌های عربی / قطر",Al Jazeera Mubasher Broadcast 2 (1080p)
+#EXTINF:-1 tvg-id="AlJazeeraMubasherBroadcast2.qa@SD" group-title="شبکه‌های خبری عربی بین‌المللی",Al Jazeera Mubasher Broadcast 2 (1080p)
 https://live-hls-web-ajm2-fa.thehlive.com/AJM2/index.m3u8
 #EXTINF:-1 tvg-id="AlMaarefTV.qa@SD" group-title="شبکه‌های عربی / قطر",Al Maaref TV (1080p)
 https://bucharest.zeuscdn724.com/lb0/CH-AL-MA/index.m3u8
@@ -647,153 +730,13 @@ https://kwtsplta.cdn.mangomolo.com/spl/smil:spl.stream.smil/chunklist.m3u8
 https://ffs.gulfsat.com/Marina-TV-HD/index.m3u8
 #EXTINF:-1 tvg-id="RitmuTV.kw@SD" group-title="شبکه‌های عربی / کویت",Ritmu TV
 https://659605a54e9a6.streamlock.net:8443/live/livestream/playlist.m3u8
-#EXTINF:-1 tvg-id="AlistiqamaTV.om@SD" group-title="شبکه‌های عربی / عمان",Alistiqama TV (576p)
-https://jmc-live.ercdn.net/alistiqama/alistiqama.m3u8
-#EXTINF:-1 tvg-id="OmanTVCultural.om@SD" group-title="شبکه‌های عربی / عمان",Oman Althakafia (1080p)
-https://partwota.cdn.mgmlcdn.com/omcultural/smil:omcultural.stream.smil/chunklist.m3u8
-#EXTINF:-1 tvg-id="OmanTVMubashir.om@SD" group-title="شبکه‌های عربی / عمان",Oman Mubashir (1080p)
-https://partwota.cdn.mgmlcdn.com/omlive/smil:omlive.stream.smil/chunklist.m3u8
-#EXTINF:-1 tvg-id="OmanTV.om@SD" group-title="شبکه‌های عربی / عمان",Oman TV (1080p)
-https://partneta.cdn.mgmlcdn.com/omantv/smil:omantv.stream.smil/chunklist.m3u8
-#EXTINF:-1 tvg-id="OmanTV.om@SD" group-title="شبکه‌های عربی / عمان",Oman TV (360p)
-https://cdn-globecast.akamaized.net/live/eds/oman_tv/hls_roku/index.m3u8
-#EXTINF:-1 tvg-id="OmanTV.om@SD" group-title="شبکه‌های عربی / عمان",Oman TV
-http://trn03.bozztv.com/gin-omantv/index.m3u8
-#EXTINF:-1 tvg-id="AlerthAlnabawiChannel.jo@SD" group-title="شبکه‌های عربی / اردن",Alerth Alnabawi Channel (576p)
-http://82.212.74.2:8000/live/7307.m3u8
-#EXTINF:-1 tvg-id="AltaghierTV.jo@SD" group-title="شبکه‌های عربی / اردن",Altaghier TV (1080p)
-https://jmc-live.ercdn.net/altaghier/altaghier.m3u8
-#EXTINF:-1 tvg-id="AmmanTV.jo@SD" group-title="شبکه‌های عربی / اردن",Amman TV (720p)
-https://ammantv-live.ercdn.net/ammantvhd/ammantvhd.m3u8
-#EXTINF:-1 tvg-id="AmmanTV.jo@SD" group-title="شبکه‌های عربی / اردن",Amman TV (720p)
-https://htvnksdtmy.erbvr.com/ammantvhd/ammantvhd.m3u8
-#EXTINF:-1 tvg-id="JordanArchive.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Archive (1080p)
-https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Archive/playlist.m3u8
-#EXTINF:-1 tvg-id="JordanComedy.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Comedy (1080p)
-https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Comedy/playlist.m3u8
-#EXTINF:-1 tvg-id="JordanDrama.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Drama (1080p)
-https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Drama/playlist.m3u8
-#EXTINF:-1 tvg-id="JordanKitchen.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Kitchen (1080p)
-https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/cooking/playlist.m3u8
-#EXTINF:-1 tvg-id="JordanTV.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Satellite Channel (1080p)
-https://jrtv-live.ercdn.net/jordanhd/jordanhd.m3u8
-#EXTINF:-1 tvg-id="JordanSongs.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Songs (1080p)
-https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Song/playlist.m3u8
-#EXTINF:-1 tvg-id="JordanSport.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Sport (1080p) [Geo-blocked]
-https://jrtv-live.ercdn.net/jordansporthd/jordansporthd.m3u8
-#EXTINF:-1 tvg-id="JordanTourism.jo@SD" group-title="شبکه‌های عربی / اردن",Jordan Tourism (1080p)
-https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Tourism/playlist.m3u8
-#EXTINF:-1 tvg-id="KaifaTV.jo@SD" group-title="شبکه‌های عربی / اردن",Kaifa TV (576p)
-http://82.212.74.2:8000/live/7311.m3u8
-#EXTINF:-1 tvg-id="RoyaTV.jo@SD" group-title="شبکه‌های عربی / اردن",Roya TV (1080p)
-https://live.kwikmotion.com/royatvpublic/royatv.smil/playlist.m3u8
-#EXTINF:-1 tvg-id="AjyalTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Ajyal TV (720p)
-http://htvajyal.mada.ps:8888/ajyal/index.m3u8
-#EXTINF:-1 tvg-id="AjyalTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Ajyal TV (720p)
-http://htvmada.mada.ps:8888/ajyal/index.m3u8
-#EXTINF:-1 tvg-id="AlMadina.ps@SD" group-title="شبکه‌های عربی / فلسطین",Al Madina (720p)
-https://streaming.zaytonatube.com:8081/AlMadinatv/almadina21/index.m3u8
-#EXTINF:-1 tvg-id="AlNajahNews.ps@SD" group-title="شبکه‌های عربی / فلسطین",Al Najah News (720p)
-https://streaming.najah.edu:8443/hls/AlNajah.m3u8
-#EXTINF:-1 tvg-id="FalastiniTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Falastini TV (1080p)
-https://rp.tactivemedia.com/palestiniantv_source/live/playlist.m3u8
-#EXTINF:-1 tvg-id="HolyQuranRadioNablus.ps@SD" group-title="شبکه‌های عربی / فلسطین",Holy Quran Radio Nablus (720p)
-http://streaming.zaytonatube.com:8080/holyquran/holyquran/video.m3u8
-#EXTINF:-1 tvg-id="KolalnasTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Kolalnas TV
-https://htvint.mada.ps/kolalnas/index.m3u8
-#EXTINF:-1 tvg-id="MaanTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Ma'an TV (720p)
-https://htvmada.mada.ps:4443/maannews/index.m3u8
-#EXTINF:-1 tvg-id="PalestineEdu.ps@SD" group-title="شبکه‌های عربی / فلسطین",Palestine Edu (1080p)
-https://pbc.furrera.ps/PalestineEDU/index.m3u8
-#EXTINF:-1 tvg-id="PalestineMubasher.ps@SD" group-title="شبکه‌های عربی / فلسطین",Palestine Mubasher (1080p)
-https://pbc.furrera.ps/palestinelivehd/index.m3u8
-#EXTINF:-1 tvg-id="PalestineSatelliteChannel.ps@SD" group-title="شبکه‌های عربی / فلسطین",Palestine Satellite Channel (1080p)
-https://pbc.furrera.ps/palestinehd/index.m3u8
-#EXTINF:-1 tvg-id="PalestineSatelliteChannel.ps@SD" group-title="شبکه‌های عربی / فلسطین",Palestine Satellite Channel (360p)
-https://cdn-globecast.akamaized.net/live/eds/palestinian_satellite_channel/hls_roku/palestinian_satellite_channel.m3u8
-#EXTINF:-1 tvg-id="PalestineToday.ps@SD" group-title="شبکه‌های عربی / فلسطین",Palestine Today (480p) [Geo-blocked]
-https://live.paltodaytv.com/paltv/live/playlist.m3u8
-#EXTINF:-1 tvg-id="RadioAlbaladTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Radio Albalad TV (720p)
-http://streaming.zaytonatube.com:8080/radioalbalad/radioalbalad/playlist.m3u8
-#EXTINF:-1 tvg-id="RadioAlbaladTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Radio Albalad TV (576p)
-https://streaming.zaytonatube.com:8081/radioalbalad/radioalbalad/index.m3u8
-#EXTINF:-1 tvg-id="SerajTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Seraj TV (1080i)
-https://43869de4e1a0d641.servers.dvcloud.tv/hls/al_aqsa_channel/6udfi7v8a3eof6nlps6e9ovfrs65c7l7.m3u8
-#EXTINF:-1 tvg-id="WattanTV.ps@SD" group-title="شبکه‌های عربی / فلسطین",Wattan TV
-https://htvmada.mada.ps:4443/wattan/index.m3u8
-#EXTINF:-1 tvg-id="AlSahatTV.ye@SD" group-title="شبکه‌های عربی / یمن",Al-Sahat TV (720p)
-https://assahat.b-cdn.net/Assahat/assahatobs/index.m3u8
-#EXTINF:-1 tvg-id="YemenTodayTV.ye@SD" group-title="شبکه‌های عربی / یمن",Yemen Today TV (480p)
-https://video.yementdy.tv/hls/yementoday.m3u8
-#EXTINF:-1 tvg-id="2M.ma@SD" group-title="شبکه‌های عربی / مراکش",2M (576p)
-http://185.9.2.18/chid_218/index.m3u8
-#EXTINF:-1 tvg-id="2MMonde.ma@SD" group-title="شبکه‌های عربی / مراکش",2M Monde (360p)
-https://cdn-globecast.akamaized.net/live/eds/2m_monde/hls_video_ts_tuhawxpiemz257adfc/2m_monde.m3u8
-#EXTINF:-1 tvg-id="2MMonde.ma@Plus1" group-title="شبکه‌های عربی / مراکش",2M Monde +1 (1080p)
-https://d2qh3gh0k5vp3v.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-n6pess5lwbghr/2M_ES.m3u8
-#EXTINF:-1 tvg-id="AlMaghribia.ma@SD" group-title="شبکه‌های عربی / مراکش",Al Maghribia (1080p)
-http://185.9.2.18/chid_205/index.m3u8
-#EXTINF:-1 tvg-id="Arryadia.ma@SD" group-title="شبکه‌های عربی / مراکش",Arryadia (720p)
-http://149.100.11.252:8000/play/a065/index.m3u8
-#EXTINF:-1 tvg-id="ChadaTV.ma@SD" group-title="شبکه‌های عربی / مراکش",Chada TV (720p)
-https://edge13.vedge.infomaniak.com/livecast/ik:chadatv/manifest.m3u8
-#EXTINF:-1 tvg-id="ChadaTV.ma@SD" group-title="شبکه‌های عربی / مراکش",Chada TV (720p)
-https://edge19.vedge.infomaniak.com/livecast/ik:chadatv/playlist.m3u8
-#EXTINF:-1 tvg-id="Medi1TVAfrique.ma@SD" group-title="شبکه‌های عربی / مراکش",Medi1TV Afrique (1080p)
-https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-afrique_tm7tu45/playlist.m3u8
-#EXTINF:-1 tvg-id="Medi1TVAfrique.ma@SD" group-title="شبکه‌های عربی / مراکش",Medi1TV Afrique (1080p) (DVR) (1080p)
-https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-afrique_tm7tu45/playlist_dvr.m3u8
-#EXTINF:-1 tvg-id="Medi1TVArabic.ma@SD" group-title="شبکه‌های عربی / مراکش",Medi 1 TV Arabic (1080p)
-https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-arabic_g90v4ec/playlist.m3u8
-#EXTINF:-1 tvg-id="Medi1TVArabic.ma@SD" group-title="شبکه‌های عربی / مراکش",Medi 1 TV Arabic (1080p) (DVR) (1080p)
-https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-arabic_g90v4ec/playlist_dvr.m3u8
-#EXTINF:-1 tvg-id="Medi1TVMaghreb.ma@SD" group-title="شبکه‌های عربی / مراکش",Medi 1 TV Maghreb (1080p)
-https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-maghreb_jnbspmg/playlist.m3u8
-#EXTINF:-1 tvg-id="Medi1TVMaghreb.ma@SD" group-title="شبکه‌های عربی / مراکش",Medi 1 TV Maghreb (1080p) (DVR) (1080p)
-https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-maghreb_jnbspmg/playlist_dvr.m3u8
-#EXTINF:-1 tvg-id="StoryChannelTV.ma@SD" group-title="شبکه‌های عربی / مراکش",StoryChannel TV (720p)
-https://136044159.r.cdnsun.net/storychannel.m3u8
-#EXTINF:-1 tvg-id="AL24News.dz@SD" group-title="شبکه‌های عربی / الجزایر",AL24 News
-https://cdn.live.easybroadcast.io/abr_corp/66_al24_u4yga6h/corp/66_al24_u4yga6h_240p/chunks.m3u8
-#EXTINF:-1 tvg-id="AmouYazidTV.dz@SD" group-title="شبکه‌های عربی / الجزایر",Amou Yazid TV (576p)
-http://mkstream.servehttp.com:1940/AmouYazid/ay1/playlist.m3u8
-#EXTINF:-1 tvg-id="ElHeddafTV.dz@SD" group-title="شبکه‌های عربی / الجزایر",El-Heddaf TV (1080p)
-https://live.elheddaftv.com:8081/elheddaftv/index.m3u8
-#EXTINF:-1 tvg-id="ElwataniaTV.dz@SD" group-title="شبکه‌های عربی / الجزایر",Elwatania TV (1080i)
-https://livesstream.work.gd:5443/WebRTCApp/streams/stream.m3u8
-#EXTINF:-1 tvg-id="NileDrama.eg@SD" group-title="شبکه‌های عربی / الجزایر",Nile Drama (576p)
-http://185.9.2.18/chid_352/index.m3u8
-#EXTINF:-1 tvg-id="TV2.dz@SD" group-title="شبکه‌های عربی / الجزایر",TV2 (1080p)
-http://185.9.2.18/chid_347/index.m3u8
-#EXTINF:-1 tvg-id="TV4.dz@SD" group-title="شبکه‌های عربی / الجزایر",TV4 (720p)
-http://91.228.35.249:8001/1:0:1:06A6:3138:13E:820000:0:0:0
-#EXTINF:-1 tvg-id="ElWatania1.tn@SD" group-title="شبکه‌های عربی / تونس",El Watania 1 (1080i)
-https://sw1.tanitweb.net/TunisiaTV/_definst_/watania1/chunklist.m3u8
-#EXTINF:-1 tvg-id="ElWatania1.tn@SD" group-title="شبکه‌های عربی / تونس",El Watania 1 (1080p)
-https://sw1.tanitweb.net/TunisiaTV/_definst_/watania1/playlist.m3u8?DVR
-#EXTINF:-1 tvg-id="ElWatania1.tn@SD" group-title="شبکه‌های عربی / تونس",El Watania 1 (1080i)
-https://sw1.tanitweb.net/TunisiaTV/_definst_/watania2/chunklist.m3u8
-#EXTINF:-1 tvg-id="ElWatania2.tn@SD" group-title="شبکه‌های عربی / تونس",El Watania 2 (1080p)
-https://sw1.tanitweb.net/TunisiaTV/_definst_/watania2/playlist.m3u8?DVR
-#EXTINF:-1 tvg-id="ElyssaTV.tn@HD" group-title="شبکه‌های عربی / تونس",Elyssa TV (1080p)
-https://tv.elyssatv.com/live/master.m3u8
-#EXTINF:-1 tvg-id="MosaiqueFM.tn@SD" group-title="شبکه‌های عربی / تونس",Mosaique FM (1080p)
-https://webcam.mosaiquefm.net/mosatv/_definst_/studio/playlist.m3u8?DVR
-#EXTINF:-1 tvg-id="AlMasarTV.ly@SD" group-title="شبکه‌های عربی / لیبی",Al Masar TV (576p)
-https://starmenajo.com/hls/almasar/index.m3u8
-#EXTINF:-1 tvg-id="LibyaAlWataniya.ly@SD" group-title="شبکه‌های عربی / لیبی",Libya Al Wataniya (360p)
-https://cdn-globecast.akamaized.net/live/eds/libya_al_watanya/hls_roku/index.m3u8
-#EXTINF:-1 tvg-id="TanasuhTV.ly@HD" group-title="شبکه‌های عربی / لیبی",Tanasuh TV (1080p)
-https://kilolink.pulsarstarsolutions.com/live/smil:tanasuhtv.smil/manifest.m3u8
-#EXTINF:-1 tvg-id="TanasuhTV.ly@HD" group-title="شبکه‌های عربی / لیبی",Tanasuh TV (1080p)
-https://kilolink.pulsarstarsolutions.com/live/smil:tanasuhtv.smil/manifest.mpd
-#EXTINF:-1 tvg-id="TanasuhTV.ly@HD" group-title="شبکه‌های عربی / لیبی",Tanasuh TV (1080p)
-https://tip.stream.tanasuh.tv:4434/live/smil:tanasuhtv.smil/playlist.m3u8
-#EXTINF:-1 tvg-id="WasatTV.ly@SD" group-title="شبکه‌های عربی / لیبی",Wasat TV (1080p)
-https://alwasattv.hibridcdn.net/alwasattv/alwasat_abr/playlist.m3u8
-#EXTINF:-1 tvg-id="AlAlamiya2.sd@SD" group-title="شبکه‌های عربی / سودان",Al Alamiya 2
-http://82.212.74.98:8000/live/7815.m3u8
-#EXTINF:-1 tvg-id="DabangaTV.sd@SD" group-title="شبکه‌های عربی / سودان",Dabanga TV (1080p)
-https://hls.dabangasudan.org/hls/stream.m3u8
-#EXTINF:-1 tvg-id="SudanTV.sd@SD" group-title="شبکه‌های عربی / سودان",Sudan TV (360p)
-https://cdn-globecast.akamaized.net/live/eds/sudan_tv/hls_roku/index.m3u8
+#EXTINF:-1 tvg-id="BahrainInternational.bh@SD" group-title="شبکه‌های عربی / بحرین",Bahrain International (720p) (پخش زمان‌بندی‌شده)
+https://5c7b683162943.streamlock.net/live/ngrp:bahraininternational_all/playlist.m3u8
+#EXTINF:-1 tvg-id="BahrainQuran.bh@SD" group-title="شبکه‌های عربی / بحرین",Bahrain Quran (720p) (پخش زمان‌بندی‌شده)
+https://5c7b683162943.streamlock.net/live/ngrp:bahrainquran_all/playlist.m3u8
+#EXTINF:-1 tvg-id="BahrainSports1.bh@SD" group-title="شبکه‌های عربی / بحرین",Bahrain Sports 1 (720p) (پخش زمان‌بندی‌شده)
+https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8
+#EXTINF:-1 tvg-id="BahrainSports2.bh@SD" group-title="شبکه‌های عربی / بحرین",Bahrain Sports 2 (720p) (پخش زمان‌بندی‌شده)
+https://5c7b683162943.streamlock.net/live/ngrp:bahrainsportstwo_all/playlist.m3u8
+#EXTINF:-1 tvg-id="BahrainTV.bh@SD" group-title="شبکه‌های عربی / بحرین",Bahrain TV (720p) (پخش زمان‌بندی‌شده)
+https://5c7b683162943.streamlock.net/live/ngrp:bahraintvmain_all/playlist.m3u8
