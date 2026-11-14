@@ -128,6 +128,30 @@ jobs:
       - name: Build APK
         run: gradle -p "$PROJECT_DIR" :app:assembleDebug
 
+      - name: Verify APK package contents
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import re
+          apks = list(Path("project").glob("**/app/build/outputs/apk/debug/*.apk"))
+          if len(apks) != 1:
+              raise SystemExit(f"Expected exactly one debug APK, found {len(apks)}")
+          with ZipFile(apks[0]) as apk:
+              names = set(apk.namelist())
+              required = {"AndroidManifest.xml", "classes.dex", "assets/channels.m3u"}
+              missing = required - names
+              if missing:
+                  raise SystemExit(f"APK missing required files: {sorted(missing)}")
+              playlist = apk.read("assets/channels.m3u").decode("utf-8-sig")
+              entries = re.findall(r"(?m)^#EXTINF", playlist)
+              if len(entries) != 156:
+                  raise SystemExit(f"APK bundled playlist mismatch: expected 156 entries, found {len(entries)}")
+              if not any("شبکه‌های استانی" in line for line in playlist.splitlines()):
+                  raise SystemExit("Provincial channels metadata missing from APK")
+          print(f"APK package OK: {apks[0].name}, {apks[0].stat().st_size} bytes, 156 playlist entries")
+          PY
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
