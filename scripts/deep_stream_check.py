@@ -188,7 +188,7 @@ def run_group(name, items, mode):
         url = item["url"]
         try:
             if mode == "auto":
-                path = row.get("url", "").lower().split("?", 1)[0]
+                path = item.get("url", "").lower().split("?", 1)[0]
                 mode_for_row = "hls" if path.endswith(".m3u8") else "audio"
             else:
                 mode_for_row = mode
