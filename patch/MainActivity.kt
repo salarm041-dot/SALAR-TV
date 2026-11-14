@@ -1,6 +1,7 @@
 package com.salar.tv
 
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.asImageBitmap
@@ -120,13 +121,25 @@ fun SalarTvApp() {
     val player = remember { ExoPlayer.Builder(context).build() }
     DisposableEffect(Unit) { onDispose { player.release() } }
 
+    var selectedM3uName by remember { mutableStateOf("") }
     val m3uLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
         runCatching {
-            val content = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() } ?: ""
+            val displayName = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) cursor.getString(0) else null
+            } ?: uri.lastPathSegment ?: "playlist.m3u"
+            val content = context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+                ?: error("خواندن فایل انتخاب‌شده ممکن نشد.")
             val parsed = parseM3u(content)
-            channels.addAll(parsed)
+            require(parsed.isNotEmpty()) { "فایل انتخاب‌شده شبکه قابل‌شناسایی ندارد یا قالب M3U آن معتبر نیست." }
+            val existing = channels.map { it.url }.toSet()
+            val fresh = parsed.filter { it.url !in existing }
+            channels.addAll(fresh)
             saveChannels()
+            selectedM3uName = "$displayName • ${fresh.size} شبکه اضافه شد"
+            android.widget.Toast.makeText(context, "فایل وارد شد؛ ${fresh.size} شبکه جدید اضافه شد.", android.widget.Toast.LENGTH_LONG).show()
+        }.onFailure { error ->
+            android.widget.Toast.makeText(context, error.message ?: "خطا در واردکردن فایل M3U", android.widget.Toast.LENGTH_LONG).show()
         }
     }
 
@@ -254,8 +267,9 @@ fun SalarTvApp() {
                     }
                 } else when (page) {
                     "افزودن منابع" -> AddSourcesPage(
+                        selectedM3uName = selectedM3uName,
                         onAdd = { c -> channels.add(c); saveChannels(); page = "خانه" },
-                        onImport = { m3uLauncher.launch(arrayOf("audio/*", "application/*", "text/*")) }
+                        onImport = { m3uLauncher.launch(arrayOf("*/*")) }
                     )
                     "بیشتر" -> MorePage(
                         onSchedule = { showSchedule = true },
@@ -491,7 +505,7 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
 }
 
 @Composable
-fun AddSourcesPage(onAdd: (Channel) -> Unit, onImport: () -> Unit) {
+fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("ایران") }
@@ -524,8 +538,17 @@ fun AddSourcesPage(onAdd: (Channel) -> Unit, onImport: () -> Unit) {
             colors = ButtonDefaults.buttonColors(containerColor = Gold)
         ) { Text("ذخیره شبکه", color = Color.Black) }
         OutlinedButton(onClick = onImport, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Default.FileOpen, null); Spacer(Modifier.width(8.dp)); Text("واردکردن فایل M3U / M3U8")
+            Icon(Icons.Default.FileOpen, null); Spacer(Modifier.width(8.dp)); Text("انتخاب فایل M3U / M3U8")
         }
+        OutlinedTextField(
+            value = selectedM3uName,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("فایل انتخاب‌شده و نتیجه واردکردن") },
+            placeholder = { Text("پس از انتخاب فایل، نام آن و تعداد شبکه‌ها اینجا نمایش داده می‌شود") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = false
+        )
         Text("فقط منابع رسمی یا لینک‌هایی را وارد کنید که مجوز استفاده از آن‌ها را دارید.",
             color = Color.Gray, fontSize = 11.sp)
     }
