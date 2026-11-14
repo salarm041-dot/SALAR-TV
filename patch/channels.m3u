@@ -283,3 +283,22 @@ https://homeplushls.wns.live/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="CafeTradeTV.ir" tvg-name="Cafe Trade TV" group-title="فارسی‌زبان خارج از ایران / اقتصادی و آموزشی",Cafe Trade TV | کافه ترید
 https://cafetradehls.wns.live/hls/stream.m3u8
+
+# Additional entries matched to Salin TV public gallery; public HLS endpoints from community listings or Salin TV channel pages.
+#EXTINF:-1 tvg-id="4UPlus.ir" tvg-name="4U Plus" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/4UPlus.ir.png" group-title="فارسی‌زبان خارج از ایران / سرگرمی",4U Plus | فور یو پلاس
+https://bravoohls.wns.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="IranNama.ir" tvg-name="Iran Nama" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranNama.ir.png" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Iran Nama | ایران‌نما
+https://iran613hls.wns.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="ICCPlus.ir" tvg-name="iCC+" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ICCPlus.ir.png" group-title="فارسی‌زبان خارج از ایران / سرگرمی",iCC+ | آی‌سی‌سی پلاس
+https://icchls.wns.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="RaheNejatTV.ir" tvg-name="Rahe Nejat" group-title="فارسی‌زبان خارج از ایران / مذهبی",Rahe Nejat | راه نجات
+https://hls.rahenejat.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="4UFamily.tr" tvg-name="4U Family" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/4UFamily.tr.png" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",4U Family | فور یو خانواده
+https://familyhls.4utv.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="4Kurd.fr" tvg-name="4 Kurd" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/4Kurd.fr.png" group-title="کردی و فارسی / موسیقی",4 Kurd | فور کورد
+https://4kuhls.persiana.live/hls/stream.m3u8
