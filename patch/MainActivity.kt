@@ -1,6 +1,13 @@
 package com.salar.tv
 
 import android.net.Uri
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.URL
 import android.app.Activity
 import java.io.File
 import android.os.Bundle
@@ -50,7 +57,8 @@ data class Channel(
     val url: String,
     val country: String = "سایر",
     val kind: String = "تلویزیون",
-    val favorite: Boolean = false
+    val favorite: Boolean = false,
+    val logoUrl: String = ""
 )
 
 class MainActivity : ComponentActivity() {
@@ -73,7 +81,7 @@ fun SalarTvApp() {
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
                     add(Channel(o.optString("name"), o.optString("url"), o.optString("country"),
-                        o.optString("kind"), o.optBoolean("favorite")))
+                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl")))
                 }
             }
         }
@@ -82,7 +90,8 @@ fun SalarTvApp() {
         val arr = JSONArray()
         channels.forEach { c ->
             arr.put(JSONObject().put("name", c.name).put("url", c.url)
-                .put("country", c.country).put("kind", c.kind).put("favorite", c.favorite))
+                .put("country", c.country).put("kind", c.kind).put("favorite", c.favorite)
+                .put("logoUrl", c.logoUrl))
         }
         prefs.edit().putString("channels", arr.toString()).apply()
     }
@@ -349,6 +358,36 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
     }
 }
 
+
+@Composable
+private fun ChannelLogo(logoUrl: String, kind: String) {
+    var bitmap by remember(logoUrl) { mutableStateOf<android.graphics.Bitmap?>(null) }
+    LaunchedEffect(logoUrl) {
+        bitmap = if (logoUrl.startsWith("https://") || logoUrl.startsWith("http://")) {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    val connection = URL(logoUrl).openConnection()
+                    connection.connectTimeout = 5000
+                    connection.readTimeout = 5000
+                    connection.getInputStream().use { BitmapFactory.decodeStream(it) }
+                }.getOrNull()
+            }
+        } else null
+    }
+    Box(
+        Modifier.size(42.dp).background(Color(0xFF252B38), RoundedCornerShape(9.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        if (bitmap != null) {
+            Image(bitmap = bitmap!!.asImageBitmap(), contentDescription = "لوگوی شبکه",
+                modifier = Modifier.fillMaxSize().padding(3.dp), contentScale = ContentScale.Fit)
+        } else {
+            Icon(if (kind == "رادیو") Icons.Default.Radio else Icons.Default.Tv,
+                contentDescription = null, tint = Gold, modifier = Modifier.size(23.dp))
+        }
+    }
+}
+
 @Composable
 fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
                 onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
@@ -383,10 +422,7 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                         shape = RoundedCornerShape(14.dp)
                     ) {
                         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                if (c.kind == "رادیو") Icons.Default.Radio else Icons.Default.Tv,
-                                null, tint = Gold
-                            )
+                            ChannelLogo(c.logoUrl, c.kind)
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
@@ -532,10 +568,13 @@ private fun parseM3u(text: String): List<Channel> {
     var title = "شبکه بدون نام"
     var country = "سایر"
     var kind = "تلویزیون"
+    var logoUrl = ""
     text.lineSequence().forEach { raw ->
         val line = raw.trim()
         if (line.startsWith("#EXTINF", true)) {
             title = line.substringAfter(",", "شبکه بدون نام").trim().ifBlank { "شبکه بدون نام" }
+            logoUrl = Regex("tvg-logo=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
+                .find(line)?.groupValues?.getOrNull(1).orEmpty()
             val lower = line.lowercase()
             val group = Regex("group-title=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
                 .find(line)?.groupValues?.getOrNull(1)?.lowercase().orEmpty()
@@ -549,8 +588,8 @@ private fun parseM3u(text: String): List<Channel> {
             }
             kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
-            result.add(Channel(title, line, country, kind))
-            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"
+            result.add(Channel(title, line, country, kind, logoUrl = logoUrl))
+            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""
         }
     }
     return result.distinctBy { it.url }
