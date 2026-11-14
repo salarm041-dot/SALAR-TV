@@ -81,7 +81,7 @@ https://oitnhls.wns.live/hls/stream.m3u8
 https://tv.iraniancongress.com/stream/tv.m3u8
 #EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",Iran National Revolution TV
 https://hls.irannrtv.live/hls/stream.m3u8
-#EXTINF:-1 tvg-id="IranInternational.fa" tvg-name="ایران اینترنشنال" group-title="فارسی‌زبان خارج از ایران / خبری",ایران اینترنشنال
+#EXTINF:-1 tvg-id="IranInternational.fa" tvg-name="ایران اینترنشنال" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranInternational.uk.png" group-title="فارسی‌زبان خارج از ایران / خبری",ایران اینترنشنال
 https://hlspackager.akamaized.net/live/DB/IRAN_INTERNATIONAL/HLS/IRAN_INTERNATIONAL.m3u8
 #EXTINF:-1 tvg-id="TVITN.ir" tvg-name="ITN" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TVITN.ir.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",ITN | آی‌تی‌ان
 https://itnhls.wns.live/hls/stream.m3u8
@@ -105,8 +105,6 @@ https://turkhls.persiana.live/hls/stream.m3u8
 https://vs-hls-pushb-ww-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_persian_tv/mobile_wifi_main_hd_abr_v2.m3u8
 #EXTINF:-1 tvg-id="DidgahTV.us" tvg-name="Didgah TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/DidgahTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",Didgah TV | دیدگاه
 https://media.streambrothers.com:1936/8276/8276/playlist.m3u8
-#EXTINF:-1 tvg-id="IranInternational.uk" tvg-name="Iran International" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranInternational.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="FHD",Iran International | ایران اینترنشنال
-https://hlspackager.akamaized.net/live/DB/IRAN_INTERNATIONAL/HLS/IRAN_INTERNATIONAL.m3u8
 #EXTINF:-1 tvg-id="IraneFardaTV.uk" tvg-name="IraneFarda TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IraneFardaTV.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="HD",IraneFarda TV | ایران فردا
 https://iranefardalive.com/stream/live.m3u8
 #EXTINF:-1 tvg-id="KanalJadid.uk" tvg-name="Kanal Jadid" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KanalJadid.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",Kanal Jadid | کانال جدید
