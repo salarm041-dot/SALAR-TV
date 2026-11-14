@@ -402,21 +402,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            set -e
-            APK="$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
-            echo "Emulator workspace: $GITHUB_WORKSPACE"
-            pwd
-            ls -lah "$GITHUB_WORKSPACE"
-            test -f "$APK"
-            adb install -r "$APK"
-            adb shell am start -n com.salar.tv/.MainActivity
-            sleep 20
-            adb shell pidof com.salar.tv >/dev/null
-            if adb logcat -d -t 5000 | grep -A 12 "FATAL EXCEPTION" | grep -q "com.salar.tv"; then
-              echo "SALAR TV crashed during Android 11 startup"
-              exit 1
-            fi
-            echo "Android 11 emulator launch smoke test passed"
+            set -e; echo "Emulator workspace: $GITHUB_WORKSPACE"; pwd; ls -lah "$GITHUB_WORKSPACE"; test -f "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"; adb install -r "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"; adb shell am start -n com.salar.tv/.MainActivity; sleep 20; adb shell pidof com.salar.tv >/dev/null; if adb logcat -d -t 5000 | grep -A 12 "FATAL EXCEPTION" | grep -q "com.salar.tv"; then echo "SALAR TV crashed during Android 11 startup"; exit 1; fi; echo "Android 11 emulator launch smoke test passed"
 
       - name: Upload APK
         if: always()
