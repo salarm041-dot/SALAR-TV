@@ -135,6 +135,18 @@ fun SalarTvApp() {
         val bundled = runCatching {
             context.assets.open("channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
         }.getOrDefault(emptyList())
+        val bundledByUrl = bundled.associateBy { it.url }
+        for (index in channels.indices) {
+            val old = channels[index]
+            val fresh = bundledByUrl[old.url] ?: continue
+            channels[index] = old.copy(
+                tvgId = old.tvgId.ifBlank { fresh.tvgId },
+                logoUrl = old.logoUrl.ifBlank { fresh.logoUrl },
+                groupTitle = old.groupTitle.ifBlank { fresh.groupTitle },
+                country = if (old.country == "سایر") fresh.country else old.country,
+                kind = if (old.kind == "تلویزیون" && fresh.kind != "تلویزیون") fresh.kind else old.kind
+            )
+        }
         val existing = channels.map { it.url }.toSet()
         channels.addAll(bundled.filter { it.url !in existing })
         saveChannels()
