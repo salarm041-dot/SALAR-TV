@@ -649,12 +649,27 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
             "url" -> {
                 OutlinedTextField(name, { name = it }, label = { Text("نام شبکه / ایستگاه") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                 OutlinedTextField(url, { url = it }, label = { Text("آدرس مستقیم پخش") }, placeholder = { Text("https://example.com/live.m3u8") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
-                Button(onClick = {
+                Button(enabled = !busy, onClick = {
                     val clean = url.trim()
-                    if (name.isNotBlank() && (clean.startsWith("https://") || clean.startsWith("http://"))) {
+                    if (!(clean.startsWith("https://") || clean.startsWith("http://"))) status = "آدرس معتبر http/https را وارد کنید."
+                    else if (clean.substringBefore("?").endsWith(".m3u", true) || clean.substringBefore("?").endsWith(".m3u8", true)) {
+                        busy = true; status = "در حال دریافت فهرست M3U از اینترنت…"
+                        scope.launch {
+                            val result = withContext(Dispatchers.IO) { runCatching {
+                                val connection = URL(clean).openConnection()
+                                connection.connectTimeout = 12000; connection.readTimeout = 25000
+                                connection.getInputStream().bufferedReader(Charsets.UTF_8).use { parseM3u(it.readText()) }
+                            } }
+                            result.onSuccess { imported ->
+                                if (imported.isEmpty()) status = "فهرست دریافت شد اما شبکه قابل‌شناسایی نداشت."
+                                else { imported.forEach(onAdd); status = "تعداد ${imported.size} شبکه از فهرست اینترنتی اضافه شد." }
+                            }.onFailure { err -> status = "دریافت فهرست ناموفق: ${err.message ?: "خطای شبکه"}" }
+                            busy = false
+                        }
+                    } else if (name.isNotBlank()) {
                         onAdd(Channel(name.trim(), clean, country, kind)); name = ""; url = ""; status = "لینک شبکه ذخیره شد."
-                    } else status = "نام شبکه و آدرس معتبر http/https را وارد کنید."
-                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) { Text("ذخیره لینک شبکه", color = Color.Black) }
+                    } else status = "برای لینک پخش مستقیم، نام شبکه را وارد کنید."
+                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) { Text(if (busy) "در حال دریافت…" else "ذخیره لینک / دریافت فهرست", color = Color.Black) }
             }
             "xtream" -> {
                 OutlinedTextField(server, { server = it }, label = { Text("آدرس سرور (با پورت در صورت نیاز)") }, placeholder = { Text("http://example.com:8080") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
@@ -690,7 +705,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
                                     val id = item.optString("stream_id")
                                     if (id.isBlank() || id == "null") continue
                                     val streamName = item.optString("name", "شبکه $id")
-                                    val streamUrl = "$base/live/$u/$p/$id.m3u8"
+                                    val streamUrl = "$base/live/$u/$p/$id.ts"
                                     imported.add(Channel(streamName, streamUrl, country, "تلویزیون", logoUrl = item.optString("stream_icon"), groupTitle = categoryNames[item.optString("category_id")].orEmpty().ifBlank { "سرور IPTV" }))
                                 }
                                 if (imported.isEmpty()) error("فهرست شبکه زنده‌ای از سرور دریافت نشد.")
