@@ -354,13 +354,13 @@ https://live-aburayhan1108.telewebion.ir/ek/kordestan/live/1080p/index.m3u8
 https://ncdn.telewebion.ir/mahabad/live/playlist.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MakranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",مکران
 https://live-aburayhan1104.telewebion.ir/na/makran/live/1080p/index.m3u8
-#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NoorTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",نور (مازندران)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NoorTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",نور (قم)
 https://live-aburayhan1107.telewebion.ir/ek/noor/live/1080p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QazvinTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",قزوین
 https://live-aburayhan1113.telewebion.ir/ek/qazvin/live/576p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabalanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سبلان (اردبیل)
 https://live-aburayhan1111.telewebion.ir/ek/sabalan/live/576p/index.m3u8
-#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabzTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سبز (خراسان رضوی)
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabzTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سبز (گلستان)
 https://live-aburayhan1111.telewebion.ir/ek/sabz/live/576p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SahandTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سهند (آذربایجان شرقی)
 https://live-aburayhan1106.telewebion.ir/ek/sahand/live/1080p/index.m3u8
