@@ -376,14 +376,18 @@ jobs:
                   raise SystemExit(f"APK missing required files: {sorted(missing)}")
               playlist = apk.read("assets/channels.m3u").decode("utf-8-sig")
               entries = re.findall(r"(?m)^#EXTINF", playlist)
-              if len(entries) != 156:
-                  raise SystemExit(f"APK bundled playlist mismatch: expected 156 entries, found {len(entries)}")
+              source_playlist = Path("patch/channels.m3u").read_text(encoding="utf-8-sig")
+              source_entries = re.findall(r"(?m)^#EXTINF", source_playlist)
+              if len(entries) < 150:
+                  raise SystemExit(f"APK bundled playlist unexpectedly small: {len(entries)} entries")
+              if len(entries) != len(source_entries):
+                  raise SystemExit(f"APK/source playlist mismatch: APK has {len(entries)}, source has {len(source_entries)} entries")
               if not any("شبکه‌های استانی" in line for line in playlist.splitlines()):
                   raise SystemExit("Provincial channels metadata missing from APK")
           apk_path = apks[0].resolve()
           with open(__import__("os").environ["GITHUB_ENV"], "a") as env:
               env.write(f"SALAR_TV_APK_PATH={apk_path}\\n")
-          print(f"APK package OK: {apk_path}, {apks[0].stat().st_size} bytes, 156 playlist entries")
+          print(f"APK package OK: {apk_path}, {apks[0].stat().st_size} bytes, {len(entries)} playlist entries")
           PY
 
       - name: Stage APK for emulator container
