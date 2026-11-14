@@ -215,8 +215,10 @@ fun SalarTvApp() {
                         onSchedule = { showSchedule = true },
                         onAbout = { page = "درباره ما" },
                         onSources = { page = "افزودن منابع" },
-                        onRecordings = { page = "ضبط‌ها" }
+                        onRecordings = { page = "ضبط‌ها" },
+                        onLiveDubbing = { page = "دوبله هوشمند زنده" }
                     )
+                    "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "ضبط‌ها" -> RecordingsPage(
                         files = (context.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES)
                             ?: context.filesDir).listFiles()?.filter { it.isFile }?.sortedByDescending { it.lastModified() } ?: emptyList(),
@@ -485,14 +487,73 @@ fun AddSourcesPage(onAdd: (Channel) -> Unit, onImport: () -> Unit) {
 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
-             onRecordings: () -> Unit) {
+             onRecordings: () -> Unit, onLiveDubbing: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
         MoreButton("فایل‌های ضبط‌شده", Icons.Default.VideoLibrary, onRecordings)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
         Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی",
+            color = Color.LightGray, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun LiveDubbingPage() {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
+    var enabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
+    var keepOriginal by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
+    var voice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
+    var volume by remember { mutableFloatStateOf(prefs.getFloat("live_dubbing_volume", 1f)) }
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("مترجم و دوبلور هوشمند زنده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
+            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("وضعیت موتور هوش مصنوعی", color = Gold, fontWeight = FontWeight.Bold)
+                Text("هنوز به سرویس تشخیص گفتار، ترجمه و تولید صدای زنده متصل نشده است.",
+                    color = Color(0xFFFFCC80), fontSize = 12.sp)
+                Text("این صفحه تنظیمات قابلیت را نگه می‌دارد؛ دوبله واقعی پس از اتصال موتور پردازش صدا فعال می‌شود.",
+                    color = Color.LightGray, fontSize = 12.sp)
+            }
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("فعال‌سازی دوبله فارسی", color = TextMain)
+                Text("زبان مقصد: فارسی", color = Color.Gray, fontSize = 11.sp)
+            }
+            Switch(checked = enabled, onCheckedChange = {
+                enabled = it
+                prefs.edit().putBoolean("live_dubbing_enabled", it).apply()
+            })
+        }
+        Text("صدای دوبله", color = Gold, fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("زن", "مرد").forEach { option ->
+                FilterChip(selected = voice == option, onClick = {
+                    voice = option
+                    prefs.edit().putString("live_dubbing_voice", option).apply()
+                }, label = { Text(option) })
+            }
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("حفظ صدای اصلی شبکه", color = TextMain)
+                Text("برای شنیدن صدای اصلی همراه دوبله", color = Color.Gray, fontSize = 11.sp)
+            }
+            Switch(checked = keepOriginal, onCheckedChange = {
+                keepOriginal = it
+                prefs.edit().putBoolean("live_dubbing_original", it).apply()
+            })
+        }
+        Text("بلندی صدای دوبله: ${(volume * 100).toInt()}٪", color = Gold, fontSize = 12.sp)
+        Slider(value = volume, onValueChange = {
+            volume = it
+            prefs.edit().putFloat("live_dubbing_volume", it).apply()
+        }, valueRange = 0f..1f)
+        Text("زبان‌های ورودی موردنظر: انگلیسی، ترکی استانبولی و ترکی آذربایجانی؛ خروجی فارسی.",
             color = Color.LightGray, fontSize = 12.sp)
     }
 }
