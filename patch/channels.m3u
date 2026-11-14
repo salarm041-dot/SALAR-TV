@@ -81,3 +81,5 @@ https://oitnhls.wns.live/hls/stream.m3u8
 https://tv.iraniancongress.com/stream/tv.m3u8
 #EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",Iran National Revolution TV
 https://hls.irannrtv.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="IranInternational.fa" tvg-name="ایران اینترنشنال" group-title="فارسی‌زبان خارج از ایران / خبری",ایران اینترنشنال
+https://ott.iranintl.com/tv?lang=fa
