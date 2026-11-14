@@ -113,6 +113,7 @@ fun SalarTvApp() {
     var showSchedule by remember { mutableStateOf(false) }
     var editingChannel by remember { mutableStateOf<Channel?>(null) }
     var brightness by remember { mutableFloatStateOf(0.75f) }
+    var useExternalPlayer by remember { mutableStateOf(prefs.getBoolean("external_player_default", false)) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
 
     val player = remember { ExoPlayer.Builder(context).build() }
@@ -175,10 +176,35 @@ fun SalarTvApp() {
                 if (selected != null) {
                     TextButton(onClick = { selected = null }) { Icon(Icons.Default.ArrowBack, null); Text("بازگشت") }
                     Text(selected!!.name, color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    AndroidView(
-                        factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
-                        modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
-                    )
+                    Text("انتخاب پخش‌کننده", color = Gold, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(selected = !useExternalPlayer, onClick = { useExternalPlayer = false },
+                            label = { Text("پخش‌کننده داخلی") },
+                            leadingIcon = { Icon(Icons.Default.PlayCircle, null) })
+                        FilterChip(selected = useExternalPlayer, onClick = { useExternalPlayer = true },
+                            label = { Text("پخش‌کننده خارجی") },
+                            leadingIcon = { Icon(Icons.Default.OpenInNew, null) })
+                    }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text("ذخیره به‌عنوان انتخاب پیش‌فرض", color = Color.LightGray, fontSize = 12.sp,
+                            modifier = Modifier.weight(1f))
+                        Switch(checked = prefs.getBoolean("external_player_default", false) == useExternalPlayer,
+                            onCheckedChange = { prefs.edit().putBoolean("external_player_default", useExternalPlayer).apply() })
+                    }
+                    if (!useExternalPlayer) {
+                        AndroidView(
+                            factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                            modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
+                        )
+                    } else {
+                        Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
+                            Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.OpenInNew, null, tint = Gold)
+                                Spacer(Modifier.width(10.dp))
+                                Text("پخش در برنامه خارجی انتخاب‌شده از فهرست اندروید", color = TextMain, fontSize = 12.sp)
+                            }
+                        }
+                    }
                     Text("روشنایی تصویر", color = Gold, fontSize = 12.sp)
                     Slider(value = brightness, onValueChange = {
                         brightness = it
@@ -190,10 +216,25 @@ fun SalarTvApp() {
                     }, valueRange = 0.05f..1f)
                     Text("صدای پخش", color = Gold, fontSize = 12.sp)
                     Slider(value = player.volume, onValueChange = { player.volume = it }, valueRange = 0f..1f)
-                    LaunchedEffect(selected!!.url) {
-                        player.setMediaItem(MediaItem.fromUri(selected!!.url))
-                        player.prepare()
-                        player.playWhenReady = true
+                    LaunchedEffect(selected!!.url, useExternalPlayer) {
+                        if (useExternalPlayer) {
+                            player.pause()
+                            runCatching {
+                                val mimeType = if (selected!!.kind == "رادیو") "audio/*" else "application/vnd.apple.mpegurl"
+                                val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                                    setDataAndType(Uri.parse(selected!!.url), mimeType)
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                context.startActivity(Intent.createChooser(viewIntent, "انتخاب پخش‌کننده خارجی"))
+                            }.onFailure {
+                                android.widget.Toast.makeText(context, "پخش‌کننده سازگار پیدا نشد؛ پخش‌کننده داخلی را انتخاب کنید.", android.widget.Toast.LENGTH_LONG).show()
+                                useExternalPlayer = false
+                            }
+                        } else {
+                            player.setMediaItem(MediaItem.fromUri(selected!!.url))
+                            player.prepare()
+                            player.playWhenReady = true
+                        }
                     }
                     Text("در صورت پشتیبانی منبع، پخش زنده در این قسمت نمایش داده می‌شود.", color = Color.LightGray, fontSize = 12.sp)
                     Spacer(Modifier.height(10.dp))
