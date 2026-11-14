@@ -1,6 +1,8 @@
 package com.salar.tv
 
 import android.net.Uri
+import android.app.Activity
+import java.io.File
 import android.os.Bundle
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -102,6 +104,8 @@ fun SalarTvApp() {
     var selected by remember { mutableStateOf<Channel?>(null) }
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
+    var editingChannel by remember { mutableStateOf<Channel?>(null) }
+    var brightness by remember { mutableFloatStateOf(0.75f) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
 
     val player = remember { ExoPlayer.Builder(context).build() }
@@ -168,6 +172,17 @@ fun SalarTvApp() {
                         factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                         modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
                     )
+                    Text("روشنایی تصویر", color = Gold, fontSize = 12.sp)
+                    Slider(value = brightness, onValueChange = {
+                        brightness = it
+                        (context as? Activity)?.window?.let { window ->
+                            val attrs = window.attributes
+                            attrs.screenBrightness = it.coerceIn(0.05f, 1f)
+                            window.attributes = attrs
+                        }
+                    }, valueRange = 0.05f..1f)
+                    Text("صدای پخش", color = Gold, fontSize = 12.sp)
+                    Slider(value = player.volume, onValueChange = { player.volume = it }, valueRange = 0f..1f)
                     LaunchedEffect(selected!!.url) {
                         player.setMediaItem(MediaItem.fromUri(selected!!.url))
                         player.prepare()
@@ -192,19 +207,68 @@ fun SalarTvApp() {
                     "بیشتر" -> MorePage(
                         onSchedule = { showSchedule = true },
                         onAbout = { page = "درباره ما" },
-                        onSources = { page = "افزودن منابع" }
+                        onSources = { page = "افزودن منابع" },
+                        onRecordings = { page = "ضبط‌ها" }
+                    )
+                    "ضبط‌ها" -> RecordingsPage(
+                        files = (context.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES)
+                            ?: context.filesDir).listFiles()?.filter { it.isFile }?.sortedByDescending { it.lastModified() } ?: emptyList(),
+                        onDelete = { file -> file.delete(); page = "ضبط‌ها" }
                     )
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> ChannelList(channels.filter { it.kind == "تلویزیون" }, onSelect = { selected = it },
-                        onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) })
+                        onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                     "رادیو" -> ChannelList(channels.filter { it.kind == "رادیو" }, onSelect = { selected = it },
-                        onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) })
+                        onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                     "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selected = it },
-                        onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) })
-                    else -> HomePage(channels, onSelect = { selected = it }, onAdd = { page = "افزودن منابع" })
+                        onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                    else -> HomePage(channels, onSelect = { selected = it }, onAdd = { page = "افزودن منابع" },
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                 }
             }
         }
+    }
+
+    if (editingChannel != null) {
+        val original = editingChannel!!
+        var name by remember(original.url) { mutableStateOf(original.name) }
+        var url by remember(original.url) { mutableStateOf(original.url) }
+        var country by remember(original.url) { mutableStateOf(original.country) }
+        var kind by remember(original.url) { mutableStateOf(original.kind) }
+        AlertDialog(
+            onDismissRequest = { editingChannel = null },
+            title = { Text("ویرایش شبکه", color = Gold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(name, { name = it }, label = { Text("نام شبکه") }, singleLine = true)
+                    OutlinedTextField(url, { url = it }, label = { Text("لینک پخش") }, singleLine = true)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        listOf("ایران", "ترکیه", "آذربایجان", "سایر").forEach {
+                            FilterChip(selected = country == it, onClick = { country = it }, label = { Text(it) })
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        listOf("تلویزیون", "رادیو").forEach {
+                            FilterChip(selected = kind == it, onClick = { kind = it }, label = { Text(it) })
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (name.isNotBlank() && (url.startsWith("http://") || url.startsWith("https://"))) {
+                        val index = channels.indexOfFirst { it.url == original.url }
+                        if (index >= 0) channels[index] = original.copy(name = name.trim(), url = url.trim(), country = country, kind = kind)
+                        saveChannels()
+                        editingChannel = null
+                    }
+                }) { Text("ذخیره تغییرات", color = Gold) }
+            },
+            dismissButton = { TextButton(onClick = { editingChannel = null }) { Text("انصراف") } }
+        )
     }
 
     if (showSchedule) {
@@ -266,7 +330,8 @@ fun SalarTvApp() {
 }
 
 @Composable
-fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> Unit) {
+fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> Unit,
+             onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(18.dp)) {
             Column(Modifier.fillMaxWidth().padding(18.dp)) {
@@ -282,12 +347,13 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
         if (channels.isEmpty()) {
             Text("هنوز شبکه‌ای اضافه نشده است. از بخش افزودن منابع، لینک مجاز یا فایل M3U وارد کنید.",
                 color = Color.LightGray)
-        } else ChannelList(channels, onSelect, {})
+        } else ChannelList(channels, onSelect, {}, onEdit, onDelete)
     }
 }
 
 @Composable
-fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit) {
+fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
+                onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
     if (channels.isEmpty()) {
         Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
             Text("موردی برای نمایش وجود ندارد.", color = Color.LightGray)
@@ -329,11 +395,10 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                                 Text("${c.country} • ${c.kind}", color = Color.Gray, fontSize = 11.sp)
                             }
                             IconButton(onClick = { onFavorite(c) }) {
-                                Icon(
-                                    Icons.Default.Favorite, null,
-                                    tint = if (c.favorite) Gold else Color.Gray
-                                )
+                                Icon(Icons.Default.Favorite, null, tint = if (c.favorite) Gold else Color.Gray)
                             }
+                            IconButton(onClick = { onEdit(c) }) { Icon(Icons.Default.Edit, "ویرایش", tint = Color.LightGray) }
+                            IconButton(onClick = { onDelete(c) }) { Icon(Icons.Default.Delete, "حذف", tint = Color(0xFFE57373)) }
                         }
                     }
                 }
@@ -384,14 +449,35 @@ fun AddSourcesPage(onAdd: (Channel) -> Unit, onImport: () -> Unit) {
 }
 
 @Composable
-fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit) {
+fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
+             onRecordings: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
+        MoreButton("فایل‌های ضبط‌شده", Icons.Default.VideoLibrary, onRecordings)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
         Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی",
             color = Color.LightGray, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun RecordingsPage(files: List<File>, onDelete: (File) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("فایل‌های ضبط‌شده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        if (files.isEmpty()) Text("هنوز فایلی ضبط نشده است.", color = Color.LightGray)
+        files.forEach { file ->
+            Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
+                Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(file.name, color = TextMain, fontSize = 12.sp)
+                        Text("${file.length() / 1_048_576} مگابایت", color = Color.Gray, fontSize = 11.sp)
+                    }
+                    IconButton(onClick = { onDelete(file) }) { Icon(Icons.Default.Delete, "حذف فایل", tint = Color(0xFFE57373)) }
+                }
+            }
+        }
     }
 }
 
@@ -413,7 +499,7 @@ fun AboutPage() {
         Text("سازنده و مالک: سید سالار موسوی ملکی", color = TextMain)
         Text("ایمیل: Salar.m041@gmail.com", color = Color.LightGray)
         Text("اینستاگرام: Salar_mousavi_41", color = Color.LightGray)
-        Text("نسخه 1.2.0", color = Color.Gray)
+        Text("نسخه 1.3.0", color = Color.Gray)
     }
 }
 
