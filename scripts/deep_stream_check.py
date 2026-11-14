@@ -218,6 +218,7 @@ def main():
     primary = parse_m3u(ROOT / "patch/channels.m3u")
     radio = parse_m3u(ROOT / "patch/radio-candidates.m3u")
     az = parse_m3u(ROOT / "patch/azerbaijan-candidates.m3u")
+    arab_israel = parse_m3u(ROOT / "patch/arab-israel-candidates.m3u")
     # TRT candidate URLs are checked separately from the main playlist.
     trt = [
         {"name": "TRT Belgesel candidate 1", "category": "ترکیه / نامزد", "url": "https://tv-trtbelgesel.medya.trt.com.tr/master.m3u8", "source_file": "workflow candidate"},
@@ -228,6 +229,7 @@ def main():
         run_group("main-playlist", primary, "auto"),
         run_group("radio-candidates", radio, "auto"),
         run_group("azerbaijan-candidates", az, "hls"),
+        run_group("israel-arab-country-candidates", arab_israel, "hls"),
         run_group("trt-candidates", trt, "hls"),
     ]
     summary = {"checked_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
