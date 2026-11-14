@@ -130,8 +130,12 @@ jobs:
               raise SystemExit(f"Unexpectedly small playlist: {len(entries)} entries (minimum 150)")
           if len(urls) != len(set(urls)):
               raise SystemExit("Duplicate stream URLs found in bundled playlist")
-          if len(provincial) != 34:
-              raise SystemExit(f"Expected 34 provincial IRIB channels, found {len(provincial)}")
+          if len(provincial) != 33:
+              raise SystemExit(f"Expected 33 official provincial/local IRIB channels, found {len(provincial)}")
+          provincial_text = "\\n".join(provincial)
+          for required_label in ("نور (قم)", "سبز (گلستان)", "تبرستان (مازندران)"):
+              if required_label not in provincial_text:
+                  raise SystemExit(f"Required provincial network missing or mislabeled: {required_label}")
           if len(logos) != len(entries):
               raise SystemExit(f"Expected every channel to have a logo: {len(logos)}/{len(entries)}")
           print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
