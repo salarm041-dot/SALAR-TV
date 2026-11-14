@@ -459,13 +459,30 @@ private fun ChannelLogo(logoUrl: String, kind: String) {
 @Composable
 fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
                 onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
+    var searchQuery by remember { mutableStateOf("") }
     if (channels.isEmpty()) {
         Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
             Text("موردی برای نمایش وجود ندارد.", color = Color.LightGray)
         }
     } else {
-        val sections = channels.groupBy { "${it.country} / ${categoryForChannel(it)} / ${it.kind}" }.toSortedMap()
+        val visibleChannels = channels.filter {
+            it.name.contains(searchQuery, ignoreCase = true) ||
+                it.country.contains(searchQuery, ignoreCase = true) ||
+                categoryForChannel(it).contains(searchQuery, ignoreCase = true)
+        }
+        val sections = visibleChannels.groupBy { "${it.country} / ${categoryForChannel(it)} / ${it.kind}" }.toSortedMap()
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            item(key = "channel_search") {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text("جست‌وجوی شبکه، کشور یا موضوع") },
+                    leadingIcon = { Icon(Icons.Default.Search, null) }
+                )
+            }
+            if (visibleChannels.isEmpty()) item { Text("شبکه‌ای با این عبارت پیدا نشد.", color = Color.LightGray) }
             sections.forEach { (sectionTitle, sectionChannels) ->
                 item(key = "section_${sectionTitle}") {
                     Row(
