@@ -2,6 +2,12 @@ package com.salar.tv
 
 import android.net.Uri
 import android.os.Bundle
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Intent
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -180,7 +186,10 @@ fun SalarTvApp() {
 
     if (showSchedule) {
         var title by remember { mutableStateOf("") }
+        var streamUrl by remember { mutableStateOf("") }
         var dateTime by remember { mutableStateOf("") }
+        var duration by remember { mutableStateOf("60") }
+        var scheduleError by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { showSchedule = false },
             title = { Text("زمان‌بندی ضبط", color = Gold) },
@@ -188,19 +197,44 @@ fun SalarTvApp() {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("نام شبکه یا برنامه")
                     OutlinedTextField(title, { title = it }, placeholder = { Text("مثلاً خبر") })
+                    OutlinedTextField(streamUrl, { streamUrl = it }, label = { Text("لینک مستقیم HLS / M3U8") },
+                        placeholder = { Text("https://server/live/index.m3u8") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                     Text("زمان شروع (نمونه: 2026-12-01 20:30)")
-                    OutlinedTextField(dateTime, { dateTime = it }, placeholder = { Text("YYYY-MM-DD HH:mm") })
-                    Text("این نسخه زمان‌بندی را ذخیره می‌کند؛ ضبط خودکار هنوز به ماژول ضبط و منبع مجاز نیاز دارد.",
+                    OutlinedTextField(dateTime, { dateTime = it }, placeholder = { Text("YYYY-MM-DD HH:mm") }, singleLine = true)
+                    OutlinedTextField(duration, { duration = it.filter(Char::isDigit).take(3) },
+                        label = { Text("مدت ضبط به دقیقه (۱ تا ۳۶۰)") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                    if (scheduleError.isNotBlank()) Text(scheduleError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                    Text("برای ضبط خودکار، لینک HLS قابل دسترس و اتصال اینترنت پایدار لازم است.",
                         color = Color.Gray, fontSize = 11.sp)
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    if (title.isNotBlank() && dateTime.isNotBlank()) {
-                        schedules = (schedules + "\n$title | $dateTime").trim()
+                    try {
+                        val start = LocalDateTime.parse(dateTime.trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                        val startMillis = start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        val minutes = duration.toIntOrNull()?.coerceIn(1, 360) ?: error("مدت ضبط را بین ۱ تا ۳۶۰ دقیقه وارد کنید.")
+                        require(title.isNotBlank()) { "نام برنامه را وارد کنید." }
+                        require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
+                        require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
+                        val requestCode = (title + streamUrl + startMillis).hashCode()
+                        val alarmIntent = Intent(context, RecordingAlarmReceiver::class.java).apply {
+                            putExtra("name", title.trim())
+                            putExtra("url", streamUrl.trim())
+                            putExtra("duration", minutes)
+                        }
+                        val pending = PendingIntent.getBroadcast(context, requestCode, alarmIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                        val alarm = context.getSystemService(AlarmManager::class.java)
+                        alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
+                        schedules = (schedules + "\n$title | $dateTime | $minutes دقیقه").trim()
                         prefs.edit().putString("schedules", schedules).apply()
+                        showSchedule = false
+                    } catch (e: Exception) {
+                        scheduleError = e.message ?: "اطلاعات زمان‌بندی معتبر نیست."
                     }
-                    showSchedule = false
                 }) { Text("ذخیره", color = Gold) }
             },
             dismissButton = { TextButton(onClick = { showSchedule = false }) { Text("انصراف") } }
