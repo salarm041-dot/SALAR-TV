@@ -44,6 +44,10 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Apply corrected app source
+        run: |
+          install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
+
       - name: Inspect project source
         run: |
           echo "=== PROJECT FILES ==="
