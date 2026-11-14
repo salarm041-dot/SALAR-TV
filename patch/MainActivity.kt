@@ -89,15 +89,13 @@ fun SalarTvApp() {
 
     // Seed the bundled public playlist once. Existing user channels are preserved.
     LaunchedEffect(Unit) {
-        {
-            val bundled = runCatching {
-                context.assets.open("channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
-            }.getOrDefault(emptyList())
-            val existing = channels.map { it.url }.toSet()
-            channels.addAll(bundled.filter { it.url !in existing })
-            saveChannels()
-            prefs.edit().putBoolean("built_in_seeded", true).apply()
-        }
+        val bundled = runCatching {
+            context.assets.open("channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
+        }.getOrDefault(emptyList())
+        val existing = channels.map { it.url }.toSet()
+        channels.addAll(bundled.filter { it.url !in existing })
+        saveChannels()
+        prefs.edit().putBoolean("built_in_seeded", true).apply()
     }
 
     var page by remember { mutableStateOf("خانه") }
