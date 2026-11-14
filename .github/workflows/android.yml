@@ -65,15 +65,15 @@ jobs:
           p.write_text(s)
           PY
 
-      - name: Set app version to 1.2.0
+      - name: Set app version to 1.3.0
         run: |
           python3 - "$PROJECT_DIR/app/build.gradle.kts" <<'PY'
           import re, sys
           from pathlib import Path
           p = Path(sys.argv[1])
           s = p.read_text()
-          s, code_count = re.subn(r'versionCode *= *[0-9]+', 'versionCode = 12', s, count=1)
-          s, name_count = re.subn(r'versionName\s*=\s*"[^"]+"', 'versionName = "1.2.0"', s, count=1)
+          s, code_count = re.subn(r'versionCode *= *[0-9]+', 'versionCode = 13', s, count=1)
+          s, name_count = re.subn(r'versionName\s*=\s*"[^"]+"', 'versionName = "1.3.0"', s, count=1)
           if code_count != 1 or name_count != 1:
               raise SystemExit("Could not safely update app version in app/build.gradle.kts")
           p.write_text(s)
