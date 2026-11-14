@@ -21,3 +21,44 @@ http://38.99.146.102:8000/mahoor.mp3
 http://iranonairone.mine.nu:9300/;
 #EXTINF:-1 group-title="رادیو فارسی خارج از ایران / موسیقی سنتی",رادیو درویش
 http://50.22.218.73/stream.mp3?ipport=50.22.218.73_24445
+# Candidate IRIB radio streams; all are pending deep HLS validation.
+#EXTINF:-1 tvg-id="RadioIran.ir" group-title="ایران / رادیو / عمومی",رادیو ایران
+https://cdnw.telewebion.com/radioiran/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioAva.ir" group-title="ایران / رادیو / موسیقی",رادیو آوا
+https://cdnw.telewebion.com/radioava/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioEghtesad.ir" group-title="ایران / رادیو / اقتصادی",رادیو اقتصاد
+https://cdnw.telewebion.com/radioeghtesad/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioPayam.ir" group-title="ایران / رادیو / عمومی",رادیو پیام
+https://cdnw.telewebion.com/radiopayam/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioQuran.ir" group-title="ایران / رادیو / قرآنی",رادیو قرآن
+https://cdnw.telewebion.com/radioquran/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioTehran.ir" group-title="ایران / رادیو / محلی",رادیو تهران
+https://cdnw.telewebion.com/radiotehran/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioJavan.ir" group-title="ایران / رادیو / موسیقی",رادیو جوان
+https://cdnw.telewebion.com/radiojavan/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioSalamat.ir" group-title="ایران / رادیو / سلامت",رادیو سلامت
+https://cdnw.telewebion.com/radiosalamat/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioSaba.ir" group-title="ایران / رادیو / سرگرمی",رادیو صبا
+https://cdnw.telewebion.com/radiosaba/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioFarhang.ir" group-title="ایران / رادیو / فرهنگ",رادیو فرهنگ
+https://cdnw.telewebion.com/radiofarhang/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioNamayesh.ir" group-title="ایران / رادیو / نمایش",رادیو نمایش
+https://cdnw.telewebion.com/radionamayesh/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioVarzesh.ir" group-title="ایران / رادیو / ورزش",رادیو ورزش
+https://cdnw.telewebion.com/radiovarzesh/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioZiarat.ir" group-title="ایران / رادیو / مذهبی",رادیو زیارت
+https://cdnw.telewebion.com/radioziarat/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioGoftogu.ir" group-title="ایران / رادیو / گفت‌وگو",رادیو گفت‌وگو
+https://cdnw.telewebion.com/radiogoftogo/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioMaaref.ir" group-title="ایران / رادیو / معارف",رادیو معارف
+https://cdnw.telewebion.com/radiomaaref/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioTelavat.ir" group-title="ایران / رادیو / قرآنی",رادیو تلاوت
+https://cdnw.telewebion.com/radiotelavat/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioTartil.ir" group-title="ایران / رادیو / قرآنی",رادیو ترتیل
+https://cdnw.telewebion.com/radiotartil/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioMonasebati.ir" group-title="ایران / رادیو / مناسبتی",رادیو مناسبتی
+https://cdnw.telewebion.com/radiomonasebati/live/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioJavan.ir" group-title="ایران / رادیو / موسیقی",رادیو جوان (سرور ایران‌صدا)
+http://s1.cdn1.iranseda.ir:1935/liveedge/radio-javan/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioFarhang.ir" group-title="ایران / رادیو / فرهنگ",رادیو فرهنگ (سرور ایران‌صدا)
+http://s0.cdn1.iranseda.ir:1935/liveedge/radio-farhang/playlist.m3u8
