@@ -15,6 +15,9 @@ import java.net.URLEncoder
 import android.app.Activity
 import java.io.File
 import android.os.Bundle
+import android.os.Build
+import android.app.PictureInPictureParams
+import android.util.Rational
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
@@ -71,6 +74,19 @@ data class Channel(
 )
 
 class MainActivity : ComponentActivity() {
+    fun enterPlayerPictureInPicture() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            runCatching {
+                val params = PictureInPictureParams.Builder()
+                    .setAspectRatio(Rational(16, 9))
+                    .build()
+                enterPictureInPictureMode(params)
+            }.onFailure {
+                android.widget.Toast.makeText(this, "حالت تصویر در تصویر در این دستگاه در دسترس نیست.", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { SalarTvApp() }
@@ -287,6 +303,16 @@ fun SalarTvApp() {
                             factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
                         )
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            OutlinedButton(
+                                onClick = { (context as? MainActivity)?.enterPlayerPictureInPicture() },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.PictureInPictureAlt, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("پخش شناور (تصویر در تصویر)")
+                            }
+                        }
                     } else {
                         Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
                             Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
