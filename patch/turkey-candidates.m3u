@@ -1,0 +1,72 @@
+#EXTM3U
+# Candidate Turkish general, entertainment, drama, children's, music and news channels. Only deeply validated entries with verified raster logos are promoted to the app playlist.
+#EXTINF:-1 tvg-id="A2TV.tr@SD" tvg-name="A2TV" group-title="ترکیه / عمومی" tvg-language="tur" tvg-quality="1080p",A2TV
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/a2tv/a2tv.m3u8
+#EXTINF:-1 tvg-id="AHaber.tr@SD" tvg-name="A Haber" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="1080p",A Haber
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/ahaber/ahaber.m3u8
+#EXTINF:-1 tvg-id="ASpor.tr@SD" tvg-name="A Spor" group-title="ترکیه / ورزشی" tvg-language="tur" tvg-quality="1080p",A Spor
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/aspor/aspor.m3u8
+#EXTINF:-1 tvg-id="ATV.tr@SD" tvg-name="ATV" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="1080p",ATV
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/atv/atv_1080p.m3u8
+#EXTINF:-1 tvg-id="ATVAvrupa.tr@SD" tvg-name="ATV Avrupa" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="576p",ATV Avrupa
+https://flask-api-hls-atvavrupahdtrkvz-live.onrender.com/hls_stream/master.m3u8
+#EXTINF:-1 tvg-id="BloombergHT.tr@SD" tvg-name="Bloomberg HT" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="720p",Bloomberg HT
+https://mumbai-edge.smartplaytv.in/BloombergHT/index.m3u8
+#EXTINF:-1 tvg-id="CNBCe.tr@SD" tvg-name="CNBC-e" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="HD",CNBC-e
+https://hnpsechtsc.turknet.ercdn.net/xpnvudnlsv/cnbc-e/cnbc-e.m3u8
+#EXTINF:-1 tvg-id="DreamTurk.tr@SD" tvg-name="Dream Türk" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="720p",Dream Türk
+https://live.duhnet.tv/S2/HLS_LIVE/dreamturknp/playlist.m3u8
+#EXTINF:-1 tvg-id="EuroD.tr@SD" tvg-name="Euro D" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="720p",Euro D
+https://live.duhnet.tv/S2/HLS_LIVE/eurodnp/playlist.m3u8
+#EXTINF:-1 tvg-id="HalkTV.tr@SD" tvg-name="Halk TV" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="1080p",Halk TV
+https://halktv-live.daioncdn.net/halktv/halktv.m3u8
+#EXTINF:-1 tvg-id="HTSporTV.tr@SD" tvg-name="HTSpor TV" group-title="ترکیه / ورزشی" tvg-language="tur" tvg-quality="1080p",HTSpor TV
+https://ciner.daioncdn.net/ht-spor/ht-spor.m3u8?app=web
+#EXTINF:-1 tvg-id="Kanal7.tr@SD" tvg-name="Kanal 7" group-title="ترکیه / عمومی" tvg-language="tur" tvg-quality="720p",Kanal 7
+https://kanal7.blutv.com/blutv_kanal7_live/live.m3u8
+#EXTINF:-1 tvg-id="KanalD.tr@SD" tvg-name="Kanal D" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="1080p",Kanal D
+https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web&ce=3
+#EXTINF:-1 tvg-id="KanalDDrama.tr@SD" tvg-name="Kanal D Drama" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="1080p",Kanal D Drama
+https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01602-themahqfrance-vivekanald-samsungspain/playlist.m3u8
+#EXTINF:-1 tvg-id="KralPopTV.tr@SD" tvg-name="KRAL Pop TV" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="720p",KRAL Pop TV
+https://dogus-live.daioncdn.net/kralpoptv/playlist.m3u8
+#EXTINF:-1 tvg-id="MinikaCocuk.tr@SD" tvg-name="Minika Cocuk" group-title="ترکیه / کودک و نوجوان" tvg-language="tur" tvg-quality="720p",Minika Cocuk
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago_cocuk/minikago_cocuk.m3u8
+#EXTINF:-1 tvg-id="MinikaGo.tr@SD" tvg-name="Minika Go" group-title="ترکیه / کودک و نوجوان" tvg-language="tur" tvg-quality="720p",Minika Go
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago/minikago.m3u8
+#EXTINF:-1 tvg-id="NOW.tr@SD" tvg-name="NOW" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="720p",NOW
+https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv_720p.m3u8
+#EXTINF:-1 tvg-id="NTV.tr@SD" tvg-name="NTV" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="HD",NTV
+https://dogus.daioncdn.net/ntv/ntv.m3u8?app=ntv_web
+#EXTINF:-1 tvg-id="Number1TV.tr@SD" tvg-name="Number 1 TV" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="720p",Number 1 TV
+https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e17cd59e8b.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="Number1TV.tr@SD" tvg-name="Number 1 TV" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="720p",Number 1 TV
+https://mn-nl.mncdn.com/blutv_nr12/live.m3u8
+#EXTINF:-1 tvg-id="PowerDance.tr@SD" tvg-name="Power Dance" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="1080p",Power Dance
+https://livetv.powerapp.com.tr/dance/dance.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="PowerLove.tr@SD" tvg-name="Power Love" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="1080p",Power Love
+https://livetv.powerapp.com.tr/plove/love.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="PowerTurkAkustik.tr@SD" tvg-name="Power Türk Akustik" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="1080p",Power Türk Akustik
+https://livetv.powerapp.com.tr/pturkakustik/akustik.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="PowerTurkSlow.tr@SD" tvg-name="Power Türk Slow" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="1080p",Power Türk Slow
+https://livetv.powerapp.com.tr/pturkslow/slow.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="PowerTurkTaptaze.tr@SD" tvg-name="Power Türk Taptaze" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="1080p",Power Türk Taptaze
+https://livetv.powerapp.com.tr/pturktaptaze/taptaze.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="PowerTV.tr@SD" tvg-name="Power TV" group-title="ترکیه / موسیقی" tvg-language="tur" tvg-quality="1080p",Power TV
+https://livetv.powerapp.com.tr/powerTV/powerhd.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="ShowTurk.tr@SD" tvg-name="Show Turk" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="1080p",Show Turk
+https://raw.githubusercontent.com/bnyusuf67-crypto/streams/refs/heads/main/streams/shturk.m3u8
+#EXTINF:-1 tvg-id="StarTV.tr@SD" tvg-name="Star TV" group-title="ترکیه / فیلم و سریال" tvg-language="tur" tvg-quality="720p",Star TV
+https://dogus.daioncdn.net/startv/startv_720p.m3u8?app=a20ac41e-bdc3-4aa1-934d-26b484480ac9&ce=3&sid=8l4w3lst4co5
+#EXTINF:-1 tvg-id="Tele1.tr@SD" tvg-name="Tele 1" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="1080p",Tele 1
+https://tele1-live.ercdn.net/tele1/tele1.m3u8
+#EXTINF:-1 tvg-id="TGRTHaber.tr@SD" tvg-name="TGRT Haber" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="720p",TGRT Haber
+https://canli.tgrthaber.com/tgrt.m3u8
+#EXTINF:-1 tvg-id="Tivi6.tr@SD" tvg-name="Tivi 6" group-title="ترکیه / عمومی" tvg-language="tur" tvg-quality="720p",Tivi 6
+https://live.artidijitalmedya.com/artidijital_tivi6/tivi6/playlist.m3u8
+#EXTINF:-1 tvg-id="TV8.tr@SD" tvg-name="TV 8" group-title="ترکیه / سرگرمی" tvg-language="tur" tvg-quality="1080p",TV 8
+https://tv8.daioncdn.net/tv8/tv8.m3u8?app=7ddc255a-ef47-4e81-ab14-c0e5f2949788&ce=3
+#EXTINF:-1 tvg-id="24TV.tr@SD" tvg-name="TV 24" group-title="ترکیه / خبری" tvg-language="tur" tvg-quality="720p",TV 24
+https://turkmedya-live.ercdn.net/tv24/tv24.m3u8
+#EXTINF:-1 tvg-id="VavTV.tr@SD" tvg-name="Vav TV" group-title="ترکیه / دینی و فرهنگی" tvg-language="tur" tvg-quality="1080p",Vav TV
+https://playlist.fasttvcdn.com/pl/rfrk9821hdy9dayo8wfyha/kltr-sanat-tv/playlist.m3u8
