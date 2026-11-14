@@ -44,9 +44,21 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Apply corrected app source
+      - name: Apply corrected app source and recording module
         run: |
           install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
+          install -D patch/HlsRecorderService.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HlsRecorderService.kt"
+          install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
+          python3 - "$PROJECT_DIR/app/src/main/AndroidManifest.xml" <<'PY'
+          import sys
+          from pathlib import Path
+          p = Path(sys.argv[1])
+          s = p.read_text()
+          s = s.replace('<uses-permission android:name="android.permission.INTERNET" />',
+              '<uses-permission android:name="android.permission.INTERNET" />\\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
+          s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\\n    </application>')
+          p.write_text(s)
+          PY
 
       - name: Inspect project source
         run: |
