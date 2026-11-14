@@ -127,8 +127,10 @@ jobs:
           urls = [url for _, url in entries]
           provincial = [meta for meta, _ in entries if "شبکه‌های استانی" in meta]
           logos = [meta for meta, _ in entries if "tvg-logo=" in meta]
-          if len(entries) != 156:
-              raise SystemExit(f"Unexpectedly small playlist: {len(entries)} entries")
+          # Do not pin the playlist to an exact count: adding verified channels
+          # must not break the Android build. Keep a floor to catch missing assets.
+          if len(entries) < 150:
+              raise SystemExit(f"Unexpectedly small playlist: {len(entries)} entries (minimum 150)")
           if len(urls) != len(set(urls)):
               raise SystemExit("Duplicate stream URLs found in bundled playlist")
           if len(provincial) != 34:
