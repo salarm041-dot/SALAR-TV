@@ -198,8 +198,8 @@ fun SalarTvApp() {
     }
 
     if (showSchedule) {
-        var title by remember { mutableStateOf("") }
-        var streamUrl by remember { mutableStateOf("") }
+        var title by remember { mutableStateOf(selected?.name ?: "") }
+        var streamUrl by remember { mutableStateOf(selected?.url ?: "") }
         var dateTime by remember { mutableStateOf("") }
         var duration by remember { mutableStateOf("60") }
         var scheduleError by remember { mutableStateOf("") }
