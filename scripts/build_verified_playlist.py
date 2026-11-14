@@ -60,7 +60,7 @@ def main():
     if not MAIN.exists():
         raise SystemExit(f"Main playlist not found: {MAIN}")
     original = MAIN.read_text(encoding="utf-8-sig")
-    existing = set(re.findall(r"(?m)^https?://\\S+", original))
+    existing = set(re.findall(r"(?m)^https?://\S+", original))
     additions: list[str] = []
     promoted: dict[str, int] = {}
     skipped_scheduled = 0
