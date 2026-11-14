@@ -17,6 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run only at 09:00 Europe/Berlin
+        id: localtime
         if: github.event_name == 'schedule'
         run: |
           python - <<'PY'
@@ -36,10 +37,11 @@ jobs:
           python-version: "3.12"
 
       - name: Validate primary and candidate streams deeply
+        if: steps.localtime.outputs.skip != 'true'
         run: python scripts/deep_stream_check.py
 
       - name: Upload detailed stream validation reports
-        if: always()
+        if: always() && steps.localtime.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: SALAR-TV-Deep-Stream-Validation
