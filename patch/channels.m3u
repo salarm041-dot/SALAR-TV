@@ -20,8 +20,6 @@ https://live.itv.az/itv.m3u8
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
 #EXTINF:-1 tvg-logo="https://www.oonternet.com/_panel/upload/content/oonternet-8883943415280.jpeg" group-title="ایران / رادیو",رادیو ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
-#EXTINF:-1 tvg-logo="https://radiospinner.com/media/logos/180/83710/logo_ZTropL1kFU.png" group-title="ایران / رادیو",رادیو انگلیسی ایران
-http://s1.cdn1.iranseda.ir:1935/liveedge/radio-english/playlist.m3u8
 # Iran TV endpoints from a public playlist updated 2026-11-09; may require an Iranian IP.
 #EXTINF:-1 tvg-id="IRIB1.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1.ir.png" group-title="ایران / تلویزیون",شبکه یک
 https://live-aburayhan1108.telewebion.ir/ek/tv1/live/1080p/index.m3u8
