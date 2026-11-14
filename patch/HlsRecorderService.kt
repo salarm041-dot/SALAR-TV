@@ -14,6 +14,7 @@ import java.net.URL
 
 class HlsRecorderService : Service() {
     @Volatile private var running = false
+    @Volatile private var recordingGeneration = 0L
     private var worker: Thread? = null
 
     private data class ByteRange(val length: Long, val offset: Long?)
@@ -25,8 +26,12 @@ class HlsRecorderService : Service() {
         val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(1, 360)
         createChannel()
         startForeground(4102, notification("در حال ضبط: $name"))
-        running = true
-        worker?.interrupt()
+        val myGeneration = synchronized(this) {
+            recordingGeneration += 1
+            worker?.interrupt()
+            running = true
+            recordingGeneration
+        }
         worker = Thread {
             val folder = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: filesDir
             if (!folder.exists()) folder.mkdirs()
@@ -37,7 +42,7 @@ class HlsRecorderService : Service() {
             var output: File? = null
             var saved = 0L
             try {
-                while (running && System.currentTimeMillis() < deadline) {
+                while (isCurrent(myGeneration) && System.currentTimeMillis() < deadline) {
                     val masterText = downloadText(streamUrl)
                     val mediaUrl = resolveMediaPlaylist(streamUrl, masterText)
                     val mediaText = if (mediaUrl == streamUrl) masterText else downloadText(mediaUrl)
@@ -56,7 +61,7 @@ class HlsRecorderService : Service() {
                     }
 
                     for (map in mapParts) {
-                        if (!running || System.currentTimeMillis() >= deadline) break
+                        if (!isCurrent(myGeneration) || System.currentTimeMillis() >= deadline) break
                         val absolute = URL(URL(mediaUrl), map.uri).toString()
                         val key = partKey(absolute, map.range)
                         if (writtenMaps.add(key)) {
@@ -67,14 +72,16 @@ class HlsRecorderService : Service() {
                     }
 
                     for (part in parts) {
-                        if (!running || System.currentTimeMillis() >= deadline) break
+                        if (!isCurrent(myGeneration) || System.currentTimeMillis() >= deadline) break
                         val absolute = URL(URL(mediaUrl), part.uri).toString()
                         val key = partKey(absolute, part.range)
                         if (seen.add(key)) {
                             val bytes = downloadPart(absolute, part.range)
                             output!!.appendBytes(bytes)
                             saved += bytes.size
-                            updateNotification("در حال ضبط: $name • " + (saved / 1_048_576) + " مگابایت")
+                            if (isCurrent(myGeneration)) {
+                                updateNotification("در حال ضبط: $name • " + (saved / 1_048_576) + " مگابایت")
+                            }
                         }
                     }
 
@@ -82,17 +89,24 @@ class HlsRecorderService : Service() {
                     val target = Regex("#EXT-X-TARGETDURATION:(\\d+)", RegexOption.IGNORE_CASE)
                         .find(mediaText)?.groupValues?.get(1)?.toLongOrNull() ?: 6L
                     try { Thread.sleep((target.coerceIn(2L, 10L) * 500L).coerceIn(1000L, 5000L)) }
-                    catch (_: InterruptedException) { if (!running) break }
+                    catch (_: InterruptedException) { if (!isCurrent(myGeneration)) break }
                 }
-                updateNotification(if (saved > 0 && output != null) {
-                    "ضبط ذخیره شد: " + output!!.name
-                } else "ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
+                if (isCurrent(myGeneration)) {
+                    updateNotification(if (saved > 0 && output != null) {
+                        "ضبط ذخیره شد: " + output!!.name
+                    } else "ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
+                }
             } catch (e: Exception) {
-                updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
+                if (isCurrent(myGeneration)) {
+                    updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
+                }
             } finally {
-                running = false
-                stopForeground(STOP_FOREGROUND_DETACH)
-                stopSelf()
+                if (isCurrent(myGeneration)) {
+                    running = false
+                    worker = null
+                    stopForeground(STOP_FOREGROUND_DETACH)
+                    stopSelfResult(startId)
+                }
             }
         }.also { it.start() }
         return START_NOT_STICKY
@@ -202,9 +216,14 @@ class HlsRecorderService : Service() {
         } finally { connection.disconnect() }
     }
 
+    private fun isCurrent(generation: Long): Boolean =
+        running && recordingGeneration == generation
+
     override fun onDestroy() {
+        recordingGeneration += 1
         running = false
         worker?.interrupt()
+        worker = null
         super.onDestroy()
     }
 
