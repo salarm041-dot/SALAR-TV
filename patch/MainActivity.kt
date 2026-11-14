@@ -1117,7 +1117,7 @@ private fun EpgPage() {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var xmlUrl by remember { mutableStateOf(prefs.getString("xmltv_url", "") ?: "") }
-    var loadedUrl by remember { mutableStateOf("") }
+    var loadedUrl by remember { mutableStateOf(prefs.getString("xmltv_url", "") ?: "") }
     var reloadKey by remember { mutableIntStateOf(0) }
     var rows by remember { mutableStateOf<List<EpgRow>>(emptyList()) }
     var loading by remember { mutableStateOf(false) }
