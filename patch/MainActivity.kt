@@ -85,6 +85,19 @@ fun SalarTvApp() {
         prefs.edit().putString("channels", arr.toString()).apply()
     }
 
+    // Seed the bundled public playlist once. Existing user channels are preserved.
+    LaunchedEffect(Unit) {
+        if (!prefs.getBoolean("built_in_seeded", false)) {
+            val bundled = runCatching {
+                context.assets.open("channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
+            }.getOrDefault(emptyList())
+            val existing = channels.map { it.url }.toSet()
+            channels.addAll(bundled.filter { it.url !in existing })
+            saveChannels()
+            prefs.edit().putBoolean("built_in_seeded", true).apply()
+        }
+    }
+
     var page by remember { mutableStateOf("خانه") }
     var selected by remember { mutableStateOf<Channel?>(null) }
     var showAdd by remember { mutableStateOf(false) }
@@ -383,17 +396,20 @@ private fun parseM3u(text: String): List<Channel> {
         if (line.startsWith("#EXTINF", true)) {
             title = line.substringAfter(",", "شبکه بدون نام").trim().ifBlank { "شبکه بدون نام" }
             val lower = line.lowercase()
+            val group = Regex("group-title=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
+                .find(line)?.groupValues?.getOrNull(1)?.lowercase().orEmpty()
+            val meta = "$lower $group"
             country = when {
-                "turkey" in lower || "tur" in lower -> "ترکیه"
-                "azerbaijan" in lower || "aze" in lower -> "آذربایجان"
-                "iran" in lower || "irn" in lower -> "ایران"
+                "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
+                "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
+                "iran" in meta || "ایران" in meta || "ir/" in meta -> "ایران"
                 else -> "سایر"
             }
-            kind = if ("radio" in lower) "رادیو" else "تلویزیون"
+            kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
             result.add(Channel(title, line, country, kind))
             title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"
         }
     }
-    return result
+    return result.distinctBy { it.url }
 }
