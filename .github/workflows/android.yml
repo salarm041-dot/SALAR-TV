@@ -152,6 +152,13 @@ jobs:
           print(f"APK package OK: {apks[0].name}, {apks[0].stat().st_size} bytes, 156 playlist entries")
           PY
 
+      - name: Stage APK for emulator container
+        run: |
+          APK=$(find "$PROJECT_DIR" -path "*/app/build/outputs/apk/debug/*.apk" -print -quit)
+          test -n "$APK"
+          cp "$APK" "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+          ls -lh "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+
       - name: Android 11 emulator smoke test
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -161,8 +168,8 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK=$(find "${{ github.workspace }}/project" -path "*/app/build/outputs/apk/debug/*.apk" -print -quit)
-            test -n "$APK"
+            APK="/github/workspace/SALAR-TV-debug.apk"
+            test -f "$APK"
             adb install -r "$APK"
             adb shell am start -n com.salar.tv/.MainActivity
             sleep 20
@@ -177,6 +184,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SALAR-TV-APK
-          path: project/**/app/build/outputs/apk/debug/*.apk
+          path: SALAR-TV-debug.apk
           if-no-files-found: error
 
