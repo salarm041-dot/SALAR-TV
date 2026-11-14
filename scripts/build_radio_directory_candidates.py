@@ -64,12 +64,23 @@ def clean(s): return (s or "").replace('"',"'").replace("\n"," ").replace("\r","
 
 def main():
     stations={}
-    for endpoint in ("bylanguage/persian?limit=100","bycountry/iran?limit=100"):
+    endpoints=["bylanguage/persian?limit=100","bycountry/iran?limit=100"]
+    # The broad country query is capped and often misses local/provincial stations.
+    # Search each provincial centre by name as a separate discovery source.
+    for province, terms in PROVINCIAL_STATIONS.items():
+        if terms:
+            endpoints.append("byname/"+urllib.parse.quote(terms[0], safe="")+"?limit=100")
+    def safe_fetch(endpoint):
         try:
-            for st in fetch_json(endpoint):
+            return endpoint, fetch_json(endpoint)
+        except Exception as e:
+            print("Radio Browser query failed:",endpoint,e)
+            return endpoint, []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+        for endpoint, found in pool.map(safe_fetch, endpoints):
+            for st in found:
                 key=st.get("stationuuid") or st.get("url_resolved") or st.get("url")
                 if key: stations[key]=st
-        except Exception as e: print("Radio Browser query failed:",endpoint,e)
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
         results=list(pool.map(validate,stations.values()))
     report={"generated_at":int(time.time()),"total":len(results),
