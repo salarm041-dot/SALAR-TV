@@ -65,6 +65,7 @@ def main():
     promoted: dict[str, int] = {}
     skipped_scheduled = 0
     skipped_duplicate = 0
+    skipped_missing_logo = 0
     promoted_total = 0
 
     for source, report_path in report_files.items():
@@ -76,6 +77,9 @@ def main():
             joined = " ".join(metadata)
             if "پخش زمان‌بندی‌شده" in joined or "scheduled" in joined.lower():
                 skipped_scheduled += 1
+                continue
+            if not re.search(r'tvg-logo="https?://[^"]+"', metadata[0], re.IGNORECASE):
+                skipped_missing_logo += 1
                 continue
             if url in existing:
                 skipped_duplicate += 1
@@ -98,6 +102,7 @@ def main():
         "promoted_total": promoted_total,
         "skipped_scheduled": skipped_scheduled,
         "skipped_duplicate": skipped_duplicate,
+        "skipped_missing_logo": skipped_missing_logo,
         "final_entries": len(re.findall(r"(?m)^#EXTINF", MAIN.read_text(encoding="utf-8"))),
     }
     (REPORTS / "promotion-report.json").write_text(
