@@ -93,7 +93,7 @@ def main():
 
     report = {
         "promoted_by_source": promoted,
-        "promoted_total": len(additions) // 2,
+        "promoted_total": promoted_total,
         "skipped_scheduled": skipped_scheduled,
         "skipped_duplicate": skipped_duplicate,
         "final_entries": len(re.findall(r"(?m)^#EXTINF", MAIN.read_text(encoding="utf-8"))),
