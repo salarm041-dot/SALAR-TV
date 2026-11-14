@@ -17,6 +17,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 PLAYLISTS = [
     ROOT / "patch/arab-israel-candidates.m3u",
     ROOT / "patch/azerbaijan-candidates.m3u",
+    ROOT / "patch/radio-candidates.m3u",
 ]
 API = "https://iptv-org.github.io/api/logos.json"
 UA = "Mozilla/5.0 SALAR-TV-logo-audit/1.1"
