@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - main
+      - improve/deep-stream-validation
 
 permissions:
   contents: read
