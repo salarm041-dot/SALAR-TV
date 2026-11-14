@@ -174,6 +174,16 @@ fun SalarTvApp() {
                         player.playWhenReady = true
                     }
                     Text("در صورت پشتیبانی منبع، پخش زنده در این قسمت نمایش داده می‌شود.", color = Color.LightGray, fontSize = 12.sp)
+                    Spacer(Modifier.height(10.dp))
+                    Button(
+                        onClick = { showSchedule = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Gold)
+                    ) {
+                        Icon(Icons.Default.CalendarMonth, null, tint = Color.Black)
+                        Spacer(Modifier.width(8.dp))
+                        Text("زمان‌بندی ضبط همین شبکه", color = Color.Black)
+                    }
                 } else when (page) {
                     "افزودن منابع" -> AddSourcesPage(
                         onAdd = { c -> channels.add(c); saveChannels(); page = "خانه" },
