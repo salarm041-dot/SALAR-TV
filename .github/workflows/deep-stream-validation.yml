@@ -38,6 +38,23 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Enrich Israel, Arab and Azerbaijan candidates with verified raster logos
+        if: steps.localtime.outputs.skip != 'true'
+        continue-on-error: true
+        run: python scripts/enrich_candidate_logos.py
+
+      - name: Upload candidate logo audit and enriched playlists
+        if: always() && steps.localtime.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Candidate-Logos
+          path: |
+            candidate-logo-report.json
+            patch/arab-israel-candidates.m3u
+            patch/azerbaijan-candidates.m3u
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Validate primary and candidate streams deeply
         if: steps.localtime.outputs.skip != 'true'
         run: python scripts/deep_stream_check.py
