@@ -14,32 +14,32 @@ https://tv-trtcocuk.medya.trt.com.tr/master.m3u8
 https://tv-trtmuzik.medya.trt.com.tr/master.m3u8
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtavaz.png" group-title="ترکیه / تلویزیون",TRT Avaz
 https://tv-trtavaz.medya.trt.com.tr/master.m3u8
-#EXTINF:-1 group-title="آذربایجان / تلویزیون",İctimai TV
+#EXTINF:-1 tvg-logo="https://static.epg.best/az/IctimaiTV.az.png" group-title="آذربایجان / تلویزیون",İctimai TV
 https://live.itv.az/itv.m3u8
-#EXTINF:-1 group-title="آذربایجان / تلویزیون",ATV Azərbaycan
+#EXTINF:-1 tvg-logo="https://atv.az/assets/images/logo_white.png" group-title="آذربایجان / تلویزیون",ATV Azərbaycan
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
 #EXTINF:-1 group-title="ایران / رادیو",رادیو ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
 #EXTINF:-1 group-title="ایران / رادیو",رادیو انگلیسی ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-english/playlist.m3u8
 # Iran TV endpoints from a public playlist updated 2026-11-09; may require an Iranian IP.
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه یک
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1.ir.png" group-title="ایران / تلویزیون",شبکه یک
 https://live-aburayhan1108.telewebion.ir/ek/tv1/live/1080p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه دو
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB2.ir.png" group-title="ایران / تلویزیون",شبکه دو
 https://live-aburayhan1111.telewebion.ir/ek/tv2/live/1080p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه سه
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB3.ir.png" group-title="ایران / تلویزیون",شبکه سه
 https://live-aburayhan1112.telewebion.ir/ek/tv3/live/108050p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه چهار
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB4.ir.png" group-title="ایران / تلویزیون",شبکه چهار
 https://live-aburayhan1109.telewebion.ir/ek/tv4/live/576p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه قرآن
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QuranTV.ir.png" group-title="ایران / تلویزیون",شبکه قرآن
 https://live-aburayhan1110.telewebion.ir/ek/quran/live/1080p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه سلامت
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SalamatTV.ir.png" group-title="ایران / تلویزیون",شبکه سلامت
 https://live-aburayhan1107.telewebion.ir/ek/salamat/live/576p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه تماشا
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/Tamasha.ir.png" group-title="ایران / تلویزیون",شبکه تماشا
 https://live-aburayhan1105.telewebion.ir/ek/hdtest/live/1080p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه ورزش
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/VarzeshTV.ir.png" group-title="ایران / تلویزیون",شبکه ورزش
 https://live-aburayhan1110.telewebion.ir/ek/varzesh/live/108050p/index.m3u8
-#EXTINF:-1 group-title="ایران / تلویزیون",شبکه خبر
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRINN.ir.png" group-title="ایران / تلویزیون",شبکه خبر
 https://live-aburayhan1111.telewebion.ir/ek/irinn/live/1080p/index.m3u8
 
 # Persian-language channels outside Iran. Entries passed the validator's latest stream probe.
@@ -65,7 +65,7 @@ https://euhls.persiana.live/hls/stream.m3u8
 https://sonhls.persiana.live/hls/stream.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaMusic.fr.png" group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Music
 https://musichls.persiana.live/hls/stream.m3u8
-#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Vibe
+#EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaVibe.fr.png" group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Vibe
 https://raphls.persiana.live/hls/stream.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaNostalgia.fr.png" group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Nostalgia
 https://noshls.persiana.live/hls/stream.m3u8
