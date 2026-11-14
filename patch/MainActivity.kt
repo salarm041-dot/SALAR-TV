@@ -62,6 +62,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.zip.GZIPInputStream
 
 private var Gold by mutableStateOf(Color(0xFFD6AD62))
 private var Background by mutableStateOf(Color(0xFF0B0D13))
@@ -77,7 +78,8 @@ data class Channel(
     val kind: String = "تلویزیون",
     val favorite: Boolean = false,
     val logoUrl: String = "",
-    val groupTitle: String = ""
+    val groupTitle: String = "",
+    val tvgId: String = ""
 )
 
 class MainActivity : ComponentActivity() {
@@ -113,7 +115,7 @@ fun SalarTvApp() {
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
                     add(Channel(o.optString("name"), o.optString("url"), o.optString("country"),
-                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle")))
+                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"), o.optString("tvgId")))
                 }
             }
         }
@@ -123,7 +125,7 @@ fun SalarTvApp() {
         channels.forEach { c ->
             arr.put(JSONObject().put("name", c.name).put("url", c.url)
                 .put("country", c.country).put("kind", c.kind).put("favorite", c.favorite)
-                .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle))
+                .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle).put("tvgId", c.tvgId))
         }
         prefs.edit().putString("channels", arr.toString()).apply()
     }
@@ -405,7 +407,7 @@ fun SalarTvApp() {
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
-                    "راهنمای برنامه‌ها" -> EpgPage()
+                    "راهنمای برنامه‌ها" -> EpgPage(channels)
                     "تنظیمات" -> SettingsPage(
                         themeMode = themeMode,
                         onThemeModeChange = { mode ->
@@ -973,10 +975,13 @@ private fun parseM3u(text: String): List<Channel> {
     var kind = "تلویزیون"
     var logoUrl = ""
     var groupTitle = ""
+    var tvgId = ""
     text.lineSequence().forEach { raw ->
         val line = raw.trim()
         if (line.startsWith("#EXTINF", true)) {
             title = line.substringAfter(",", "شبکه بدون نام").trim().ifBlank { "شبکه بدون نام" }
+            tvgId = Regex("tvg-id=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
+                .find(line)?.groupValues?.getOrNull(1).orEmpty()
             logoUrl = Regex("tvg-logo=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
                 .find(line)?.groupValues?.getOrNull(1).orEmpty()
             val lower = line.lowercase()
@@ -1012,8 +1017,8 @@ private fun parseM3u(text: String): List<Channel> {
             }
             kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
-            result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle))
-            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""
+            result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle, tvgId = tvgId))
+            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""; tvgId = ""
         }
     }
     return result.distinctBy { it.url }
@@ -1027,7 +1032,7 @@ private data class EpgProgram(
     val startMillis: Long,
     val stopMillis: Long
 )
-private data class EpgRow(val channelName: String, val current: EpgProgram?, val next: EpgProgram?)
+private data class EpgRow(val channelId: String, val channelName: String, val current: EpgProgram?, val next: EpgProgram?)
 
 private fun parseXmlTvDate(value: String): Long? {
     for (pattern in listOf("yyyyMMddHHmmss Z", "yyyyMMddHHmmss")) {
@@ -1113,70 +1118,122 @@ private fun readXmlTv(input: InputStream): Pair<Map<String, String>, List<EpgPro
 }
 
 @Composable
-private fun EpgPage() {
+private fun EpgPage(channels: List<Channel>) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
-    var xmlUrl by remember { mutableStateOf(prefs.getString("xmltv_url", "") ?: "") }
-    var loadedUrl by remember { mutableStateOf(prefs.getString("xmltv_url", "") ?: "") }
+    val iranGuide = "https://iptv-org.github.io/epg/guides/ir/tva.tv.epg.xml.gz"
+    val israelGuide = "https://iptv-org.github.io/epg/guides/il/i24news.tv.epg.xml.gz"
+    val savedGuide = (prefs.getString("xmltv_url", iranGuide) ?: iranGuide).ifBlank { iranGuide }
+    var xmlUrl by remember { mutableStateOf(savedGuide) }
+    var loadedUrl by remember { mutableStateOf(savedGuide) }
     var reloadKey by remember { mutableIntStateOf(0) }
     var rows by remember { mutableStateOf<List<EpgRow>>(emptyList()) }
     var loading by remember { mutableStateOf(false) }
-    var status by remember { mutableStateOf("آدرس فایل XMLTV را وارد و ذخیره کنید.") }
+    var status by remember { mutableStateOf("منبع راهنمای برنامه‌های ایران آماده دریافت است.") }
 
     fun loadGuide() {
-        val target = xmlUrl.trim()
-        if (!target.startsWith("https://") && !target.startsWith("http://")) {
-            status = "آدرس باید با http:// یا https:// شروع شود."
+        val targets = xmlUrl.lines().map { it.trim() }.filter { it.isNotBlank() }
+        if (targets.isEmpty()) {
+            status = "حداقل یک نشانی XMLTV وارد کنید."
             return
         }
-        prefs.edit().putString("xmltv_url", target).apply()
-        loadedUrl = target
+        val invalid = targets.firstOrNull {
+            !it.startsWith("https://", true) && !it.startsWith("http://", true)
+        }
+        if (invalid != null) {
+            status = "نشانی نامعتبر است: $invalid"
+            return
+        }
+        val normalized = targets.distinct().joinToString("\n")
+        prefs.edit().putString("xmltv_url", normalized).apply()
+        xmlUrl = normalized
+        loadedUrl = normalized
         reloadKey++
     }
 
-    LaunchedEffect(loadedUrl, reloadKey) {
+    fun addGuide(source: String) {
+        val current = xmlUrl.lines().map { it.trim() }.filter { it.isNotBlank() }
+        if (source !in current) xmlUrl = (current + source).joinToString("\n")
+    }
+
+    LaunchedEffect(loadedUrl, reloadKey, channels.size) {
         if (loadedUrl.isBlank()) return@LaunchedEffect
         loading = true
         status = "در حال دریافت و پردازش راهنمای برنامه‌ها…"
         try {
-            val parsed = withContext(Dispatchers.IO) {
-                val connection = (URL(loadedUrl).openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 15000
-                    readTimeout = 25000
-                    requestMethod = "GET"
-                    setRequestProperty("User-Agent", "SALAR-TV/1.3 Android")
-                }
+            val sources = loadedUrl.lines().map { it.trim() }.filter { it.isNotBlank() }
+            val mergedNames = linkedMapOf<String, String>()
+            val mergedPrograms = mutableListOf<EpgProgram>()
+            val sourceErrors = mutableListOf<String>()
+            for (source in sources) {
                 try {
-                    if (connection.responseCode !in 200..299) error("HTTP ${connection.responseCode}")
-                    connection.inputStream.use { readXmlTv(it) }
-                } finally { connection.disconnect() }
+                    val parsed = withContext(Dispatchers.IO) {
+                        val connection = (URL(source).openConnection() as HttpURLConnection).apply {
+                            connectTimeout = 15000
+                            readTimeout = 30000
+                            requestMethod = "GET"
+                            setRequestProperty("User-Agent", "SALAR-TV/1.4 Android")
+                            setRequestProperty("Accept-Encoding", "identity")
+                        }
+                        try {
+                            if (connection.responseCode !in 200..299) error("HTTP ${connection.responseCode}")
+                            val raw = connection.inputStream
+                            val input = if (source.substringBefore("?").endsWith(".gz", true)) GZIPInputStream(raw) else raw
+                            input.use { readXmlTv(it) }
+                        } finally {
+                            connection.disconnect()
+                        }
+                    }
+                    mergedNames.putAll(parsed.first)
+                    mergedPrograms.addAll(parsed.second)
+                } catch (e: Exception) {
+                    sourceErrors += source.substringAfterLast("/").take(48) + ": " + (e.message ?: "خطای دریافت")
+                }
             }
+            if (mergedPrograms.isEmpty()) {
+                error(if (sourceErrors.isEmpty()) "هیچ برنامه‌ای در منابع پیدا نشد." else sourceErrors.joinToString("؛ "))
+            }
+
             val now = System.currentTimeMillis()
-            val result = parsed.second.groupBy { it.channelId }.mapNotNull { (id, list) ->
-                val ordered = list.sortedBy { it.startMillis }
+            val appById = channels.filter { it.tvgId.isNotBlank() }.associateBy { it.tvgId }
+            val allRows = mergedPrograms.groupBy { it.channelId }.mapNotNull { (id, list) ->
+                val ordered = list.distinctBy { "${id}|${it.startMillis}|${it.stopMillis}|${it.title}" }.sortedBy { it.startMillis }
                 val current = ordered.firstOrNull { it.startMillis <= now && it.stopMillis > now }
                 val next = ordered.firstOrNull { it.startMillis > now }
                 if (current == null && next == null) null
-                else EpgRow(parsed.first[id] ?: id, current, next)
+                else EpgRow(id, appById[id]?.name ?: mergedNames[id] ?: id, current, next)
             }.sortedBy { it.channelName.lowercase(Locale.ROOT) }
-            rows = result
-            status = if (result.isEmpty()) "فایل دریافت شد، اما برنامه جاری/بعدی قابل نمایش پیدا نشد."
-                else "${result.size} شبکه دارای برنامه جاری یا بعدی هستند."
+
+            val matchedRows = if (appById.isEmpty()) emptyList() else allRows.filter { it.channelId in appById.keys }
+            rows = if (matchedRows.isNotEmpty()) matchedRows else allRows
+            status = buildString {
+                append("${rows.size} شبکه دارای برنامه جاری یا بعدی هستند.")
+                if (matchedRows.isNotEmpty()) append(" ${matchedRows.size} مورد با شناسه فهرست SALAR TV تطبیق یافت.")
+                else append(" تطبیق شناسه با فهرست فعلی پیدا نشد؛ راهنما به‌صورت عمومی نمایش داده می‌شود.")
+                if (sourceErrors.isNotEmpty()) append(" منابع ناموفق: ${sourceErrors.joinToString("؛ ")}")
+            }
         } catch (e: Exception) {
             rows = emptyList()
             status = "دریافت راهنما ناموفق بود: ${e.message ?: "خطای نامشخص"}"
-        } finally { loading = false }
+        } finally {
+            loading = false
+        }
     }
 
     val clock = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("راهنمای برنامه‌ها (EPG)", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text("نشانی XMLTV را وارد کنید؛ برنامه جاری و برنامه بعدی هر شبکه نمایش داده می‌شود.",
+        Text("هر خط یک نشانی XMLTV است؛ فایل‌های فشرده ‎.gz نیز پشتیبانی می‌شوند. برنامه جاری و بعدی بر اساس شناسه شبکه تطبیق داده می‌شود.",
             color = SecondaryText, fontSize = 12.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = { addGuide(iranGuide) }) { Text("راهنمای ایران") }
+            OutlinedButton(onClick = { addGuide(israelGuide) }) { Text("راهنمای اسرائیل") }
+        }
         OutlinedTextField(
             value = xmlUrl, onValueChange = { xmlUrl = it }, modifier = Modifier.fillMaxWidth(),
-            label = { Text("آدرس فایل XMLTV") },
-            placeholder = { Text("https://example.com/guide.xml") }, singleLine = true
+            label = { Text("نشانی‌های XMLTV (هر خط یک منبع)") },
+            placeholder = { Text("https://example.com/guide.xml.gz") },
+            minLines = 2, maxLines = 4
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = { loadGuide() }, enabled = !loading,
@@ -1188,7 +1245,7 @@ private fun EpgPage() {
             }
         }
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Gold)
-        Text(status, color = if (status.contains("ناموفق") || status.contains("باید")) Color(0xFFFFCC80) else SecondaryText,
+        Text(status, color = if (status.contains("ناموفق") || status.contains("نامعتبر")) Color(0xFFFFCC80) else SecondaryText,
             fontSize = 12.sp)
         if (rows.isNotEmpty()) {
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1204,15 +1261,14 @@ private fun EpgPage() {
                                 if (p.description.isNotBlank()) Text(p.description, color = SecondaryText, fontSize = 11.sp, maxLines = 3)
                             }
                             row.next?.let { p ->
-                                Text("بعدی: ${p.title}", color = SecondaryText)
-                                Text("شروع: ${clock.format(Date(p.startMillis))}", color = MutedText, fontSize = 10.sp)
+                                Text("بعدی: ${p.title}", color = TextMain)
+                                Text("${clock.format(Date(p.startMillis))} تا ${clock.format(Date(p.stopMillis))}",
+                                    color = MutedText, fontSize = 10.sp)
                             }
                         }
                     }
                 }
             }
         }
-        Text("برنامه‌ها فقط برای شبکه‌هایی نمایش داده می‌شوند که شناسه آن‌ها در فایل XMLTV وجود داشته باشد.",
-            color = MutedText, fontSize = 10.sp)
     }
 }
