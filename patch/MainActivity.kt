@@ -688,7 +688,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
                                 fun request(action: String): JSONArray {
                                     val conn = (URL("$base/player_api.php?username=$u&password=$p&action=$action").openConnection() as HttpURLConnection)
                                     conn.connectTimeout = 12000; conn.readTimeout = 20000
-                                    try {
+                                    return try {
                                         val code = conn.responseCode
                                         val body = (if (code in 200..299) conn.inputStream else conn.errorStream)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
                                         if (code !in 200..299) error("پاسخ سرور: HTTP $code")
