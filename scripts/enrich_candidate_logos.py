@@ -66,8 +66,7 @@ def main():
                     (x.get("width") or 0) * (x.get("height") or 0),
                     (x.get("format") or "").upper() in {"PNG", "JPEG", "WEBP"}
                 ), reverse=True)
-                chosen = options[0] if options else None
-                records.append((len(records), path, pending, line, chosen))
+                records.append((len(records), path, pending, line, options))
                 output.extend([pending, line])
                 pending = None
             else:
@@ -79,14 +78,15 @@ def main():
             output.append(pending)
         candidates.extend(records)
 
-    urls = list(dict.fromkeys(row[4]["url"] for row in candidates if row[4]))
+    urls = list(dict.fromkeys(option["url"] for row in candidates for option in row[4]))
     with concurrent.futures.ThreadPoolExecutor(max_workers=24) as pool:
         valid = dict(zip(urls, pool.map(image_is_usable, urls)))
 
     results = []
     by_path = {p: p.read_text(encoding="utf-8-sig").splitlines() for p in PLAYLISTS}
-    for _, path, meta, stream, logo in candidates:
-        selected = logo and valid.get(logo["url"], False)
+    for _, path, meta, stream, options in candidates:
+        logo = next((option for option in options if valid.get(option["url"], False)), None)
+        selected = logo is not None
         if selected:
             if 'tvg-logo="' in meta:
                 meta = re.sub(r'tvg-logo="[^"]*"', 'tvg-logo="' + logo["url"] + '"', meta, count=1)
