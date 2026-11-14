@@ -360,6 +360,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
 
 
 @Composable
+// Reads optional tvg-logo URLs from M3U and renders a safe TV/radio fallback.
 private fun ChannelLogo(logoUrl: String, kind: String) {
     var bitmap by remember(logoUrl) { mutableStateOf<android.graphics.Bitmap?>(null) }
     LaunchedEffect(logoUrl) {
