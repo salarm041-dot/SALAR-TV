@@ -63,7 +63,8 @@ data class Channel(
     val country: String = "سایر",
     val kind: String = "تلویزیون",
     val favorite: Boolean = false,
-    val logoUrl: String = ""
+    val logoUrl: String = "",
+    val groupTitle: String = ""
 )
 
 class MainActivity : ComponentActivity() {
@@ -86,7 +87,7 @@ fun SalarTvApp() {
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
                     add(Channel(o.optString("name"), o.optString("url"), o.optString("country"),
-                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl")))
+                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle")))
                 }
             }
         }
@@ -96,7 +97,7 @@ fun SalarTvApp() {
         channels.forEach { c ->
             arr.put(JSONObject().put("name", c.name).put("url", c.url)
                 .put("country", c.country).put("kind", c.kind).put("favorite", c.favorite)
-                .put("logoUrl", c.logoUrl))
+                .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle))
         }
         prefs.edit().putString("channels", arr.toString()).apply()
     }
@@ -845,7 +846,7 @@ fun AboutPage() {
 
 private fun categoryForChannel(channel: Channel): String {
     if (channel.kind == "رادیو") return "رادیو"
-    val value = (channel.name + " " + channel.country).lowercase()
+    val value = (channel.name + " " + channel.country + " " + channel.groupTitle).lowercase()
     return when {
         listOf("خبر", "news", "haber", "bbc", "cnn", "irinn", "voa persian", "congress tv", "revolution tv").any { it in value } -> "خبری"
         listOf("ورزش", "sport", "sports", "varzesh", "trt spor", "persiana fight").any { it in value } -> "ورزشی"
@@ -857,7 +858,7 @@ private fun categoryForChannel(channel: Channel): String {
         listOf("سلامت", "health", "saglik", "sağlık", "persiana medical").any { it in value } -> "سلامت"
         listOf("قرآن", "معارف", "quran", "religion").any { it in value } -> "دینی و فرهنگی"
         "persiana comedy" in value -> "سرگرمی"
-        channel.country == "ایران" && listOf("استان", "شبکه آذربایجان غربی", "شبکه سهند", "شبکه سبلان").any { it in value } -> "استانی"
+        channel.groupTitle.contains("شبکه‌های استانی", ignoreCase = true) || (channel.country == "ایران" && listOf("استان", "شبکه آذربایجان غربی", "شبکه سهند", "شبکه سبلان").any { it in value }) -> "استانی"
         else -> "عمومی"
     }
 }
@@ -874,6 +875,7 @@ private fun parseM3u(text: String): List<Channel> {
     var country = "سایر"
     var kind = "تلویزیون"
     var logoUrl = ""
+    var groupTitle = ""
     text.lineSequence().forEach { raw ->
         val line = raw.trim()
         if (line.startsWith("#EXTINF", true)) {
@@ -881,14 +883,15 @@ private fun parseM3u(text: String): List<Channel> {
             logoUrl = Regex("tvg-logo=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
                 .find(line)?.groupValues?.getOrNull(1).orEmpty()
             val lower = line.lowercase()
-            val group = Regex("group-title=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
-                .find(line)?.groupValues?.getOrNull(1)?.lowercase().orEmpty()
+            groupTitle = Regex("group-title=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
+                .find(line)?.groupValues?.getOrNull(1).orEmpty()
+            val group = groupTitle.lowercase()
             val meta = "$lower $group"
             country = when {
                 "فارسی‌زبان خارج از ایران" in meta || "فارسی زبان خارج از ایران" in meta -> "فارسی‌زبان خارج از ایران"
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
-                "iran" in meta || "ایران" in meta || "ir/" in meta -> "ایران"
+                "iran" in meta || "ایران" in meta || "ir/" in meta || "شبکه‌های استانی" in meta -> "ایران"
                 "saudi" in meta || "عربستان" in meta || "sa/" in meta -> "عربستان"
                 "uae" in meta || "emirates" in meta || "امارات" in meta || "ae/" in meta -> "امارات"
                 "qatar" in meta || "قطر" in meta || "qa/" in meta -> "قطر"
@@ -912,8 +915,8 @@ private fun parseM3u(text: String): List<Channel> {
             }
             kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
-            result.add(Channel(title, line, country, kind, logoUrl = logoUrl))
-            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""
+            result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle))
+            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""
         }
     }
     return result.distinctBy { it.url }
