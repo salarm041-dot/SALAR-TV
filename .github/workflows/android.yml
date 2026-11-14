@@ -208,6 +208,48 @@ jobs:
           path: trt-candidate-report.json
           if-no-files-found: ignore
 
+
+      - name: Probe Persian radio stream candidates (HLS and direct audio)
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, urllib.request, urllib.error, json, pathlib, time
+          p=pathlib.Path("patch/radio-candidates.m3u")
+          lines=p.read_text(encoding="utf-8-sig").splitlines()
+          items=[]; meta=None
+          for line in lines:
+              line=line.strip()
+              if line.startswith("#EXTINF"): meta=line.split(",",1)[-1].strip()
+              elif line.startswith(("http://","https://")) and meta:
+                  items.append({"name":meta,"url":line}); meta=None
+          def check(item):
+              req=urllib.request.Request(item["url"],headers={"User-Agent":"Mozilla/5.0 SALAR-TV-radio-check/1.0","Icy-MetaData":"1","Accept":"*/*"})
+              try:
+                  with urllib.request.urlopen(req,timeout=18) as r:
+                      data=r.read(8192); ctype=r.headers.get("Content-Type","").lower()
+                      head=data.lstrip(b"\\xef\\xbb\\xbf\\r\\n \\t")[:2048].decode("utf-8","ignore")
+                      hls="#EXTM3U" in head
+                      audio=("audio" in ctype or "mpeg" in ctype or "ogg" in ctype or "aac" in ctype or "octet-stream" in ctype or data.startswith((b"ID3",b"\\xff\\xfb",b"\\xff\\xf3",b"\\xff\\xf2",b"OggS",b"fLaC")))
+                      ok=r.status in (200,206) and (hls or audio) and len(data)>32
+                      return {**item,"status":r.status,"content_type":ctype,"bytes_sampled":len(data),"valid_stream_response":ok,"protocol":"HLS" if hls else ("audio/direct" if audio else "unknown"),"detail":"stream bytes received" if ok else "response not recognized as HLS/audio"}
+              except urllib.error.HTTPError as e: return {**item,"status":e.code,"valid_stream_response":False,"detail":"HTTP error"}
+              except Exception as e: return {**item,"status":None,"valid_stream_response":False,"detail":type(e).__name__+": "+str(e)[:180]}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool: results=list(pool.map(check,items))
+          good=[x for x in results if x["valid_stream_response"]]
+          out={"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"total":len(results),"passed":len(good),"failed_or_unverified":len(results)-len(good),"results":results}
+          pathlib.Path("radio-candidate-report.json").write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding="utf-8")
+          print(f"RADIO CANDIDATES: {len(good)}/{len(results)} passed basic stream-response validation")
+          for x in results: print(("PASS " if x["valid_stream_response"] else "FAIL/UNVERIFIED ")+x["name"]+" :: "+str(x.get("status"))+" "+x["url"]+" :: "+x["detail"])
+          PY
+
+      - name: Upload Persian radio candidate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Persian-Radio-Candidate-Report
+          path: radio-candidate-report.json
+          if-no-files-found: ignore
+
       - name: Build APK
         run: gradle -p "$PROJECT_DIR" :app:assembleDebug
 
