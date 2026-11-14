@@ -216,9 +216,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="${{ github.workspace }}/SALAR-TV-debug.apk"
-            test -f "$APK"
-            adb install -r "$APK"
+            APK="${{ github.workspace }}/SALAR-TV-debug.apk"; test -f "$APK" && adb install -r "$APK"
             adb shell am start -n com.salar.tv/.MainActivity
             sleep 20
             adb shell dumpsys activity activities | grep -q "com.salar.tv"
