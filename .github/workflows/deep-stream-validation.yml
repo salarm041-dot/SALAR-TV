@@ -41,6 +41,14 @@ jobs:
                   f.write("skip=true\n")
           PY
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate AI broker JavaScript syntax
+        run: node --check server/index.mjs
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
