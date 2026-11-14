@@ -161,7 +161,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK=$(find project -path "*/app/build/outputs/apk/debug/*.apk" -print -quit)
+            APK=$(find "$GITHUB_WORKSPACE/project" -path "*/app/build/outputs/apk/debug/*.apk" -print -quit)
             test -n "$APK"
             adb install -r "$APK"
             adb shell am start -n com.salar.tv/.MainActivity
