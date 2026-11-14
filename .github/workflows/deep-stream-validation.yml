@@ -56,6 +56,7 @@ jobs:
             candidate-logo-report.json
             patch/arab-israel-candidates.m3u
             patch/azerbaijan-candidates.m3u
+            patch/radio-candidates.m3u
           if-no-files-found: ignore
           retention-days: 30
 
