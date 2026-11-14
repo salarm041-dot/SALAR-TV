@@ -1,0 +1,20 @@
+#EXTM3U
+# Official IRIB national-network candidates. Promoted only after deep stream and raster-logo validation.
+#EXTINF:-1 tvg-id="AmouzeshTV.ir" tvg-name="IRIB Amoozesh" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AmouzeshTV.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="SD",شبکه آموزش
+https://live-aburayhan1103.telewebion.ir/ek/amouzesh/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="OfoghTV.ir" tvg-name="IRIB Ofogh" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/OfoghTV.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه افق
+https://live-aburayhan1106.telewebion.ir/ek/ofogh/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IRIBOmid.ir" tvg-name="IRIB Omid" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBOmid.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه امید
+https://live-aburayhan1111.telewebion.ir/ek/omid/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="PooyaTV.ir" tvg-name="IRIB Pooya & Nahal" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PooyaTV.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه پویا و نهال
+https://live-aburayhan1112.telewebion.ir/ek/pooya/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="NamayeshTV.ir" tvg-name="IRIB Namayesh" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NamayeshTV.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه نمایش
+https://live-aburayhan1105.telewebion.ir/ek/namayesh/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IRIB1Plus.ir" tvg-name="IRIB TV1 Plus" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1Plus.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه یک پلاس
+https://live-aburayhan1111.telewebion.ir/ek/tv1plus/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IRINN2.ir" tvg-name="IRINN 2" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRINN2.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه خبر ۲
+https://live-aburayhan1112.telewebion.ir/ek/irinn2/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="RoyaTV.ir" tvg-name="Roya" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/RoyaTV.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="HD",شبکه رویا
+https://live-aburayhan1102.telewebion.ir/na/iribu/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="GolkhaneTv.ir" tvg-name="Golkhane" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/GolkhaneTv.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="HD",شبکه گلخانه
+https://live-aburayhan1111.telewebion.ir/na/golkhane/live/720p/index.m3u8

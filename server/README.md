@@ -2,12 +2,15 @@
 
 This small server keeps the permanent OpenAI API key off the Android APK and issues short-lived Realtime client secrets.
 
-## Current endpoint
+## Endpoints
 
 - `GET /health`
 - `POST /v1/live/subtitle-session`
+- `POST /v1/live/persian-dub-session`
 
-The session endpoint creates a short-lived `gpt-live-transcribe` transcription session for live captions. It accepts an optional JSON body:
+### Source-language live captions
+
+`POST /v1/live/subtitle-session` creates a short-lived `gpt-live-transcribe` transcription session. Optional JSON body:
 
 ```json
 {
@@ -16,19 +19,36 @@ The session endpoint creates a short-lived `gpt-live-transcribe` transcription s
 }
 ```
 
-It returns only the ephemeral client secret, expiry and session ID. The Android client must connect to the Realtime transcription WebSocket using that short-lived secret and stream **24 kHz mono PCM16** audio. The permanent API key must exist only as the server environment variable `OPENAI_API_KEY`.
+The Android client must connect to the Realtime transcription WebSocket using the returned short-lived secret and stream **24 kHz mono PCM16** audio.
 
-## Important product limitation
+### Persian live dubbing session
 
-Live transcription produces source-language text; it does not translate it to Persian or generate Persian speech. The separate Persian text-translation and TTS stages, plus the Media3 audio tap and playback mixer, are not implemented yet.
+`POST /v1/live/persian-dub-session` creates a short-lived `gpt-realtime-2.1` session configured to interpret incoming broadcast speech into Iranian Persian, with PCM16 audio output and optional source-language transcript events.
 
-The dedicated `gpt-realtime-translate` model currently lists 13 output languages and Persian is not among them. Therefore SALAR TV must not send `fa` as its output language to that model. The intended Persian path is:
+Optional JSON body:
 
-1. Capture decoded audio from the app's own Media3 player (not the phone microphone).
-2. Stream PCM16/24 kHz mono to `gpt-live-transcribe`.
-3. Translate transcript segments to Persian with a text model.
-4. For dubbing, synthesize Persian audio and mix it with the original player output.
-5. Display translated subtitle deltas independently of the dubbing toggle.
+```json
+{
+  "languages": ["en", "tr", "az", "ar", "fa", "he"],
+  "installId": "non-secret-installation-id"
+}
+```
+
+The endpoint returns an ephemeral client secret, expiry, session ID, model name, and the expected 24 kHz mono PCM16 output format. The permanent API key is never returned to the client.
+
+The dedicated `gpt-realtime-translate` model is not used for Persian output: its currently documented target languages do not include Persian. The Persian route therefore uses a Realtime speech session with explicit interpreter instructions. Translation quality and timing still require testing with real broadcast audio.
+
+## Remaining Android integration work
+
+The server endpoints are implemented, but live dubbing is **not yet an end-to-end app feature**. These Android components remain to be completed and tested:
+
+1. Capture decoded audio from SALAR TV's own Media3 player (not the phone microphone).
+2. Resample/downmix to 24 kHz mono PCM16 and stream continuously to the Realtime WebSocket.
+3. Receive translated audio and transcript events.
+4. Play translated PCM while ducking/mixing the original player audio.
+5. Display translated subtitle deltas and provide independent controls for subtitles, dubbed audio, original audio, and volume.
+
+The Android app also needs a configured broker URL. Do not put an OpenAI API key in the APK.
 
 ## Run locally
 

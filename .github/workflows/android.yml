@@ -3,9 +3,17 @@ name: Build SALAR TV APK
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
+      - improve/deep-stream-validation
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -43,6 +51,36 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+
+      - name: Discover and prepare Persian radio candidates
+        run: python3 scripts/build_radio_directory_candidates.py
+
+      - name: Enrich candidate channel logos
+        run: python scripts/enrich_candidate_logos.py
+
+      - name: Deep-validate candidate streams before packaging
+        timeout-minutes: 25
+        run: python scripts/deep_stream_check.py
+
+      - name: Add only verified live candidates to the app playlist
+        run: python scripts/build_verified_playlist.py
+
+      - name: Upload verified channel promotion report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Verified-Channel-Report
+          path: |
+            candidate-logo-report.json
+            deep-stream-reports/
+            patch/arab-israel-candidates.m3u
+            patch/azerbaijan-candidates.m3u
+            patch/endpoint-replacement-candidates.m3u
+            patch/irib-national-candidates.m3u
+            patch/radio-candidates.m3u
+            patch/radio-directory-candidates.m3u
+            patch/turkey-candidates.m3u
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Apply corrected app source and recording module
         run: |
@@ -124,14 +162,20 @@ jobs:
           urls = [url for _, url in entries]
           provincial = [meta for meta, _ in entries if "شبکه‌های استانی" in meta]
           logos = [meta for meta, _ in entries if "tvg-logo=" in meta]
-          if len(entries) != 156:
-              raise SystemExit(f"Unexpectedly small playlist: {len(entries)} entries")
+          # Do not pin the playlist to an exact count: adding verified channels
+          # must not break the Android build. Keep a floor to catch missing assets.
+          if len(entries) < 150:
+              raise SystemExit(f"Unexpectedly small playlist: {len(entries)} entries (minimum 150)")
           if len(urls) != len(set(urls)):
               raise SystemExit("Duplicate stream URLs found in bundled playlist")
           if len(provincial) != 34:
-              raise SystemExit(f"Expected 34 provincial IRIB channels, found {len(provincial)}")
-          if len(logos) != 156:
-              raise SystemExit(f"Expected 156 channel logos, found {len(logos)}")
+              raise SystemExit(f"Expected 34 official provincial/local IRIB channels, found {len(provincial)}")
+          provincial_text = "\\n".join(provincial)
+          for required_label in ("نور (قم)", "سبز (گلستان)", "تبرستان (مازندران)", "شبکه پنج (تهران)"):
+              if required_label not in provincial_text:
+                  raise SystemExit(f"Required provincial network missing or mislabeled: {required_label}")
+          if len(logos) != len(entries):
+              raise SystemExit(f"Expected every channel to have a logo: {len(logos)}/{len(entries)}")
           print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
           PY
 
@@ -261,48 +305,6 @@ jobs:
           if-no-files-found: ignore
 
 
-      - name: Discover Persian stations from Radio Browser and validate streams
-        continue-on-error: true
-        run: |
-          python3 - <<'PY'
-          import concurrent.futures, urllib.request, urllib.parse, json, pathlib, time
-          base="https://de1.api.radio-browser.info/json/stations"
-          headers={"User-Agent":"SALAR-TV/1.3 (Persian radio directory validation; contact Salar.m041@gmail.com)","Accept":"application/json"}
-          def api(path):
-              req=urllib.request.Request(base+path,headers=headers)
-              with urllib.request.urlopen(req,timeout=25) as r: return json.loads(r.read().decode("utf-8"))
-          stations={}
-          for path in ("/bylanguage/persian?hidebroken=true&limit=500&order=clickcount&reverse=true",
-                       "/bycountrycodeexact/ir?hidebroken=true&limit=500&order=clickcount&reverse=true"):
-              try:
-                  for s in api(path):
-                      u=s.get("url_resolved") or s.get("url")
-                      if u and u.startswith(("http://","https://")):
-                          stations[u]=s
-              except Exception as e: print("DIRECTORY QUERY WARNING",path,type(e).__name__,str(e)[:160])
-          def check(pair):
-              url,s=pair
-              req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 SALAR-TV-radio-check/1.0","Icy-MetaData":"1","Accept":"*/*"})
-              try:
-                  with urllib.request.urlopen(req,timeout=15) as r:
-                      data=r.read(8192); ct=r.headers.get("Content-Type","").lower()
-                      head=data.lstrip(b"\\xef\\xbb\\xbf\\r\\n \\t")[:2048].decode("utf-8","ignore")
-                      hls="#EXTM3U" in head
-                      audio=("audio" in ct or "mpeg" in ct or "ogg" in ct or "aac" in ct or "octet-stream" in ct or data.startswith((b"ID3",b"\\xff\\xfb",b"\\xff\\xf3",b"\\xff\\xf2",b"OggS",b"fLaC")))
-                      ok=r.status in (200,206) and (hls or audio) and len(data)>32
-                      return {"name":s.get("name",""),"url":url,"homepage":s.get("homepage",""),"country":s.get("country",""),"language":s.get("language",""),"codec":s.get("codec",""),"bitrate":s.get("bitrate",0),"status":r.status,"content_type":ct,"bytes_sampled":len(data),"valid_stream_response":ok,"protocol":"HLS" if hls else ("audio/direct" if audio else "unknown"),"directory_lastcheckok":s.get("lastcheckok")}
-              except Exception as e: return {"name":s.get("name",""),"url":url,"country":s.get("country",""),"language":s.get("language",""),"valid_stream_response":False,"status":None,"detail":type(e).__name__+": "+str(e)[:160],"directory_lastcheckok":s.get("lastcheckok")}
-          pairs=list(stations.items())
-          with concurrent.futures.ThreadPoolExecutor(max_workers=24) as pool: results=list(pool.map(check,pairs))
-          good=[x for x in results if x["valid_stream_response"]]
-          out={"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"directory_candidates":len(pairs),"passed":len(good),"failed_or_unverified":len(results)-len(good),"results":results}
-          pathlib.Path("radio-directory-report.json").write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding="utf-8")
-          print(f"RADIO BROWSER: {len(good)}/{len(results)} Persian/Iran directory streams passed response validation")
-          for x in good: print("PASS",x["name"],x["country"],x["codec"],x["url"])
-          for x in results:
-              if not x["valid_stream_response"]: print("FAIL/UNVERIFIED",x["name"],x["status"],x["url"],x.get("detail",""))
-          PY
-
       - name: Upload Persian radio directory report
         if: always()
         uses: actions/upload-artifact@v4
@@ -370,14 +372,18 @@ jobs:
                   raise SystemExit(f"APK missing required files: {sorted(missing)}")
               playlist = apk.read("assets/channels.m3u").decode("utf-8-sig")
               entries = re.findall(r"(?m)^#EXTINF", playlist)
-              if len(entries) != 156:
-                  raise SystemExit(f"APK bundled playlist mismatch: expected 156 entries, found {len(entries)}")
+              source_playlist = Path("patch/channels.m3u").read_text(encoding="utf-8-sig")
+              source_entries = re.findall(r"(?m)^#EXTINF", source_playlist)
+              if len(entries) < 150:
+                  raise SystemExit(f"APK bundled playlist unexpectedly small: {len(entries)} entries")
+              if len(entries) != len(source_entries):
+                  raise SystemExit(f"APK/source playlist mismatch: APK has {len(entries)}, source has {len(source_entries)} entries")
               if not any("شبکه‌های استانی" in line for line in playlist.splitlines()):
                   raise SystemExit("Provincial channels metadata missing from APK")
           apk_path = apks[0].resolve()
           with open(__import__("os").environ["GITHUB_ENV"], "a") as env:
               env.write(f"SALAR_TV_APK_PATH={apk_path}\\n")
-          print(f"APK package OK: {apk_path}, {apks[0].stat().st_size} bytes, 156 playlist entries")
+          print(f"APK package OK: {apk_path}, {apks[0].stat().st_size} bytes, {len(entries)} playlist entries")
           PY
 
       - name: Stage APK for emulator container
@@ -388,6 +394,7 @@ jobs:
           ls -lh "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
 
       - name: Android 11 emulator smoke test
+        timeout-minutes: 12
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
@@ -396,9 +403,10 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="${{ github.workspace }}/SALAR-TV-debug.apk"; test -f "$APK" && adb install -r "$APK" && adb shell am start -n com.salar.tv/.MainActivity && sleep 20 && adb shell dumpsys activity activities | grep -q "com.salar.tv" && (adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv" && { echo "App crashed during startup smoke test"; exit 1; } || echo "Android 11 emulator launch smoke test passed")
+            set -e; echo "Emulator workspace: $GITHUB_WORKSPACE"; pwd; ls -lah "$GITHUB_WORKSPACE"; test -f "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"; adb install -r "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"; adb shell am start -n com.salar.tv/.MainActivity; sleep 20; adb shell pidof com.salar.tv >/dev/null; if adb logcat -d -t 5000 | grep -A 12 "FATAL EXCEPTION" | grep -q "com.salar.tv"; then echo "SALAR TV crashed during Android 11 startup"; exit 1; fi; echo "Android 11 emulator launch smoke test passed"
 
       - name: Upload APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: SALAR-TV-APK

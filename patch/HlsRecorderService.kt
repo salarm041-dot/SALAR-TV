@@ -14,7 +14,11 @@ import java.net.URL
 
 class HlsRecorderService : Service() {
     @Volatile private var running = false
+    @Volatile private var recordingGeneration = 0L
     private var worker: Thread? = null
+
+    private data class ByteRange(val length: Long, val offset: Long?)
+    private data class MediaPart(val uri: String, val range: ByteRange? = null)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val name = intent?.getStringExtra("name") ?: "SALAR TV"
@@ -22,76 +26,234 @@ class HlsRecorderService : Service() {
         val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(1, 360)
         createChannel()
         startForeground(4102, notification("در حال ضبط: $name"))
-        running = true
-        worker = Thread {
+        val myGeneration = synchronized(this) {
+            recordingGeneration += 1
+            worker?.interrupt()
+            running = true
+            recordingGeneration
+        }
+        val recordingWorker = Thread {
             val folder = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: filesDir
+            if (!folder.exists()) folder.mkdirs()
             val safeName = name.replace(Regex("[^\\p{L}\\p{N}_-]"), "_").take(40)
-            val output = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + ".ts")
-            val seen = HashSet<String>()
             val deadline = System.currentTimeMillis() + durationMinutes * 60_000L
+            val seen = HashSet<String>()
+            val writtenMaps = HashSet<String>()
+            var output: File? = null
             var saved = 0L
             try {
-                while (running && System.currentTimeMillis() < deadline) {
-                    val playlistText = downloadText(streamUrl)
-                    val playlistUrl = URL(streamUrl)
-                    val lines = playlistText.lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.toList()
-                    val variant = lines.firstOrNull { !it.startsWith("#") && it.contains(".m3u8", true) }
-                    val mediaUrl = if (variant != null) URL(playlistUrl, variant).toString() else streamUrl
-                    val mediaText = if (variant != null) downloadText(mediaUrl) else playlistText
-                    if (mediaText.contains("#EXT-X-KEY") && !mediaText.contains("METHOD=NONE")) {
-                        error("این منبع HLS رمزگذاری شده است و ضبط مستقیم آن پشتیبانی نمی‌شود.")
+                while (isCurrent(myGeneration) && System.currentTimeMillis() < deadline) {
+                    val masterText = downloadText(streamUrl)
+                    val mediaUrl = resolveMediaPlaylist(streamUrl, masterText)
+                    val mediaText = if (mediaUrl == streamUrl) masterText else downloadText(mediaUrl)
+                    if (mediaText.contains("#EXT-X-KEY") &&
+                        Regex("METHOD=([^,\\s]+)", RegexOption.IGNORE_CASE).findAll(mediaText)
+                            .any { !it.groupValues[1].equals("NONE", true) }) {
+                        error("این منبع HLS رمزگذاری شده است؛ ضبط بدون کلید مجاز/قابل پشتیبانی نیست.")
                     }
-                    if (mediaText.contains("#EXT-X-MAP") || mediaText.contains("#EXT-X-BYTERANGE")) {
-                        error("این قالب HLS از نوع قطعه‌بندی‌شده خاص است؛ ضبط امن این نوع هنوز پشتیبانی نمی‌شود.")
+
+                    val mapParts = parseMaps(mediaText)
+                    val parts = parseSegments(mediaText)
+                    if (parts.isEmpty()) error("پلی‌لیست رسانه هیچ قطعه‌ای برای ضبط ندارد.")
+                    if (output == null) {
+                        val ext = if (mapParts.isNotEmpty()) "mp4" else "ts"
+                        output = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + "." + ext)
                     }
-                    val base = URL(mediaUrl)
-                    val segments = mediaText.lineSequence().map { it.trim() }
-                        .filter { it.isNotEmpty() && !it.startsWith("#") }
-                        .map { URL(base, it).toString() }.toList()
-                    for (segment in segments) {
-                        if (!running || System.currentTimeMillis() >= deadline) break
-                        if (seen.add(segment)) {
-                            val bytes = downloadBytes(segment)
-                            output.appendBytes(bytes)
+
+                    for (map in mapParts) {
+                        if (!isCurrent(myGeneration) || System.currentTimeMillis() >= deadline) break
+                        val absolute = URL(URL(mediaUrl), map.uri).toString()
+                        val key = partKey(absolute, map.range)
+                        if (writtenMaps.add(key)) {
+                            val bytes = downloadPart(absolute, map.range)
+                            output!!.appendBytes(bytes)
                             saved += bytes.size
-                            updateNotification("در حال ضبط: $name • " + (saved / 1_048_576) + " مگابایت")
                         }
                     }
+
+                    for (part in parts) {
+                        if (!isCurrent(myGeneration) || System.currentTimeMillis() >= deadline) break
+                        val absolute = URL(URL(mediaUrl), part.uri).toString()
+                        val key = partKey(absolute, part.range)
+                        if (seen.add(key)) {
+                            val bytes = downloadPart(absolute, part.range)
+                            output!!.appendBytes(bytes)
+                            saved += bytes.size
+                            if (isCurrent(myGeneration)) {
+                                updateNotification("در حال ضبط: $name • " + (saved / 1_048_576) + " مگابایت")
+                            }
+                        }
+                    }
+
                     if (mediaText.contains("#EXT-X-ENDLIST")) break
-                    Thread.sleep(3000)
+                    val target = Regex("#EXT-X-TARGETDURATION:(\\d+)", RegexOption.IGNORE_CASE)
+                        .find(mediaText)?.groupValues?.get(1)?.toLongOrNull() ?: 6L
+                    try { Thread.sleep((target.coerceIn(2L, 10L) * 500L).coerceIn(1000L, 5000L)) }
+                    catch (_: InterruptedException) { if (!isCurrent(myGeneration)) break }
                 }
-                updateNotification(if (saved > 0) "ضبط ذخیره شد: " + output.name else "ضبط انجام نشد؛ منبع قطعه قابل ذخیره ارائه نکرد")
+                if (isCurrent(myGeneration)) {
+                    updateNotification(if (saved > 0 && output != null) {
+                        "ضبط ذخیره شد: " + output!!.name
+                    } else "ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
+                }
             } catch (e: Exception) {
-                updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
+                if (isCurrent(myGeneration)) {
+                    updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
+                }
             } finally {
-                running = false
-                stopForeground(STOP_FOREGROUND_DETACH)
-                stopSelf()
+                val shouldStop = synchronized(this) {
+                    if (recordingGeneration == myGeneration) {
+                        running = false
+                        worker = null
+                        true
+                    } else false
+                }
+                if (shouldStop) {
+                    stopForeground(STOP_FOREGROUND_DETACH)
+                    stopSelfResult(startId)
+                }
             }
-        }.also { it.start() }
+        }
+        synchronized(this) {
+            if (recordingGeneration == myGeneration) worker = recordingWorker
+        }
+        if (isCurrent(myGeneration)) recordingWorker.start()
         return START_NOT_STICKY
     }
 
+    private fun resolveMediaPlaylist(masterUrl: String, text: String): String {
+        val lines = text.lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.toList()
+        val variants = mutableListOf<Pair<Long, String>>()
+        for (i in lines.indices) {
+            if (lines[i].startsWith("#EXT-X-STREAM-INF:", true)) {
+                val bandwidth = Regex("(?:AVERAGE-BANDWIDTH|BANDWIDTH)=(\\d+)", RegexOption.IGNORE_CASE)
+                    .find(lines[i])?.groupValues?.get(1)?.toLongOrNull() ?: Long.MAX_VALUE
+                val uri = lines.drop(i + 1).firstOrNull { !it.startsWith("#") }
+                if (uri != null) variants += bandwidth to uri
+            }
+        }
+        val selected = variants.minByOrNull { it.first }?.second
+        return if (selected == null) masterUrl else URL(URL(masterUrl), selected).toString()
+    }
+
+    private fun parseMaps(text: String): List<MediaPart> {
+        val result = mutableListOf<MediaPart>()
+        for (line in text.lineSequence().map { it.trim() }) {
+            if (!line.startsWith("#EXT-X-MAP:", true)) continue
+            val uri = Regex("URI=\"([^\"]+)\"", RegexOption.IGNORE_CASE)
+                .find(line)?.groupValues?.get(1) ?: continue
+            val rangeText = Regex("BYTERANGE=\"([^\"]+)\"", RegexOption.IGNORE_CASE)
+                .find(line)?.groupValues?.get(1)
+            result += MediaPart(uri, parseRange(rangeText, null))
+        }
+        return result
+    }
+
+    private fun parseSegments(text: String): List<MediaPart> {
+        val result = mutableListOf<MediaPart>()
+        var pendingRange: ByteRange? = null
+        var previousRangeEnd: Long? = null
+        var previousRangeUri: String? = null
+        for (line in text.lineSequence().map { it.trim() }) {
+            if (line.startsWith("#EXT-X-BYTERANGE:", true)) {
+                pendingRange = parseRange(line.substringAfter(":"), null)
+            } else if (line.isNotEmpty() && !line.startsWith("#")) {
+                val resolvedRange = pendingRange?.let { range ->
+                    if (range.offset != null) range
+                    else if (previousRangeUri == line && previousRangeEnd != null) range.copy(offset = previousRangeEnd)
+                    else range
+                }
+                result += MediaPart(line, resolvedRange)
+                if (resolvedRange != null) {
+                    previousRangeEnd = resolvedRange.offset?.plus(resolvedRange.length)
+                    previousRangeUri = line
+                } else {
+                    previousRangeEnd = null
+                    previousRangeUri = null
+                }
+                pendingRange = null
+            }
+        }
+        return result
+    }
+
+    private fun parseRange(raw: String?, implicitOffset: Long?): ByteRange? {
+        if (raw.isNullOrBlank()) return null
+        val pieces = raw.trim().split("@", limit = 2)
+        val length = pieces[0].toLongOrNull() ?: error("مقدار EXT-X-BYTERANGE نامعتبر است.")
+        val offset = if (pieces.size == 2) pieces[1].toLongOrNull()
+            ?: error("آفست EXT-X-BYTERANGE نامعتبر است.") else implicitOffset
+        require(length > 0 && (offset == null || offset >= 0)) { "محدوده بایت نامعتبر است." }
+        return ByteRange(length, offset)
+    }
+
+    private fun partKey(url: String, range: ByteRange?): String =
+        if (range == null) url else url + "|" + (range.offset?.toString() ?: "implicit") + "|" + range.length
+
+    private fun downloadText(address: String): String =
+        downloadBytes(address, null, 1_048_576).toString(Charsets.UTF_8)
+
+    private fun downloadPart(address: String, range: ByteRange?): ByteArray {
+        val header = range?.let {
+            val start = it.offset ?: error("آفست ضمنی BYTERANGE برای این قطعه قابل تعیین نیست.")
+            "bytes=" + start + "-" + (start + it.length - 1)
+        }
+        val bytes = downloadBytes(address, header, 32 * 1024 * 1024)
+        if (range != null && bytes.size.toLong() != range.length) {
+            error("اندازه قطعه با EXT-X-BYTERANGE مطابقت ندارد.")
+        }
+        return bytes
+    }
+
+    private fun downloadBytes(address: String, range: String?, maxBytes: Int): ByteArray {
+        val connection = URL(address).openConnection() as HttpURLConnection
+        connection.connectTimeout = 15000
+        connection.readTimeout = 25000
+        connection.setRequestProperty("User-Agent", "SALAR-TV/1.2")
+        connection.setRequestProperty("Accept", "*/*")
+        if (range != null) connection.setRequestProperty("Range", range)
+        try {
+            val code = connection.responseCode
+            if (code !in 200..299) error("HTTP $code")
+            if (range != null) {
+                if (code != 206) error("سرور درخواست محدوده بایت را نپذیرفت (HTTP $code).")
+                val requested = Regex("bytes=(\\d+)-(\\d+)", RegexOption.IGNORE_CASE)
+                    .matchEntire(range.trim()) ?: error("درخواست محدوده بایت نامعتبر است.")
+                val returned = connection.getHeaderField("Content-Range") ?: error("سرور Content-Range را برنگرداند.")
+                val actual = Regex("bytes\\s+(\\d+)-(\\d+)/(?:\\d+|\\*)", RegexOption.IGNORE_CASE)
+                    .matchEntire(returned.trim()) ?: error("هدر Content-Range نامعتبر است.")
+                if (actual.groupValues[1] != requested.groupValues[1] || actual.groupValues[2] != requested.groupValues[2]) {
+                    error("محدوده بایت دریافتی با درخواست ضبط مطابقت ندارد.")
+                }
+            }
+            val out = java.io.ByteArrayOutputStream()
+            connection.inputStream.use {
+                val buffer = ByteArray(16 * 1024)
+                var total = 0
+                while (true) {
+                    val count = it.read(buffer)
+                    if (count < 0) break
+                    total += count
+                    if (total > maxBytes) error("پاسخ سرور بیش از حد مجاز بزرگ است.")
+                    out.write(buffer, 0, count)
+                }
+            }
+            return out.toByteArray()
+        } finally { connection.disconnect() }
+    }
+
+    private fun isCurrent(generation: Long): Boolean =
+        running && recordingGeneration == generation
+
     override fun onDestroy() {
+        recordingGeneration += 1
         running = false
         worker?.interrupt()
+        worker = null
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-
-    private fun downloadText(address: String): String = downloadBytes(address).toString(Charsets.UTF_8)
-
-    private fun downloadBytes(address: String): ByteArray {
-        val connection = URL(address).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15000
-        connection.readTimeout = 20000
-        connection.setRequestProperty("User-Agent", "SALAR-TV/1.1")
-        try {
-            if (connection.responseCode !in 200..299) error("HTTP " + connection.responseCode)
-            return connection.inputStream.use { it.readBytes() }
-        } finally { connection.disconnect() }
-    }
 
     private fun createChannel() {
         if (Build.VERSION.SDK_INT >= 26) {

@@ -1,43 +1,51 @@
 #EXTM3U
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",AZTV
+#EXTINF:-1 tvg-logo="https://www.tvlogo.org/azerbaijan/az-tv-tr.png" tvg-id="AzTV.az" group-title="جمهوری آذربایجان / عمومی",AZTV
 https://str.yodacdn.net/azertv/index.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",İctimai TV
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=itv.az&sz=128" tvg-id="IctimaiTV.az" group-title="جمهوری آذربایجان / عمومی",İctimai TV
 https://live.itv.az/itv.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",ATV Azərbaycan
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=atv.az&sz=128" tvg-id="AzadTV.az" group-title="جمهوری آذربایجان / عمومی",ATV Azərbaycan
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",Xəzər TV
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=xezerxeber.az&sz=128" tvg-id="XezerTV.az" group-title="جمهوری آذربایجان / عمومی",Xəzər TV
 https://www.xezerxeber.az/stream/index.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",Space TV
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=spacetv.az&sz=128" tvg-id="SpaceTV.az" group-title="جمهوری آذربایجان / عمومی",Space TV
 https://stream.spacetv.az/hls/live.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / خبری",Baku TV
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/0/0e/Baku_TV_%282018%29.png" tvg-id="BakuTV.az" group-title="جمهوری آذربایجان / خبری",Baku TV
 https://rtmp.baku.tv/hls/bakutv.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / خبری",Real TV
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=realtv.az&sz=128" tvg-id="RealTV.az" group-title="جمهوری آذربایجان / خبری",Real TV
 https://realtv.az/live/stream.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / خبری",ARB 24
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/7/74/ARB_24_logo1.png" tvg-id="ARB24.az" group-title="جمهوری آذربایجان / خبری",ARB 24
 https://arb24.az/live/stream.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / ورزشی",CBC Sport
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/az/0/04/CBC_Sport_TV_loqo.png" tvg-id="CBCSport.az" group-title="جمهوری آذربایجان / ورزشی",CBC Sport
 https://mn-nl.mncdn.com/cbcsports_live/cbcsports/playlist.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / ورزشی",İdman TV
+#EXTINF:-1 tvg-logo="https://www.tvlogo.org/azerbaijan/idman-tv-tr.png" tvg-id="IdmanTV.az" group-title="جمهوری آذربایجان / ورزشی",İdman TV
 https://str.yodacdn.net/idmantv/index.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / فرهنگی",Mədəniyyət TV
+#EXTINF:-1 tvg-logo="https://www.tvlogo.org/azerbaijan/medeniyyet-tv-tr.png" tvg-id="MedeniyyetTV.az" group-title="جمهوری آذربایجان / فرهنگی",Mədəniyyət TV
 https://str.yodacdn.net/medeniyyettele/index.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / منطقه‌ای",Naxçıvan TV
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=ntv.az&sz=128" tvg-id="NaxcivanTV.az" group-title="جمهوری آذربایجان / منطقه‌ای",Naxçıvan TV
 https://str2.yodacdn.net/ntv/video.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / منطقه‌ای",Kanal 35
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=kanal35.az&sz=128" tvg-id="Kanal35.az" group-title="جمهوری آذربایجان / منطقه‌ای",Kanal 35
 https://str2.yodacdn.net/kanal35/index.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / منطقه‌ای",Kanal S
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=kanals.az&sz=128" tvg-id="KanalS.az" group-title="جمهوری آذربایجان / منطقه‌ای",Kanal S
 https://lives.atv.az:5443/KANAL-S/streams/kanals.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / منطقه‌ای",EL TV
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=eltv.az&sz=128" tvg-id="ELTV.az" group-title="جمهوری آذربایجان / منطقه‌ای",EL TV
 https://live.eltv.az/live/eltv/playlist.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / منطقه‌ای",Kapaz TV
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=kapaztv.az&sz=128" tvg-id="KapazTV.az" group-title="جمهوری آذربایجان / منطقه‌ای",Kapaz TV
 http://85.132.78.122:8050/hls/stream/index.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",ARB
+#EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB
 http://109.205.166.68/server124/arb/index.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",ARB (منبع جایگزین)
+#EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB (منبع جایگزین)
 https://raw.githubusercontent.com/UzunMuhalefet/streams/main/myvideo-az/arb.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",Dünya TV
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/az/5/5d/D%C3%BCnya_TV_%282019-h.h.%29.png" tvg-id="DunyaTV.az" group-title="جمهوری آذربایجان / عمومی",Dünya TV
 https://stream.dunyatv.az/live/dunyatv.m3u8
-#EXTINF:-1 group-title="جمهوری آذربایجان / عمومی",Dünya TV (منبع جایگزین)
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/az/5/5d/D%C3%BCnya_TV_%282019-h.h.%29.png" tvg-id="DunyaTV.az" group-title="جمهوری آذربایجان / عمومی",Dünya TV (منبع جایگزین)
 https://raw.githubusercontent.com/UzunMuhalefet/streams/refs/heads/main/myvideo-az/dunya-tv.m3u8
-#EXTINF:-1 group-title="شبکه‌های آذربایجانی خارج از کشور",GünAz TV
+#EXTINF:-1 tvg-logo="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Gunaz-tv.svg/960px-Gunaz-tv.svg.png" group-title="شبکه‌های آذربایجانی خارج از کشور",GünAz TV
 https://tv.gunaz.tv/hls/live.m3u8
+#EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB (منبع جایگزین ۲)
+http://85.132.81.184:8080/arb/live/index.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/7/74/ARB_24_logo1.png" tvg-id="ARB24.az" group-title="جمهوری آذربایجان / خبری",ARB 24 (منبع جایگزین ۲)
+https://arb24.tvstream.az/hls/stream/stream.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/7/74/ARB_24_logo1.png" tvg-id="ARB24.az" group-title="جمهوری آذربایجان / خبری",ARB 24 (منبع جایگزین ۳)
+http://85.132.81.184:8080/arb24/live1/index.m3u8
+#EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=itv.az&sz=128" tvg-id="IctimaiTV.az" group-title="جمهوری آذربایجان / عمومی",İctimai TV (منبع جایگزین)
+https://node19.connect.az:9081/tv/live/playlist.m3u8
