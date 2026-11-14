@@ -261,3 +261,25 @@ https://hls.nejat.live/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="FX2.ir" tvg-name="FX 2" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/FX2.ir.png" group-title="Satellite · Children | ماهواره‌ای · کودک" tvg-language="fas" tvg-quality="SD",FX 2 | اف‌ایکس ۲
 https://toonixhls.wns.live/hls/stream.m3u8
+
+# Additional Persian channels found in public community playlists; not sourced from Salin TV's private server.
+#EXTINF:-1 tvg-id="PersianaTwo.fr" tvg-name="Persiana Two" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Persiana Two | پرشیانا دو
+https://twohls.persiana.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="SL1.ir" tvg-name="SL 1" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",SL 1 | اس‌ال ۱
+https://slonehls.wns.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="SL2.ir" tvg-name="SL 2" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",SL 2 | اس‌ال ۲
+https://sltwohls.wns.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="AfraSeries.ir" tvg-name="Afra Series" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Afra Series | افرا سریال
+https://afrashls.wns.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="CaltexMusic.ir" tvg-name="Caltex Music" group-title="فارسی‌زبان خارج از ایران / موسیقی",Caltex Music | کلتکس موزیک
+https://vid1.caltexmusic.com/hls/caltextv.m3u8
+
+#EXTINF:-1 tvg-id="HomePlus.ir" tvg-name="Home Plus" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Home Plus | هوم پلاس
+https://homeplushls.wns.live/hls/stream.m3u8
+
+#EXTINF:-1 tvg-id="CafeTradeTV.ir" tvg-name="Cafe Trade TV" group-title="فارسی‌زبان خارج از ایران / اقتصادی و آموزشی",Cafe Trade TV | کافه ترید
+https://cafetradehls.wns.live/hls/stream.m3u8
