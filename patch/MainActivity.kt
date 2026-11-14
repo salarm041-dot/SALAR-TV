@@ -959,6 +959,10 @@ private fun categoryForChannel(channel: Channel): String {
     if (channel.kind == "رادیو") return "رادیو"
     val value = (channel.name + " " + channel.country + " " + channel.groupTitle).lowercase()
     return when {
+        "اسرائیل / شبکه‌های عربی" in value -> "اسرائیل - عربی"
+        "اسرائیل / شبکه‌های بین‌المللی" in value -> "اسرائیل - بین‌المللی"
+        "اسرائیل / شبکه‌های عبری" in value -> "اسرائیل - عبری"
+        "رسانه‌های عربی بین‌المللی" in value -> "خبر عربی بین‌المللی"
         listOf("خبر", "news", "haber", "bbc", "cnn", "irinn", "voa persian", "congress tv", "revolution tv").any { it in value } -> "خبری"
         listOf("ورزش", "sport", "sports", "varzesh", "trt spor", "persiana fight").any { it in value } -> "ورزشی"
         listOf("کودک", "پویا", "نهال", "kids", "cocuk", "çocuk", "cartoon", "persiana junior").any { it in value } -> "کودک"
@@ -1002,10 +1006,11 @@ private fun parseM3u(text: String): List<Channel> {
             val group = groupTitle.lowercase()
             val meta = "$lower $group"
             country = when {
+                "شبکه‌های خبری عربی بین‌المللی" in meta -> "رسانه‌های عربی بین‌المللی"
                 "فارسی‌زبان خارج از ایران" in meta || "فارسی زبان خارج از ایران" in meta -> "فارسی‌زبان خارج از ایران"
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
-                "iran" in meta || "ایران" in meta || "ir/" in meta || "شبکه‌های استانی" in meta -> "ایران"
+                "iran" in meta || "irib" in meta || "ایران" in meta || "ir/" in meta || "شبکه‌های استانی" in meta -> "ایران"
                 "saudi" in meta || "عربستان" in meta || "sa/" in meta -> "عربستان"
                 "uae" in meta || "emirates" in meta || "امارات" in meta || "ae/" in meta -> "امارات"
                 "qatar" in meta || "قطر" in meta || "qa/" in meta -> "قطر"
