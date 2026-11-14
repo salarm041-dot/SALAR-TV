@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - main
+      - improve/deep-stream-validation
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
