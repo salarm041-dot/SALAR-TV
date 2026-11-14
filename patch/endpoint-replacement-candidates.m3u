@@ -25,3 +25,9 @@ https://afrashls.wns.live/hls/stream.m3u8
 https://twohls.persiana.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="KnessetChannel.il" group-title="اسرائیل / پارلمان",Knesset Channel (alternate)
 https://kneset.gostreaming.tv/p2-kneset/_definst_/myStream/chunklist.m3u8
+#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / موسیقی و سرگرمی",Tapesh 2 (new Persian satellite candidate)
+https://maxtvhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="4UTV.tr" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",4U TV (new Persian satellite candidate)
+https://hls.4utv.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="4UFamily.tr" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",4U Family (new Persian satellite candidate)
+https://familyhls.4utv.live/hls/stream.m3u8
