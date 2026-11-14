@@ -143,6 +143,47 @@ fun SalarTvApp() {
         }
     }
 
+    val backupExportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri != null) runCatching {
+            val backup = JSONObject()
+                .put("format", "SALAR-TV-BACKUP")
+                .put("version", 1)
+                .put("channels", JSONArray(prefs.getString("channels", "[]") ?: "[]"))
+                .put("schedules", prefs.getString("schedules", "") ?: "")
+                .put("external_player_default", prefs.getBoolean("external_player_default", false))
+            context.contentResolver.openOutputStream(uri)?.use { it.write(backup.toString(2).toByteArray(Charsets.UTF_8)) }
+                ?: error("ساخت فایل پشتیبان ممکن نشد.")
+            android.widget.Toast.makeText(context, "نسخه پشتیبان ذخیره شد.", android.widget.Toast.LENGTH_LONG).show()
+        }.onFailure { error ->
+            android.widget.Toast.makeText(context, error.message ?: "خطا در پشتیبان‌گیری", android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+    val backupImportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) runCatching {
+            val raw = context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+                ?: error("خواندن فایل پشتیبان ممکن نشد.")
+            val backup = JSONObject(raw)
+            require(backup.optString("format") == "SALAR-TV-BACKUP") { "این فایل، پشتیبان معتبر SALAR TV نیست." }
+            val restored = backup.optJSONArray("channels") ?: JSONArray()
+            channels.clear()
+            for (i in 0 until restored.length()) {
+                val o = restored.getJSONObject(i)
+                channels.add(Channel(o.optString("name"), o.optString("url"), o.optString("country", "سایر"),
+                    o.optString("kind", "تلویزیون"), o.optBoolean("favorite"), o.optString("logoUrl")))
+            }
+            saveChannels()
+            prefs.edit()
+                .putString("schedules", backup.optString("schedules", ""))
+                .putBoolean("external_player_default", backup.optBoolean("external_player_default", false))
+                .apply()
+            android.widget.Toast.makeText(context, "شبکه‌ها و تنظیمات پشتیبان بازیابی شدند.", android.widget.Toast.LENGTH_LONG).show()
+        }.onFailure { error ->
+            android.widget.Toast.makeText(context, error.message ?: "بازیابی پشتیبان ناموفق بود.", android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+
     MaterialTheme(
         colorScheme = darkColorScheme(
             primary = Gold, background = Background, surface = Panel,
@@ -276,7 +317,9 @@ fun SalarTvApp() {
                         onAbout = { page = "درباره ما" },
                         onSources = { page = "افزودن منابع" },
                         onRecordings = { page = "ضبط‌ها" },
-                        onLiveDubbing = { page = "دوبله هوشمند زنده" }
+                        onLiveDubbing = { page = "دوبله هوشمند زنده" },
+                        onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
+                        onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "ضبط‌ها" -> RecordingsPage(
@@ -578,13 +621,16 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
-             onRecordings: () -> Unit, onLiveDubbing: () -> Unit) {
+             onRecordings: () -> Unit, onLiveDubbing: () -> Unit,
+             onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
         MoreButton("فایل‌های ضبط‌شده", Icons.Default.VideoLibrary, onRecordings)
+        MoreButton("تهیه نسخه پشتیبان", Icons.Default.Backup, onBackupExport)
+        MoreButton("بازیابی نسخه پشتیبان", Icons.Default.Restore, onBackupImport)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
         Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی",
             color = Color.LightGray, fontSize = 12.sp)
