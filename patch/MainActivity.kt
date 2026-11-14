@@ -504,6 +504,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
 fun LiveDubbingPage() {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
+    var subtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", false)) }
     var enabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
     var keepOriginal by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
     var voice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
@@ -521,8 +522,19 @@ fun LiveDubbingPage() {
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("فعال‌سازی دوبله فارسی", color = TextMain)
-                Text("زبان مقصد: فارسی", color = Color.Gray, fontSize = 11.sp)
+                Text("زیرنویس هوشمند فارسی", color = TextMain)
+                Text("تشخیص گفتار و نمایش ترجمه؛ مستقل از صدای دوبله", color = Color.Gray, fontSize = 11.sp)
+            }
+            Switch(checked = subtitleEnabled, onCheckedChange = {
+                subtitleEnabled = it
+                prefs.edit().putBoolean("live_subtitle_enabled", it).apply()
+            })
+        }
+        Divider(color = Gold.copy(alpha = 0.25f))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("دوبله هوشمند فارسی", color = TextMain)
+                Text("ترجمه صوتی؛ قابل استفاده مستقل یا همراه زیرنویس", color = Color.Gray, fontSize = 11.sp)
             }
             Switch(checked = enabled, onCheckedChange = {
                 enabled = it
