@@ -281,7 +281,12 @@ fun SalarTvApp() {
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "ضبط‌ها" -> RecordingsPage(
                         files = (context.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES)
-                            ?: context.filesDir).listFiles()?.filter { it.isFile }?.sortedByDescending { it.lastModified() } ?: emptyList(),
+                            ?: context.filesDir).listFiles()?.filter { it.isFile && it.extension.lowercase() in setOf("ts", "mp4", "m4v", "mkv") }
+                            ?.sortedByDescending { it.lastModified() } ?: emptyList(),
+                        onPlay = { file ->
+                            useExternalPlayer = false
+                            selected = Channel(file.nameWithoutExtension, Uri.fromFile(file).toString(), "ضبط‌شده", "تلویزیون")
+                        },
                         onDelete = { file -> file.delete(); page = "ضبط‌ها" }
                     )
                     "درباره ما" -> AboutPage()
@@ -640,9 +645,10 @@ fun LiveDubbingPage() {
 }
 
 @Composable
-fun RecordingsPage(files: List<File>, onDelete: (File) -> Unit) {
+fun RecordingsPage(files: List<File>, onPlay: (File) -> Unit, onDelete: (File) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("فایل‌های ضبط‌شده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("برای پخش هر فایل، دکمه اجرا را بزنید.", color = Color.LightGray, fontSize = 12.sp)
         if (files.isEmpty()) Text("هنوز فایلی ضبط نشده است.", color = Color.LightGray)
         files.forEach { file ->
             Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
@@ -651,7 +657,12 @@ fun RecordingsPage(files: List<File>, onDelete: (File) -> Unit) {
                         Text(file.name, color = TextMain, fontSize = 12.sp)
                         Text("${file.length() / 1_048_576} مگابایت", color = Color.Gray, fontSize = 11.sp)
                     }
-                    IconButton(onClick = { onDelete(file) }) { Icon(Icons.Default.Delete, "حذف فایل", tint = Color(0xFFE57373)) }
+                    IconButton(onClick = { onPlay(file) }) {
+                        Icon(Icons.Default.PlayArrow, "پخش فایل ضبط‌شده", tint = Gold)
+                    }
+                    IconButton(onClick = { onDelete(file) }) {
+                        Icon(Icons.Default.Delete, "حذف فایل", tint = Color(0xFFE57373))
+                    }
                 }
             }
         }
