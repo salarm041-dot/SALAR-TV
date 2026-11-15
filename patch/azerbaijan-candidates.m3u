@@ -57,3 +57,11 @@ https://streams.livetv.az/azerbaijan/arb/playlist.m3u8
 https://tv.mobyservice.ru/ARB/tracks-v1a1/mono.m3u8
 #EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB
 https://live.arbtv.az/arb/live/playlist.m3u8
+#EXTINF:-1 tvg-id="AyazTV.az@SD" tvg-logo="https://www.ayaztv.com/storage/assets/site_logo.png" group-title="جمهوری آذربایجان / موسیقی",Ayaz TV
+https://janya-ayaztv.vgcdn.net/ptnr-WebApp/title-Ayaz_TV/v1/vglive-sk-934820/main.m3u8
+#EXTINF:-1 tvg-id="AyazTV.az@SD" tvg-logo="https://www.ayaztv.com/storage/assets/site_logo.png" group-title="جمهوری آذربایجان / موسیقی",Ayaz TV (منبع جایگزین)
+https://janya-ayaztv.vgcdn.net/ptnr-ayaztv/title-Ayaz_TV/v1/vglive-sk-934820/AyazTV_2500k.m3u8
+#EXTINF:-1 tvg-id="MTVAzerbaijan.az" tvg-logo="https://www.google.com/s2/favicons?domain=mtv.az&sz=128" group-title="جمهوری آذربایجان / موسیقی",MTV Azerbaijan
+https://raw.githubusercontent.com/UzunMuhalefet/streams/refs/heads/main/myvideo-az/mtv-azerbaycan.m3u8
+#EXTINF:-1 tvg-id="MTVAzerbaijan.az" tvg-logo="https://www.google.com/s2/favicons?domain=mtv.az&sz=128" group-title="جمهوری آذربایجان / موسیقی",MTV Azerbaijan (منبع جایگزین)
+http://live.mtv.az/live/playlist.m3u8
