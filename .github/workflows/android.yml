@@ -10,6 +10,7 @@ on:
     branches:
       - main
       - improve/deep-stream-validation
+      - feature/player-controls-recording
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
