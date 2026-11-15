@@ -24,6 +24,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
@@ -198,6 +199,7 @@ jobs:
           PY
 
       - name: Check live stream endpoints (non-blocking)
+        timeout-minutes: 8
         id: streamcheck
         continue-on-error: true
         run: |
@@ -243,6 +245,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Probe alternate TRT endpoints (candidate-only)
+        timeout-minutes: 3
         continue-on-error: true
         run: |
           python3 - <<'PY'
@@ -282,6 +285,7 @@ jobs:
 
 
       - name: Probe Persian radio stream candidates (HLS and direct audio)
+        timeout-minutes: 5
         continue-on-error: true
         run: |
           python3 - <<'PY'
@@ -333,6 +337,7 @@ jobs:
 
 
       - name: Verify Azerbaijani TV stream candidates
+        timeout-minutes: 5
         continue-on-error: true
         run: |
           python3 - <<'PY'
