@@ -238,11 +238,15 @@ fun SalarTvApp() {
                 }
 
                 val existingByUrl = channels.withIndex().associate { it.value.url to it.index }
-                var metadataUpdated = 0
+                val seenUrls = existingByUrl.keys.toMutableSet()
+                var added = 0
                 remoteChannels.forEach { fresh ->
                     val index = existingByUrl[fresh.url]
                     if (index == null) {
-                        channels.add(fresh)
+                        if (seenUrls.add(fresh.url)) {
+                            channels.add(fresh)
+                            added++
+                        }
                     } else {
                         val old = channels[index]
                         val merged = old.copy(
@@ -252,13 +256,9 @@ fun SalarTvApp() {
                             country = if (old.country == "سایر") fresh.country else old.country,
                             kind = if (old.kind == "تلویزیون" && fresh.kind != "تلویزیون") fresh.kind else old.kind
                         )
-                        if (merged != old) {
-                            channels[index] = merged
-                            metadataUpdated++
-                        }
+                        if (merged != old) channels[index] = merged
                     }
                 }
-                val added = remoteChannels.count { it.url !in existingByUrl }
                 saveChannels()
                 channelRefreshStatus = if (added == 0) {
                     "فهرست به‌روز است؛ شبکه جدیدی پیدا نشد."
