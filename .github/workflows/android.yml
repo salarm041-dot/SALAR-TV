@@ -407,7 +407,16 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
-          script: adb -s emulator-5554 install -r "$GITHUB_WORKSPACE/SALAR-TV-debug.apk" && adb -s emulator-5554 shell am start -W -n com.salar.tv/.MainActivity
+          script: |
+            set -Eeuo pipefail
+            APK="$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+            SERIAL="emulator-5554"
+            test -s "$APK"
+            adb -s "$SERIAL" wait-for-device
+            adb -s "$SERIAL" install -r "$APK"
+            adb -s "$SERIAL" shell am start -W -n com.salar.tv/.MainActivity
+            sleep 8
+            adb -s "$SERIAL" shell pidof com.salar.tv
 
       - name: Package complete final Android source
         if: success()
