@@ -20,7 +20,6 @@ class RecordingAlarmReceiver : BroadcastReceiver() {
 
         try {
             ContextCompat.startForegroundService(context, service)
-            updateScheduleStatus(context, scheduleId, "start_requested")
         } catch (error: Exception) {
             updateScheduleStatus(context, scheduleId, "start_failed")
         }
