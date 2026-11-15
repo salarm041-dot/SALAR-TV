@@ -495,6 +495,44 @@ jobs:
             fi
             echo "Android 11 emulator launch smoke test passed"
 
+      - name: Package complete final Android source
+        if: success()
+        run: |
+          set -Eeuo pipefail
+          mkdir -p SALAR-TV-Full-Source/project
+          cp -a "$PROJECT_DIR/." SALAR-TV-Full-Source/project/
+          cp -a patch scripts server .github SALAR-TV-Full-Source/
+          cp SALAR_TV_Source_Download.zip SALAR-TV-Full-Source/ 2>/dev/null || true
+          cat > SALAR-TV-Full-Source/README_FA.md <<'EOF'
+          # سورس کامل SALAR TV نسخه ۱.۰
+
+          این بسته شامل پروژه اندروید نهاییِ استفاده‌شده برای ساخت APK، فایل‌های اصلاح‌شده، فهرست شبکه‌ها، اسکریپت‌های اعتبارسنجی، گردش‌کار ساخت و کد سرویس سمت سرور است.
+
+          ## ساخت مجدد در Android Studio
+          ۱. پوشه project را در Android Studio باز کنید.
+          ۲. از JDK 17 و Gradle 8.9 استفاده کنید.
+          ۳. Android SDK موردنیاز پروژه را نصب و Gradle Sync را اجرا کنید.
+          ۴. برای ساخت نسخه آزمایشی، وظیفه assembleDebug را اجرا کنید.
+
+          ## نکات مهم
+          - فایل APK جداگانه در artifact با نام SALAR-TV-APK ارائه می‌شود.
+          - اطلاعات محرمانه و کلیدهای API نباید داخل برنامه اندروید قرار گیرند.
+          - سرویس زیرنویس و دوبله هوش مصنوعی هنوز نیازمند تکمیل اتصال اندروید به broker و تنظیم آدرس سرور است؛ وجود کد server به معنی تکمیل اتصال سرتاسری نیست.
+          - این بسته شامل پروژه و منابع ساخت است؛ برای اجرای سرویس هوش مصنوعی باید سرور جداگانه پیکربندی شود.
+          EOF
+          (cd SALAR-TV-Full-Source && zip -qr ../SALAR-TV-Full-Source.zip .)
+          test -s SALAR-TV-Full-Source.zip
+          unzip -t SALAR-TV-Full-Source.zip | tail -2
+
+      - name: Upload complete source archive
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Full-Source
+          path: SALAR-TV-Full-Source.zip
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Upload APK
         if: always()
         uses: actions/upload-artifact@v4
