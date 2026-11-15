@@ -636,8 +636,8 @@ fun SalarTvApp() {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                     Text("زمان شروع (نمونه: 2026-12-01 20:30)")
                     OutlinedTextField(dateTime, { dateTime = it }, placeholder = { Text("YYYY-MM-DD HH:mm") }, singleLine = true)
-                    OutlinedTextField(duration, { duration = it.filter(Char::isDigit).take(3) },
-                        label = { Text("مدت ضبط به دقیقه (۱ تا ۱۰٬۰۸۰)") }, singleLine = true,
+                    OutlinedTextField(duration, { duration = it.filter(Char::isDigit).take(5) },
+                        label = { Text("مدت ضبط به دقیقه (۰ تا ۱۰٬۰۸۰؛ صفر = بدون محدودیت)") }, singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                     if (scheduleError.isNotBlank()) Text(scheduleError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
                     Text("برای ضبط خودکار، لینک HLS قابل دسترس و اتصال اینترنت پایدار لازم است.",
@@ -649,7 +649,7 @@ fun SalarTvApp() {
                     try {
                         val start = LocalDateTime.parse(dateTime.trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                         val startMillis = start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        val minutes = duration.toIntOrNull()?.takeIf { it in 1..10080 } ?: error("مدت ضبط را بین ۱ تا ۱۰٬۰۸۰ دقیقه وارد کنید.")
+                        val minutes = duration.toIntOrNull()?.takeIf { it in 0..10080 } ?: error("مدت ضبط را بین صفر تا ۱۰٬۰۸۰ دقیقه وارد کنید؛ صفر یعنی ضبط تا توقف دستی.")
                         require(title.isNotBlank()) { "نام برنامه را وارد کنید." }
                         require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
                         require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
@@ -663,7 +663,7 @@ fun SalarTvApp() {
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                         val alarm = context.getSystemService(AlarmManager::class.java)
                         alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
-                        schedules = (schedules + "\n$title | $dateTime | $minutes دقیقه").trim()
+                        schedules = (schedules + "\n$title | $dateTime | " + if (minutes == 0) "بدون محدودیت" else "$minutes دقیقه").trim()
                         prefs.edit().putString("schedules", schedules).apply()
                         showSchedule = false
                     } catch (e: Exception) {
