@@ -191,6 +191,22 @@ fun SalarTvApp() {
     }
 
     val player = remember { ExoPlayer.Builder(context).build() }
+    var selectedQuality by remember { mutableStateOf(prefs.getString("player_quality", "خودکار") ?: "خودکار") }
+    var qualityMenuExpanded by remember { mutableStateOf(false) }
+    LaunchedEffect(selectedQuality) {
+        val maxSize = when (selectedQuality) {
+            "1080p" -> 1920 to 1080
+            "720p" -> 1280 to 720
+            "480p" -> 854 to 480
+            "360p" -> 640 to 360
+            else -> Int.MAX_VALUE to Int.MAX_VALUE
+        }
+        player.trackSelectionParameters = player.trackSelectionParameters
+            .buildUpon()
+            .setMaxVideoSize(maxSize.first, maxSize.second)
+            .build()
+        prefs.edit().putString("player_quality", selectedQuality).apply()
+    }
     DisposableEffect(Unit) { onDispose { player.release() } }
 
     var selectedM3uName by remember { mutableStateOf("") }
@@ -416,6 +432,35 @@ fun SalarTvApp() {
                         AndroidView(
                             factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
+                        )
+                        Box {
+                            OutlinedButton(onClick = { qualityMenuExpanded = true }) {
+                                Icon(Icons.Default.HighQuality, contentDescription = null)
+                                Spacer(Modifier.width(6.dp))
+                                Text("کیفیت: $selectedQuality")
+                            }
+                            DropdownMenu(
+                                expanded = qualityMenuExpanded,
+                                onDismissRequest = { qualityMenuExpanded = false }
+                            ) {
+                                listOf("خودکار", "1080p", "720p", "480p", "360p").forEach { quality ->
+                                    DropdownMenuItem(
+                                        text = { Text(quality) },
+                                        onClick = {
+                                            selectedQuality = quality
+                                            qualityMenuExpanded = false
+                                        },
+                                        leadingIcon = {
+                                            if (selectedQuality == quality) Icon(Icons.Default.Check, contentDescription = null)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                        Text(
+                            "کیفیت انتخابی سقف وضوح تصویر را تعیین می‌کند؛ انتخاب نهایی به کیفیت‌های موجود در پخش زنده بستگی دارد.",
+                            color = SecondaryText,
+                            fontSize = 11.sp
                         )
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(
