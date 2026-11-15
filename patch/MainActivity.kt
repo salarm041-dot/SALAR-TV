@@ -21,6 +21,7 @@ import android.util.Rational
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -40,6 +41,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -157,6 +160,9 @@ fun SalarTvApp() {
     var selected by remember { mutableStateOf<Channel?>(null) }
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
+    var isRecording by remember { mutableStateOf(false) }
+    var showFullscreenPlayer by remember { mutableStateOf(false) }
+    var forceLandscape by remember { mutableStateOf(true) }
     var editingChannel by remember { mutableStateOf<Channel?>(null) }
     var brightness by remember { mutableFloatStateOf(0.75f) }
     var useExternalPlayer by remember { mutableStateOf(prefs.getBoolean("external_player_default", false)) }
@@ -324,6 +330,46 @@ fun SalarTvApp() {
                             factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
                         )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = {
+                                    showFullscreenPlayer = true
+                                    forceLandscape = true
+                                    (context as? Activity)?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Fullscreen, null)
+                                Spacer(Modifier.width(6.dp))
+                                Text("تمام‌صفحه")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    val activity = context as? Activity
+                                    if (isRecording) {
+                                        activity?.startService(Intent(context, HlsRecorderService::class.java).setAction(HlsRecorderService.ACTION_STOP))
+                                        isRecording = false
+                                    } else if (selected!!.url.contains(".m3u8", ignoreCase = true)) {
+                                        val intent = Intent(context, HlsRecorderService::class.java).apply {
+                                            putExtra("name", selected!!.name)
+                                            putExtra("url", selected!!.url)
+                                            putExtra("duration", 60)
+                                        }
+                                        runCatching { ContextCompat.startForegroundService(context, intent) }
+                                            .onSuccess { isRecording = true }
+                                            .onFailure { android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطا"), android.widget.Toast.LENGTH_LONG).show() }
+                                    } else {
+                                        android.widget.Toast.makeText(context, "ضبط مستقیم فقط برای لینک‌های HLS / M3U8 پشتیبانی می‌شود.", android.widget.Toast.LENGTH_LONG).show()
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = if (isRecording) Color(0xFFFF6B6B) else Gold)
+                            ) {
+                                Icon(if (isRecording) Icons.Default.StopCircle else Icons.Default.FiberManualRecord, null)
+                                Spacer(Modifier.width(6.dp))
+                                Text(if (isRecording) "توقف ضبط" else "ضبط ۶۰ دقیقه")
+                            }
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             OutlinedButton(
                                 onClick = { (context as? MainActivity)?.enterPlayerPictureInPicture() },
@@ -491,6 +537,42 @@ fun SalarTvApp() {
             },
             dismissButton = { TextButton(onClick = { editingChannel = null }) { Text("انصراف") } }
         )
+    }
+
+    if (showFullscreenPlayer && selected != null && !useExternalPlayer) {
+        Dialog(
+            onDismissRequest = {
+                showFullscreenPlayer = false
+                (context as? Activity)?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(Modifier.fillMaxSize().background(Color.Black)) {
+                AndroidView(
+                    factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                    modifier = Modifier.fillMaxSize()
+                )
+                Row(
+                    Modifier.align(Alignment.TopEnd).padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    IconButton(onClick = {
+                        forceLandscape = !forceLandscape
+                        (context as? Activity)?.requestedOrientation =
+                            if (forceLandscape) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                            else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    }) {
+                        Icon(Icons.Default.ScreenRotation, "چرخش تصویر", tint = Color.White)
+                    }
+                    IconButton(onClick = {
+                        showFullscreenPlayer = false
+                        (context as? Activity)?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    }) {
+                        Icon(Icons.Default.FullscreenExit, "خروج از تمام‌صفحه", tint = Color.White)
+                    }
+                }
+            }
+        }
     }
 
     if (showSchedule) {
