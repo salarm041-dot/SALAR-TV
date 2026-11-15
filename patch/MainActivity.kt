@@ -9,6 +9,7 @@ import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import java.net.URL
 import java.net.HttpURLConnection
 import java.net.URLEncoder
@@ -161,6 +162,12 @@ fun SalarTvApp() {
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
     var isRecording by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            isRecording = HlsRecorderService.isRecordingActive
+            delay(1000)
+        }
+    }
     var showRecordingOptions by remember { mutableStateOf(false) }
     var recordingDuration by remember { mutableStateOf("60") }
     var recordingError by remember { mutableStateOf("") }
