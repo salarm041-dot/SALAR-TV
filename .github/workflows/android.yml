@@ -422,7 +422,7 @@ jobs:
             echo "Waiting for Android boot completion (maximum 300 seconds)..."
             boot_ready=false
             for attempt in $(seq 1 100); do
-              boot_state="$(adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+              boot_state="$(adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\015' || true)"
               if [ "$boot_state" = "1" ]; then
                 boot_ready=true
                 break
@@ -468,7 +468,45 @@ jobs:
               adb connect "$SERIAL" || true
               adb -s "$SERIAL" wait-for-device || true
               for check in $(seq 1 15); do
-                if adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' | grep -q '^1
+                retry_boot_state="$(adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\015' || true)"
+                if [ "$retry_boot_state" = "1" ] && adb -s "$SERIAL" shell service check package 2>&1 | grep -q "found"; then
+                  break
+                fi
+                sleep 2
+              done
+            done
+            if [ "$installed" != true ]; then
+              echo "APK installation failed after three attempts"
+              adb -s "$SERIAL" logcat -d -t 1000 || true
+              exit 1
+            fi
+
+            echo "Verifying package installation..."
+            adb -s "$SERIAL" shell pm path com.salar.tv
+            adb -s "$SERIAL" shell am start -W -n com.salar.tv/.MainActivity
+
+            echo "Waiting for app process..."
+            app_started=false
+            for attempt in $(seq 1 30); do
+              if adb -s "$SERIAL" shell pidof com.salar.tv 2>/dev/null | grep -q '[0-9]'; then
+                app_started=true
+                break
+              fi
+              sleep 2
+            done
+
+            if [ "$app_started" != true ]; then
+              echo "SALAR TV process did not remain alive after launch"
+              adb -s "$SERIAL" logcat -d -t 5000 | grep -A 20 -E "FATAL EXCEPTION|AndroidRuntime|com\.salar\.tv" | tail -160 || true
+              exit 1
+            fi
+
+            if adb -s "$SERIAL" logcat -d -t 5000 | grep -A 20 "FATAL EXCEPTION" | grep -q "com.salar.tv"; then
+              echo "SALAR TV crashed during Android 11 startup"
+              adb -s "$SERIAL" logcat -d -t 5000 | grep -A 20 "FATAL EXCEPTION" | tail -100 || true
+              exit 1
+            fi
+            echo "Android 11 emulator launch smoke test passed"
 
       - name: Upload APK
         if: always()
