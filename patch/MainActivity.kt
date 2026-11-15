@@ -75,7 +75,7 @@ private var TextMain by mutableStateOf(Color(0xFFF5F1E8))
 private var SecondaryText by mutableStateOf(Color.LightGray)
 private var MutedText by mutableStateOf(Color.Gray)
 
-data class ScheduledRecording(val requestCode: Int, val title: String, val url: String, val startMillis: Long, val durationMinutes: Int)
+data class ScheduledRecording(val requestCode: Int, val title: String, val url: String, val startMillis: Long, val durationMinutes: Int, val status: String = "scheduled")
 
 data class Channel(
     val name: String,
@@ -187,7 +187,7 @@ fun SalarTvApp() {
                 for (i in 0 until saved.length()) {
                     val item = saved.getJSONObject(i)
                     add(ScheduledRecording(item.optInt("requestCode"), item.optString("title"),
-                        item.optString("url"), item.optLong("startMillis"), item.optInt("durationMinutes", 60)))
+                        item.optString("url"), item.optLong("startMillis"), item.optInt("durationMinutes", 60), item.optString("status", "scheduled")))
                 }
             }
         }
@@ -197,7 +197,7 @@ fun SalarTvApp() {
         scheduledRecordings.forEach { item ->
             saved.put(JSONObject().put("requestCode", item.requestCode).put("title", item.title)
                 .put("url", item.url).put("startMillis", item.startMillis)
-                .put("durationMinutes", item.durationMinutes))
+                .put("durationMinutes", item.durationMinutes).put("status", item.status))
         }
         prefs.edit().putString("schedules_json", saved.toString()).apply()
     }
@@ -1286,8 +1286,15 @@ fun ScheduledRecordingsPage(schedules: List<ScheduledRecording>, onCancel: (Sche
                                 color = TextMain)
                             Text(if (item.durationMinutes == 0) "مدت: بدون محدودیت" else "مدت: ${item.durationMinutes} دقیقه",
                                 color = SecondaryText, fontSize = 12.sp)
-                            Text(if (pending) "وضعیت: در انتظار اجرا" else "وضعیت: زمان شروع گذشته؛ وضعیت اجرای آلارم نیازمند بررسی است",
-                                color = if (pending) SecondaryText else Color(0xFFFFCC80), fontSize = 11.sp)
+                            Text(when (item.status) {
+                                "start_requested" -> "وضعیت: درخواست شروع ضبط ارسال شد"
+                                "start_failed" -> "وضعیت: شروع ضبط ناموفق بود"
+                                else -> if (pending) "وضعیت: در انتظار اجرا" else "وضعیت: زمان اجرا گذشته؛ نتیجه آلارم ثبت نشده"
+                            }, color = when (item.status) {
+                                "start_failed" -> Color(0xFFFF8A80)
+                                "start_requested" -> Color(0xFF9CCC65)
+                                else -> if (pending) SecondaryText else Color(0xFFFFCC80)
+                            }, fontSize = 11.sp)
                             if (pending) {
                                 TextButton(onClick = { onCancel(item) }) {
                                     Icon(Icons.Default.Cancel, null, tint = Color(0xFFFF8A80))
