@@ -49,3 +49,11 @@ https://arb24.tvstream.az/hls/stream/stream.m3u8
 http://85.132.81.184:8080/arb24/live1/index.m3u8
 #EXTINF:-1 tvg-logo="https://www.google.com/s2/favicons?domain=itv.az&sz=128" tvg-id="IctimaiTV.az" group-title="جمهوری آذربایجان / عمومی",İctimai TV (منبع جایگزین)
 https://node19.connect.az:9081/tv/live/playlist.m3u8
+#EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB
+https://edge02.odtv.az/o1/arbtv/playlist.m3u8
+#EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB
+https://streams.livetv.az/azerbaijan/arb/playlist.m3u8
+#EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB
+https://tv.mobyservice.ru/ARB/tracks-v1a1/mono.m3u8
+#EXTINF:-1 tvg-logo="https://i.imgur.com/E97M2OL.png" tvg-id="ARB.az" group-title="جمهوری آذربایجان / عمومی",ARB
+https://live.arbtv.az/arb/live/playlist.m3u8
