@@ -30,6 +30,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.animation.core.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -156,6 +160,16 @@ fun SalarTvApp() {
         channels.addAll(bundled.filter { it.url !in existing })
         saveChannels()
         prefs.edit().putBoolean("built_in_seeded", true).apply()
+    }
+
+    var showSplash by remember { mutableStateOf(true) }
+    val appVersion = remember(context) {
+        runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
+            .getOrNull()?.takeIf { it.isNotBlank() } ?: "1.3.0"
+    }
+    LaunchedEffect(Unit) {
+        delay(2300)
+        showSplash = false
     }
 
     var page by remember { mutableStateOf("خانه") }
@@ -550,6 +564,15 @@ fun SalarTvApp() {
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                 }
             }
+        }
+    }
+
+    if (showSplash) {
+        Dialog(
+            onDismissRequest = {},
+            properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = false, dismissOnClickOutside = false)
+        ) {
+            AnimatedSplashScreen(version = appVersion)
         }
     }
 
@@ -1498,6 +1521,57 @@ private fun EpgPage(channels: List<Channel>) {
                     }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+private fun AnimatedSplashScreen(version: String) {
+    val transition = rememberInfiniteTransition()
+    val pulse by transition.animateFloat(
+        initialValue = 0.94f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(animation = tween(950, easing = FastOutSlowInEasing), repeatMode = RepeatMode.Reverse)
+    )
+    val glow by transition.animateFloat(
+        initialValue = 0.45f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(animation = tween(950, easing = FastOutSlowInEasing), repeatMode = RepeatMode.Reverse)
+    )
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color(0xFF080A10)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Box(
+                modifier = Modifier.size(150.dp).scale(pulse).background(
+                    Gold.copy(alpha = 0.10f * glow), RoundedCornerShape(40.dp)
+                ),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    modifier = Modifier.size(116.dp),
+                    shape = RoundedCornerShape(34.dp),
+                    color = Color(0xFF171B26),
+                    border = androidx.compose.foundation.BorderStroke(2.dp, Gold.copy(alpha = glow))
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Tv,
+                            contentDescription = "لوگوی SALAR TV",
+                            tint = Gold,
+                            modifier = Modifier.size(72.dp).alpha(glow)
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(22.dp))
+            Text("SALAR TV", color = Gold, fontSize = 30.sp, fontWeight = FontWeight.Black, letterSpacing = 3.sp)
+            Spacer(Modifier.height(8.dp))
+            Text("تلویزیون و رادیوی جهان", color = Color(0xFFB9BBC3), fontSize = 13.sp)
+            Spacer(Modifier.height(26.dp))
+            Text("نسخه $version", color = Color(0xFF9296A2), fontSize = 12.sp)
         }
     }
 }
