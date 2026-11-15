@@ -12,6 +12,7 @@ on:
       - improve/deep-stream-validation
       - feature/player-controls-recording
       - feature/channel-list-refresh
+      - fix/queue-android-validation
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
