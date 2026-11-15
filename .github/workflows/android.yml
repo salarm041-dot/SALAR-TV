@@ -183,6 +183,7 @@ jobs:
           PY
 
       - name: Check live stream endpoints (non-blocking)
+        timeout-minutes: 8
         id: streamcheck
         continue-on-error: true
         run: |
