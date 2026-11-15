@@ -116,6 +116,7 @@ class HlsRecorderService : Service() {
                     catch (_: InterruptedException) { if (!isCurrent(myGeneration)) break }
                 }
                 if (isCurrent(myGeneration)) {
+                    if (saved <= 0 || output == null) finalStatus = "failed"
                     updateNotification(if (saved > 0 && output != null) {
                         "ضبط ذخیره شد: " + output!!.name
                     } else "ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
