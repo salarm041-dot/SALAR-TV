@@ -1311,11 +1311,15 @@ fun ScheduledRecordingsPage(
                                 color = SecondaryText, fontSize = 12.sp)
                             Text(when (item.status) {
                                 "start_requested" -> "وضعیت: درخواست شروع ضبط ارسال شد"
-                                "start_failed" -> "وضعیت: شروع ضبط ناموفق بود"
+                                "start_failed", "failed" -> "وضعیت: ضبط ناموفق بود"
+                                "recording" -> "وضعیت: در حال ضبط"
+                                "completed" -> "وضعیت: ضبط تکمیل شد"
+                                "stopped" -> "وضعیت: ضبط متوقف شد"
                                 else -> if (pending) "وضعیت: در انتظار اجرا" else "وضعیت: زمان اجرا گذشته؛ نتیجه آلارم ثبت نشده"
                             }, color = when (item.status) {
-                                "start_failed" -> Color(0xFFFF8A80)
-                                "start_requested" -> Color(0xFF9CCC65)
+                                "start_failed", "failed" -> Color(0xFFFF8A80)
+                                "start_requested", "recording", "completed" -> Color(0xFF9CCC65)
+                                "stopped" -> Color(0xFFFFCC80)
                                 else -> if (pending) SecondaryText else Color(0xFFFFCC80)
                             }, fontSize = 11.sp)
                             if (pending) {
