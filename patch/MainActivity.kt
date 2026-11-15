@@ -44,6 +44,14 @@ import androidx.compose.material3.*
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.*
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -103,7 +111,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { SalarTvApp() }
+        setContent {
+            var splashVisible by remember { mutableStateOf(true) }
+            LaunchedEffect(Unit) {
+                delay(2200)
+                splashVisible = false
+            }
+            Box(Modifier.fillMaxSize()) {
+                SalarTvApp()
+                if (splashVisible) SplashScreen()
+            }
+        }
     }
 }
 
@@ -1499,5 +1517,94 @@ private fun EpgPage(channels: List<Channel>) {
                 }
             }
         }
+    }
+}
+
+
+@Composable
+private fun SplashScreen() {
+    val context = LocalContext.current
+    val versionName = remember {
+        runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        }.getOrNull()?.takeIf { it.isNotBlank() } ?: "1.0"
+    }
+    val transition = rememberInfiniteTransition(label = "salar-splash")
+    val logoScale by transition.animateFloat(
+        initialValue = 0.94f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 950),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "logo-scale"
+    )
+    val logoAlpha by transition.animateFloat(
+        initialValue = 0.82f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 950),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "logo-alpha"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0B0D13)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_salar_tv),
+                contentDescription = "لوگوی SALAR TV",
+                modifier = Modifier
+                    .size(156.dp)
+                    .graphicsLayer {
+                        scaleX = logoScale
+                        scaleY = logoScale
+                        alpha = logoAlpha
+                    },
+                contentScale = ContentScale.Fit
+            )
+            Spacer(Modifier.height(22.dp))
+            Text(
+                text = "SALAR TV",
+                color = Color(0xFFD6AD62),
+                fontSize = 27.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 3.sp
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "تلویزیون و رادیوی جهان",
+                color = Color(0xFFD6D2C9),
+                fontSize = 13.sp
+            )
+            Spacer(Modifier.height(18.dp))
+            Text(
+                text = "نسخه $versionName",
+                color = Color(0xFF9A9A9A),
+                fontSize = 12.sp
+            )
+            Spacer(Modifier.height(30.dp))
+            CircularProgressIndicator(
+                modifier = Modifier.size(22.dp),
+                color = Color(0xFFD6AD62),
+                strokeWidth = 2.dp
+            )
+        }
+        Text(
+            text = "ساخته‌شده توسط سید سالار موسوی ملکی",
+            color = Color(0xFF777777),
+            fontSize = 10.sp,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 28.dp)
+        )
     }
 }
