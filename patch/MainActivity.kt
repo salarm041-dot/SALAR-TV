@@ -75,6 +75,8 @@ private var TextMain by mutableStateOf(Color(0xFFF5F1E8))
 private var SecondaryText by mutableStateOf(Color.LightGray)
 private var MutedText by mutableStateOf(Color.Gray)
 
+data class ScheduledRecording(val requestCode: Int, val title: String, val url: String, val startMillis: Long, val durationMinutes: Int)
+
 data class Channel(
     val name: String,
     val url: String,
@@ -178,6 +180,27 @@ fun SalarTvApp() {
     var useExternalPlayer by remember { mutableStateOf(prefs.getBoolean("external_player_default", false)) }
     var rememberPlayerChoice by remember { mutableStateOf(false) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
+    val scheduledRecordings = remember {
+        mutableStateListOf<ScheduledRecording>().apply {
+            runCatching {
+                val saved = JSONArray(prefs.getString("schedules_json", "[]") ?: "[]")
+                for (i in 0 until saved.length()) {
+                    val item = saved.getJSONObject(i)
+                    add(ScheduledRecording(item.optInt("requestCode"), item.optString("title"),
+                        item.optString("url"), item.optLong("startMillis"), item.optInt("durationMinutes", 60)))
+                }
+            }
+        }
+    }
+    fun saveScheduledRecordings() {
+        val saved = JSONArray()
+        scheduledRecordings.forEach { item ->
+            saved.put(JSONObject().put("requestCode", item.requestCode).put("title", item.title)
+                .put("url", item.url).put("startMillis", item.startMillis)
+                .put("durationMinutes", item.durationMinutes))
+        }
+        prefs.edit().putString("schedules_json", saved.toString()).apply()
+    }
     var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "dark") ?: "dark") }
     val systemDark = isSystemInDarkTheme()
     val useDarkTheme = when (themeMode) { "light" -> false; "system" -> systemDark; else -> true }
@@ -331,6 +354,7 @@ fun SalarTvApp() {
                 .put("version", 1)
                 .put("channels", JSONArray(prefs.getString("channels", "[]") ?: "[]"))
                 .put("schedules", prefs.getString("schedules", "") ?: "")
+                .put("schedules_json", prefs.getString("schedules_json", "[]") ?: "[]")
                 .put("external_player_default", prefs.getBoolean("external_player_default", false))
                 .put("theme_mode", prefs.getString("theme_mode", "dark") ?: "dark")
             context.contentResolver.openOutputStream(uri)?.use { it.write(backup.toString(2).toByteArray(Charsets.UTF_8)) }
@@ -356,6 +380,7 @@ fun SalarTvApp() {
             saveChannels()
             prefs.edit()
                 .putString("schedules", backup.optString("schedules", ""))
+                .putString("schedules_json", backup.optString("schedules_json", "[]"))
                 .putBoolean("external_player_default", backup.optBoolean("external_player_default", false))
                 .putString("theme_mode", backup.optString("theme_mode", "dark"))
                 .apply()
@@ -591,6 +616,7 @@ fun SalarTvApp() {
                         onAbout = { page = "درباره ما" },
                         onSources = { page = "افزودن منابع" },
                         onRecordings = { page = "ضبط‌ها" },
+                        onScheduledList = { page = "زمان‌بندی‌ها" },
                         onLiveDubbing = { page = "دوبله هوشمند زنده" },
                         onEpg = { page = "راهنمای برنامه‌ها" },
                         onSettings = { page = "تنظیمات" },
@@ -604,6 +630,21 @@ fun SalarTvApp() {
                         onThemeModeChange = { mode ->
                             themeMode = mode
                             prefs.edit().putString("theme_mode", mode).apply()
+                        }
+                    )
+                    "زمان‌بندی‌ها" -> ScheduledRecordingsPage(
+                        schedules = scheduledRecordings.toList(),
+                        onCancel = { item ->
+                            val alarmIntent = Intent(context, RecordingAlarmReceiver::class.java)
+                            val pending = PendingIntent.getBroadcast(context, item.requestCode, alarmIntent,
+                                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
+                            if (pending != null) {
+                                context.getSystemService(AlarmManager::class.java).cancel(pending)
+                                pending.cancel()
+                            }
+                            scheduledRecordings.removeAll { it.requestCode == item.requestCode }
+                            saveScheduledRecordings()
+                            android.widget.Toast.makeText(context, "زمان‌بندی ضبط لغو شد.", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     )
                     "ضبط‌ها" -> RecordingsPage(
@@ -791,11 +832,12 @@ fun SalarTvApp() {
                         require(title.isNotBlank()) { "نام برنامه را وارد کنید." }
                         require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
                         require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
-                        val requestCode = (title + streamUrl + startMillis).hashCode()
+                        val requestCode = (title.trim() + streamUrl.trim() + startMillis).hashCode()
                         val alarmIntent = Intent(context, RecordingAlarmReceiver::class.java).apply {
                             putExtra("name", title.trim())
                             putExtra("url", streamUrl.trim())
                             putExtra("duration", minutes)
+                            putExtra("schedule_id", requestCode)
                         }
                         val pending = PendingIntent.getBroadcast(context, requestCode, alarmIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -803,6 +845,8 @@ fun SalarTvApp() {
                         alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
                         schedules = (schedules + "\n$title | $dateTime | " + if (minutes == 0) "بدون محدودیت" else "$minutes دقیقه").trim()
                         prefs.edit().putString("schedules", schedules).apply()
+                        scheduledRecordings.add(ScheduledRecording(requestCode, title.trim(), streamUrl.trim(), startMillis, minutes))
+                        saveScheduledRecordings()
                         showSchedule = false
                     } catch (e: Exception) {
                         scheduleError = e.message ?: "اطلاعات زمان‌بندی معتبر نیست."
@@ -1097,7 +1141,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
-             onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onEpg: () -> Unit, onSettings: () -> Unit,
+             onRecordings: () -> Unit, onScheduledList: () -> Unit, onLiveDubbing: () -> Unit, onEpg: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -1106,6 +1150,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         MoreButton("راهنمای برنامه‌ها (EPG)", Icons.Default.CalendarMonth, onEpg)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
+        MoreButton("مدیریت ضبط‌های زمان‌بندی‌شده", Icons.Default.EventNote, onScheduledList)
         MoreButton("فایل‌های ضبط‌شده", Icons.Default.VideoLibrary, onRecordings)
         MoreButton("تهیه نسخه پشتیبان", Icons.Default.Backup, onBackupExport)
         MoreButton("بازیابی نسخه پشتیبان", Icons.Default.Restore, onBackupImport)
@@ -1215,6 +1260,46 @@ fun LiveDubbingPage() {
         }, valueRange = 0f..1f)
         Text("زبان‌های ورودی موردنظر: انگلیسی، ترکی استانبولی و ترکی آذربایجانی؛ خروجی فارسی.",
             color = SecondaryText, fontSize = 12.sp)
+    }
+}
+
+
+@Composable
+fun ScheduledRecordingsPage(schedules: List<ScheduledRecording>, onCancel: (ScheduledRecording) -> Unit) {
+    val now = System.currentTimeMillis()
+    val formatter = remember { DateTimeFormatter.ofPattern("yyyy/MM/dd • HH:mm") }
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("مدیریت ضبط‌های زمان‌بندی‌شده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("زمان‌بندی‌های ثبت‌شده روی همین دستگاه نمایش داده می‌شوند. برای لغو، دکمهٔ لغو همان مورد را بزنید.",
+            color = SecondaryText, fontSize = 12.sp)
+        if (schedules.isEmpty()) {
+            Text("هنوز ضبط زمان‌بندی‌شده‌ای ثبت نشده است.", color = MutedText)
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(schedules.sortedBy { it.startMillis }, key = { it.requestCode }) { item ->
+                    val pending = item.startMillis > now
+                    Card(colors = CardDefaults.cardColors(containerColor = Panel),
+                        shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(item.title, color = Gold, fontWeight = FontWeight.Bold)
+                            Text(formatter.format(LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(item.startMillis), ZoneId.systemDefault())),
+                                color = TextMain)
+                            Text(if (item.durationMinutes == 0) "مدت: بدون محدودیت" else "مدت: ${item.durationMinutes} دقیقه",
+                                color = SecondaryText, fontSize = 12.sp)
+                            Text(if (pending) "وضعیت: در انتظار اجرا" else "وضعیت: زمان شروع گذشته؛ وضعیت اجرای آلارم نیازمند بررسی است",
+                                color = if (pending) SecondaryText else Color(0xFFFFCC80), fontSize = 11.sp)
+                            if (pending) {
+                                TextButton(onClick = { onCancel(item) }) {
+                                    Icon(Icons.Default.Cancel, null, tint = Color(0xFFFF8A80))
+                                    Spacer(Modifier.width(6.dp))
+                                    Text("لغو این زمان‌بندی", color = Color(0xFFFF8A80))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
