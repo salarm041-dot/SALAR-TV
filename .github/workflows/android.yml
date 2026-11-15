@@ -12,6 +12,7 @@ on:
       - improve/deep-stream-validation
       - feature/player-controls-recording
       - feature/arb-tv-stream-replacement
+      - feature/az-ayaz-mtv-candidates
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
