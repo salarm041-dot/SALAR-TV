@@ -65,3 +65,9 @@ https://janya-ayaztv.vgcdn.net/ptnr-ayaztv/title-Ayaz_TV/v1/vglive-sk-934820/Aya
 https://raw.githubusercontent.com/UzunMuhalefet/streams/refs/heads/main/myvideo-az/mtv-azerbaycan.m3u8
 #EXTINF:-1 tvg-id="MTVAzerbaijan.az" tvg-logo="https://www.google.com/s2/favicons?domain=mtv.az&sz=128" group-title="جمهوری آذربایجان / موسیقی",MTV Azerbaijan (منبع جایگزین)
 http://live.mtv.az/live/playlist.m3u8
+#EXTINF:-1 tvg-id="CBCSport.az" tvg-logo="https://upload.wikimedia.org/wikipedia/az/0/04/CBC_Sport_TV_loqo.png" group-title="جمهوری آذربایجان / ورزشی",CBC Sport Azerbaijan
+https://live.cbcsport.az/hls/cbcsport/index.m3u8
+#EXTINF:-1 tvg-id="CBCSport.az" tvg-logo="https://upload.wikimedia.org/wikipedia/az/0/04/CBC_Sport_TV_loqo.png" group-title="جمهوری آذربایجان / ورزشی",CBC Sport Azerbaijan (منبع جایگزین)
+https://mn-nl.mncdn.com/cbcsports_live/cbcsports/playlist.m3u8
+#EXTINF:-1 tvg-id="CBCSport.az" tvg-logo="https://upload.wikimedia.org/wikipedia/az/0/04/CBC_Sport_TV_loqo.png" group-title="جمهوری آذربایجان / ورزشی",CBC Sport Azerbaijan (منبع جایگزین ۲)
+http://streams2.livetv.az/azerbaijan/cbc_sport_hd/playlist.m3u8
