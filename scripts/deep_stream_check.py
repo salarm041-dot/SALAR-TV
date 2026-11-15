@@ -19,10 +19,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "deep-stream-reports"
 OUT.mkdir(exist_ok=True)
 UA = "Mozilla/5.0 (compatible; SALAR-TV-DeepValidator/1.0)"
-TIMEOUT = 18
+TIMEOUT = 8
 MAX_MANIFEST = 1024 * 1024
 MAX_SEGMENT = 384 * 1024
-SEGMENTS_TO_SAMPLE = 3
+SEGMENTS_TO_SAMPLE = 2
 
 def fetch(url: str, limit: int, use_range: bool = False):
     headers = {
@@ -209,7 +209,7 @@ def run_group(name, items, mode):
                 status, detail = "invalid_or_incomplete_stream", str(e)[:300]
             return {**item, "status": status, "detail": detail,
                     "checked_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=40) as pool:
         results = list(pool.map(one, items))
     out = {"group": name, "checked_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "total": len(results), "healthy": sum(x.get("status") == "healthy" for x in results),
