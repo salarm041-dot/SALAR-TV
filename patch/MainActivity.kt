@@ -209,7 +209,15 @@ fun SalarTvApp() {
                         val code = connection.responseCode
                         if (code !in 200..299) error("دریافت فهرست ناموفق بود؛ HTTP $code")
                         val body = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-                        parseM3u(body)
+                        val normalizedBody = body.removePrefix("\uFEFF").trimStart()
+                        if (!normalizedBody.startsWith("#EXTM3U")) {
+                            error("پاسخ سرور فایل M3U معتبر نیست.")
+                        }
+                        val parsedChannels = parseM3u(normalizedBody)
+                        if (parsedChannels.isEmpty()) {
+                            error("فهرست دریافتی معتبر است اما هیچ شبکه‌ای در آن پیدا نشد.")
+                        }
+                        parsedChannels
                     } finally { connection.disconnect() }
                 } }
                 result.onSuccess { remote ->
