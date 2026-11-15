@@ -634,6 +634,20 @@ fun SalarTvApp() {
                     )
                     "زمان‌بندی‌ها" -> ScheduledRecordingsPage(
                         schedules = scheduledRecordings.toList(),
+                        onRefresh = {
+                            scheduledRecordings.clear()
+                            runCatching {
+                                val saved = JSONArray(prefs.getString("schedules_json", "[]") ?: "[]")
+                                for (i in 0 until saved.length()) {
+                                    val item = saved.getJSONObject(i)
+                                    scheduledRecordings.add(ScheduledRecording(
+                                        item.optInt("requestCode"), item.optString("title"),
+                                        item.optString("url"), item.optLong("startMillis"),
+                                        item.optInt("durationMinutes", 60), item.optString("status", "scheduled")
+                                    ))
+                                }
+                            }
+                        },
                         onCancel = { item ->
                             val alarmIntent = Intent(context, RecordingAlarmReceiver::class.java)
                             val pending = PendingIntent.getBroadcast(context, item.requestCode, alarmIntent,
@@ -1265,13 +1279,22 @@ fun LiveDubbingPage() {
 
 
 @Composable
-fun ScheduledRecordingsPage(schedules: List<ScheduledRecording>, onCancel: (ScheduledRecording) -> Unit) {
+fun ScheduledRecordingsPage(
+    schedules: List<ScheduledRecording>,
+    onRefresh: () -> Unit,
+    onCancel: (ScheduledRecording) -> Unit
+) {
     val now = System.currentTimeMillis()
     val formatter = remember { DateTimeFormatter.ofPattern("yyyy/MM/dd • HH:mm") }
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("مدیریت ضبط‌های زمان‌بندی‌شده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text("زمان‌بندی‌های ثبت‌شده روی همین دستگاه نمایش داده می‌شوند. برای لغو، دکمهٔ لغو همان مورد را بزنید.",
             color = SecondaryText, fontSize = 12.sp)
+        OutlinedButton(onClick = onRefresh) {
+            Icon(Icons.Default.Refresh, contentDescription = null)
+            Spacer(Modifier.width(6.dp))
+            Text("به‌روزرسانی وضعیت زمان‌بندی‌ها")
+        }
         if (schedules.isEmpty()) {
             Text("هنوز ضبط زمان‌بندی‌شده‌ای ثبت نشده است.", color = MutedText)
         } else {
