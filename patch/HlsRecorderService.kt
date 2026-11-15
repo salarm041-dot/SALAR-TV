@@ -35,7 +35,7 @@ class HlsRecorderService : Service() {
         }
         val name = intent?.getStringExtra("name") ?: "SALAR TV"
         val streamUrl = intent?.getStringExtra("url") ?: return START_NOT_STICKY
-        val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(1, 360)
+        val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(0, 10080)
         createChannel()
         startForeground(4102, notification("در حال ضبط: $name"))
         val myGeneration = synchronized(this) {
@@ -48,13 +48,13 @@ class HlsRecorderService : Service() {
             val folder = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: filesDir
             if (!folder.exists()) folder.mkdirs()
             val safeName = name.replace(Regex("[^\\p{L}\\p{N}_-]"), "_").take(40)
-            val deadline = System.currentTimeMillis() + durationMinutes * 60_000L
+            val deadline = if (durationMinutes == 0) Long.MAX_VALUE else System.currentTimeMillis() + durationMinutes * 60_000L
             val seen = HashSet<String>()
             val writtenMaps = HashSet<String>()
             var output: File? = null
             var saved = 0L
             try {
-                while (isCurrent(myGeneration) && System.currentTimeMillis() < deadline) {
+                while (isCurrent(myGeneration) && (deadline == Long.MAX_VALUE || System.currentTimeMillis() < deadline)) {
                     val masterText = downloadText(streamUrl)
                     val mediaUrl = resolveMediaPlaylist(streamUrl, masterText)
                     val mediaText = if (mediaUrl == streamUrl) masterText else downloadText(mediaUrl)
