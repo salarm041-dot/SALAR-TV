@@ -13,6 +13,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class HlsRecorderService : Service() {
+    companion object { const val ACTION_STOP = "com.salar.tv.action.STOP_RECORDING" }
     @Volatile private var running = false
     @Volatile private var recordingGeneration = 0L
     private var worker: Thread? = null
@@ -21,6 +22,17 @@ class HlsRecorderService : Service() {
     private data class MediaPart(val uri: String, val range: ByteRange? = null)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP) {
+            synchronized(this) {
+                recordingGeneration += 1
+                running = false
+                worker?.interrupt()
+                worker = null
+            }
+            stopForeground(true)
+            stopSelf()
+            return START_NOT_STICKY
+        }
         val name = intent?.getStringExtra("name") ?: "SALAR TV"
         val streamUrl = intent?.getStringExtra("url") ?: return START_NOT_STICKY
         val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(1, 360)
