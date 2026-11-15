@@ -101,9 +101,9 @@ def main():
         province = next((province for province, terms in PROVINCIAL_STATIONS.items()
                          if any(term.lower() in lower_name for term in terms)), None)
         is_national = any(term.lower() in lower_name for term in NATIONAL_STATIONS)
-        # Mixed-language stations are excluded; Iranian stations with missing language metadata
-        # are admitted only when their names match a known Persian IRIB national/provincial station.
-        if is_iran and not (is_persian_only or (not language_tags and (province or is_national))): continue
+        # Iranian radio is restricted to recognized national/provincial IRIB station names.
+        # This excludes private/general Iranian stations even when they broadcast Persian.
+        if is_iran and not (province or is_national): continue
         # Overseas stations must have an explicit non-Iran country and Persian-only metadata.
         if not is_iran and (not country or not is_persian_only): continue
         url=(row.get("url") or "").strip()
