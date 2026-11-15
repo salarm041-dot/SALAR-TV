@@ -21,6 +21,7 @@ class HlsRecorderService : Service() {
     @Volatile private var running = false
     @Volatile private var recordingGeneration = 0L
     private var worker: Thread? = null
+    private var activeScheduleId: Int = Int.MIN_VALUE
 
     private data class ByteRange(val length: Long, val offset: Long?)
     private data class MediaPart(val uri: String, val range: ByteRange? = null)
@@ -31,6 +32,8 @@ class HlsRecorderService : Service() {
                 recordingGeneration += 1
                 running = false
                 isRecordingActive = false
+                updateScheduleStatus(activeScheduleId, "stopped")
+                activeScheduleId = Int.MIN_VALUE
                 worker?.interrupt()
                 worker = null
             }
@@ -43,6 +46,8 @@ class HlsRecorderService : Service() {
         val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(0, 10080)
         createChannel()
         startForeground(4102, notification("در حال ضبط: $name"))
+        activeScheduleId = intent?.getIntExtra("schedule_id", Int.MIN_VALUE) ?: Int.MIN_VALUE
+        updateScheduleStatus(activeScheduleId, "recording")
         val myGeneration = synchronized(this) {
             recordingGeneration += 1
             worker?.interrupt()
@@ -59,6 +64,7 @@ class HlsRecorderService : Service() {
             val writtenMaps = HashSet<String>()
             var output: File? = null
             var saved = 0L
+            var finalStatus = "completed"
             try {
                 while (isCurrent(myGeneration) && (deadline == Long.MAX_VALUE || System.currentTimeMillis() < deadline)) {
                     val masterText = downloadText(streamUrl)
@@ -115,6 +121,7 @@ class HlsRecorderService : Service() {
                     } else "ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
                 }
             } catch (e: Exception) {
+                finalStatus = "failed"
                 if (isCurrent(myGeneration)) {
                     updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
                 }
@@ -128,6 +135,8 @@ class HlsRecorderService : Service() {
                     } else false
                 }
                 if (shouldStop) {
+                    updateScheduleStatus(activeScheduleId, finalStatus)
+                    activeScheduleId = Int.MIN_VALUE
                     stopForeground(STOP_FOREGROUND_DETACH)
                     stopSelfResult(startId)
                 }
@@ -138,6 +147,22 @@ class HlsRecorderService : Service() {
         }
         if (isCurrent(myGeneration)) recordingWorker.start()
         return START_NOT_STICKY
+    }
+
+    private fun updateScheduleStatus(scheduleId: Int, status: String) {
+        if (scheduleId == Int.MIN_VALUE) return
+        val prefs = getSharedPreferences("salar_tv", MODE_PRIVATE)
+        runCatching {
+            val schedules = org.json.JSONArray(prefs.getString("schedules_json", "[]") ?: "[]")
+            for (index in 0 until schedules.length()) {
+                val item = schedules.optJSONObject(index) ?: continue
+                if (item.optInt("requestCode", Int.MIN_VALUE) == scheduleId) {
+                    item.put("status", status)
+                    break
+                }
+            }
+            prefs.edit().putString("schedules_json", schedules.toString()).apply()
+        }
     }
 
     private fun resolveMediaPlaylist(masterUrl: String, text: String): String {
