@@ -60,9 +60,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.TrackSelectionDialogBuilder
 import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONArray
 import org.json.JSONObject
@@ -417,6 +419,21 @@ fun SalarTvApp() {
                                 Icon(Icons.Default.Fullscreen, null)
                                 Spacer(Modifier.width(6.dp))
                                 Text("تمام‌صفحه")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    TrackSelectionDialogBuilder(
+                                        context,
+                                        "انتخاب کیفیت پخش",
+                                        player,
+                                        C.TRACK_TYPE_VIDEO
+                                    ).build().show()
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.HighQuality, null)
+                                Spacer(Modifier.width(6.dp))
+                                Text("کیفیت پخش")
                             }
                             OutlinedButton(
                                 onClick = {
