@@ -47,7 +47,8 @@ class HlsRecorderService : Service() {
         createChannel()
         startForeground(4102, notification("در حال ضبط: $name"))
         activeScheduleId = intent?.getIntExtra("schedule_id", Int.MIN_VALUE) ?: Int.MIN_VALUE
-        updateScheduleStatus(activeScheduleId, "recording")
+        val myScheduleId = activeScheduleId
+        updateScheduleStatus(myScheduleId, "recording")
         val myGeneration = synchronized(this) {
             recordingGeneration += 1
             worker?.interrupt()
@@ -136,8 +137,8 @@ class HlsRecorderService : Service() {
                     } else false
                 }
                 if (shouldStop) {
-                    updateScheduleStatus(activeScheduleId, finalStatus)
-                    activeScheduleId = Int.MIN_VALUE
+                    updateScheduleStatus(myScheduleId, finalStatus)
+                    if (activeScheduleId == myScheduleId) activeScheduleId = Int.MIN_VALUE
                     stopForeground(STOP_FOREGROUND_DETACH)
                     stopSelfResult(startId)
                 }
