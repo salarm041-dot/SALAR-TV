@@ -15,6 +15,7 @@ class RecordingAlarmReceiver : BroadcastReceiver() {
             putExtra("name", received.getStringExtra("name") ?: "SALAR TV")
             putExtra("url", url)
             putExtra("duration", received.getIntExtra("duration", 60))
+            putExtra("schedule_id", scheduleId)
         }
 
         try {
