@@ -9,6 +9,7 @@ import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import java.net.URL
 import java.net.HttpURLConnection
 import java.net.URLEncoder
@@ -161,6 +162,12 @@ fun SalarTvApp() {
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
     var isRecording by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            isRecording = HlsRecorderService.isRecordingActive
+            delay(1000)
+        }
+    }
     var showRecordingOptions by remember { mutableStateOf(false) }
     var recordingDuration by remember { mutableStateOf("60") }
     var recordingError by remember { mutableStateOf("") }
@@ -191,9 +198,109 @@ fun SalarTvApp() {
     }
 
     val player = remember { ExoPlayer.Builder(context).build() }
+    var selectedQuality by remember { mutableStateOf(prefs.getString("player_quality", "خودکار") ?: "خودکار") }
+    var qualityMenuExpanded by remember { mutableStateOf(false) }
+    LaunchedEffect(selectedQuality) {
+        val maxSize = when (selectedQuality) {
+            "1080p" -> 1920 to 1080
+            "720p" -> 1280 to 720
+            "480p" -> 854 to 480
+            "360p" -> 640 to 360
+            else -> Int.MAX_VALUE to Int.MAX_VALUE
+        }
+        player.trackSelectionParameters = player.trackSelectionParameters
+            .buildUpon()
+            .setMaxVideoSize(maxSize.first, maxSize.second)
+            .build()
+        prefs.edit().putString("player_quality", selectedQuality).apply()
+    }
     DisposableEffect(Unit) { onDispose { player.release() } }
 
     var selectedM3uName by remember { mutableStateOf("") }
+    var refreshingChannels by remember { mutableStateOf(false) }
+    var channelRefreshStatus by remember { mutableStateOf("") }
+    val refreshScope = rememberCoroutineScope()
+    fun refreshChannelDirectory() {
+        if (refreshingChannels) return
+        refreshScope.launch {
+            refreshingChannels = true
+            channelRefreshStatus = "در حال دریافت فهرست جدید شبکه‌ها..."
+            try {
+                val remoteChannels = withContext(Dispatchers.IO) {
+                    val connection = (URL("https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/channels.m3u").openConnection() as HttpURLConnection).apply {
+                        requestMethod = "GET"
+                        connectTimeout = 15000
+                        readTimeout = 25000
+                        useCaches = false
+                        setRequestProperty("Cache-Control", "no-cache")
+                        setRequestProperty("User-Agent", "SALAR-TV-Channel-Refresh/1.0")
+                        setRequestProperty("Accept", "application/vnd.apple.mpegurl, application/x-mpegURL, text/plain, */*")
+                    }
+                    try {
+                        require(connection.responseCode in 200..299) { "سرور فهرست شبکه‌ها پاسخ مناسب نداد: HTTP ${connection.responseCode}" }
+                        val bytes = java.io.ByteArrayOutputStream()
+                        connection.inputStream.use { input ->
+                            val buffer = ByteArray(8192)
+                            var total = 0
+                            while (true) {
+                                val count = input.read(buffer)
+                                if (count < 0) break
+                                total += count
+                                require(total <= 5 * 1024 * 1024) { "حجم فهرست شبکه‌ها بیش از حد مجاز است." }
+                                bytes.write(buffer, 0, count)
+                            }
+                        }
+                        val playlist = bytes.toString("UTF-8")
+                        require(playlist.trimStart().startsWith("#EXTM3U", ignoreCase = true)) { "پاسخ سرور یک فایل M3U معتبر نیست." }
+                        val parsed = parseM3u(playlist)
+                        require(parsed.size >= 50) { "فهرست دریافتی ناقص به نظر می‌رسد؛ برای جلوگیری از تغییر ناخواسته اعمال نشد." }
+                        parsed
+                    } finally {
+                        connection.disconnect()
+                    }
+                }
+
+                val existingByUrl = channels.withIndex().associate { it.value.url to it.index }
+                val seenUrls = existingByUrl.keys.toMutableSet()
+                var added = 0
+                remoteChannels.forEach { fresh ->
+                    val index = existingByUrl[fresh.url]
+                    if (index == null) {
+                        if (seenUrls.add(fresh.url)) {
+                            channels.add(fresh)
+                            added++
+                        }
+                    } else {
+                        val old = channels[index]
+                        val merged = old.copy(
+                            tvgId = old.tvgId.ifBlank { fresh.tvgId },
+                            logoUrl = old.logoUrl.ifBlank { fresh.logoUrl },
+                            groupTitle = old.groupTitle.ifBlank { fresh.groupTitle },
+                            country = if (old.country == "سایر") fresh.country else old.country,
+                            kind = if (old.kind == "تلویزیون" && fresh.kind != "تلویزیون") fresh.kind else old.kind
+                        )
+                        if (merged != old) channels[index] = merged
+                    }
+                }
+                saveChannels()
+                channelRefreshStatus = if (added == 0) {
+                    "فهرست به‌روز است؛ شبکه جدیدی پیدا نشد."
+                } else {
+                    "$added شبکه جدید اضافه شد."
+                }
+                android.widget.Toast.makeText(
+                    context,
+                    if (added == 0) "فهرست شبکه‌ها به‌روز است." else "$added شبکه جدید به فهرست اضافه شد.",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            } catch (error: Exception) {
+                channelRefreshStatus = error.message ?: "به‌روزرسانی شبکه‌ها ناموفق بود."
+                android.widget.Toast.makeText(context, channelRefreshStatus, android.widget.Toast.LENGTH_LONG).show()
+            } finally {
+                refreshingChannels = false
+            }
+        }
+    }
     val m3uLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
         runCatching {
@@ -332,6 +439,35 @@ fun SalarTvApp() {
                         AndroidView(
                             factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
+                        )
+                        Box {
+                            OutlinedButton(onClick = { qualityMenuExpanded = true }) {
+                                Icon(Icons.Default.HighQuality, contentDescription = null)
+                                Spacer(Modifier.width(6.dp))
+                                Text("کیفیت: $selectedQuality")
+                            }
+                            DropdownMenu(
+                                expanded = qualityMenuExpanded,
+                                onDismissRequest = { qualityMenuExpanded = false }
+                            ) {
+                                listOf("خودکار", "1080p", "720p", "480p", "360p").forEach { quality ->
+                                    DropdownMenuItem(
+                                        text = { Text(quality) },
+                                        onClick = {
+                                            selectedQuality = quality
+                                            qualityMenuExpanded = false
+                                        },
+                                        leadingIcon = {
+                                            if (selectedQuality == quality) Icon(Icons.Default.Check, contentDescription = null)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                        Text(
+                            "کیفیت انتخابی سقف وضوح تصویر را تعیین می‌کند؛ انتخاب نهایی به کیفیت‌های موجود در پخش زنده بستگی دارد.",
+                            color = SecondaryText,
+                            fontSize = 11.sp
                         )
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(
@@ -483,10 +619,12 @@ fun SalarTvApp() {
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> ChannelList(channels.filter { it.kind == "تلویزیون" }, onSelect = { selected = it },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
-                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
+                        onRefresh = ::refreshChannelDirectory, refreshing = refreshingChannels, refreshStatus = channelRefreshStatus)
                     "رادیو" -> ChannelList(channels.filter { it.kind == "رادیو" }, onSelect = { selected = it },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
-                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
+                        onRefresh = ::refreshChannelDirectory, refreshing = refreshingChannels, refreshStatus = channelRefreshStatus)
                     "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selected = it },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
@@ -730,67 +868,115 @@ private fun ChannelLogo(logoUrl: String, kind: String) {
 }
 
 @Composable
-fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
-                onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
+fun ChannelList(
+    channels: List<Channel>,
+    onSelect: (Channel) -> Unit,
+    onFavorite: (Channel) -> Unit,
+    onEdit: (Channel) -> Unit = {},
+    onDelete: (Channel) -> Unit = {},
+    onRefresh: (() -> Unit)? = null,
+    refreshing: Boolean = false,
+    refreshStatus: String = ""
+) {
     var searchQuery by remember { mutableStateOf("") }
-    if (channels.isEmpty()) {
-        Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-            Text("موردی برای نمایش وجود ندارد.", color = SecondaryText)
-        }
-    } else {
-        val visibleChannels = channels.filter {
-            it.name.contains(searchQuery, ignoreCase = true) ||
-                it.country.contains(searchQuery, ignoreCase = true) ||
-                categoryForChannel(it).contains(searchQuery, ignoreCase = true)
-        }
-        val sections = visibleChannels.groupBy { "${it.country} / ${categoryForChannel(it)} / ${it.kind}" }.toSortedMap()
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            item(key = "channel_search") {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    label = { Text("جست‌وجوی شبکه، کشور یا موضوع") },
-                    leadingIcon = { Icon(Icons.Default.Search, null) }
-                )
-            }
-            if (visibleChannels.isEmpty()) item { Text("شبکه‌ای با این عبارت پیدا نشد.", color = SecondaryText) }
-            sections.forEach { (sectionTitle, sectionChannels) ->
-                item(key = "section_${sectionTitle}") {
-                    Row(
-                        Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            if (sectionTitle.endsWith("رادیو")) Icons.Default.Radio else Icons.Default.Tv,
-                            null, tint = Gold, modifier = Modifier.size(20.dp)
+    val visibleChannels = channels.filter {
+        it.name.contains(searchQuery, ignoreCase = true) ||
+            it.country.contains(searchQuery, ignoreCase = true) ||
+            categoryForChannel(it).contains(searchQuery, ignoreCase = true)
+    }
+    val sections = visibleChannels.groupBy { "${it.country} / ${categoryForChannel(it)} / ${it.kind}" }.toSortedMap()
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (onRefresh != null) {
+            item(key = "channel_refresh") {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("فهرست شبکه‌ها", color = Gold, fontWeight = FontWeight.Bold)
+                        Text(
+                            if (refreshStatus.isNotBlank()) refreshStatus else "برای دریافت شبکه‌های تازه، فهرست را به‌روزرسانی کنید.",
+                            color = MutedText,
+                            fontSize = 10.sp
                         )
-                        Spacer(Modifier.width(8.dp))
-                        Text(sectionTitle, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        Spacer(Modifier.weight(1f))
-                        Text("${sectionChannels.size} شبکه", color = MutedText, fontSize = 11.sp)
                     }
-                    Divider(color = Gold.copy(alpha = 0.28f))
-                }
-                items(sectionChannels, key = { it.url }) { c ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().clickable { onSelect(c) },
-                        colors = CardDefaults.cardColors(containerColor = Panel),
-                        shape = RoundedCornerShape(14.dp)
+                    Button(
+                        onClick = onRefresh,
+                        enabled = !refreshing,
+                        colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)
                     ) {
-                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            ChannelLogo(c.logoUrl, c.kind)
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
-                                Text("${c.country} • ${c.kind}", color = MutedText, fontSize = 11.sp)
-                            }
-                            IconButton(onClick = { onFavorite(c) }) {
-                                Icon(Icons.Default.Favorite, null, tint = if (c.favorite) Gold else MutedText)
-                            }
-                            IconButton(onClick = { onEdit(c) }) { Icon(Icons.Default.Edit, "ویرایش", tint = SecondaryText) }
-                            IconButton(onClick = { onDelete(c) }) { Icon(Icons.Default.Delete, "حذف", tint = Color(0xFFE57373)) }
+                        if (refreshing) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = Color.Black
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("در حال دریافت")
+                        } else {
+                            Icon(Icons.Default.Refresh, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text("به‌روزرسانی شبکه‌ها")
+                        }
+                    }
+                }
+            }
+        }
+        item(key = "channel_search") {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                label = { Text("جست‌وجوی شبکه، کشور یا موضوع") },
+                leadingIcon = { Icon(Icons.Default.Search, null) }
+            )
+        }
+        if (visibleChannels.isEmpty()) {
+            item { Text("موردی برای نمایش وجود ندارد.", color = SecondaryText) }
+        }
+        sections.forEach { (sectionTitle, sectionChannels) ->
+            item(key = "section_${sectionTitle}") {
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        if (sectionTitle.endsWith("رادیو")) Icons.Default.Radio else Icons.Default.Tv,
+                        null, tint = Gold, modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(sectionTitle, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Spacer(Modifier.weight(1f))
+                    Text("${sectionChannels.size} شبکه", color = MutedText, fontSize = 11.sp)
+                }
+                Divider(color = Gold.copy(alpha = 0.28f))
+            }
+            items(sectionChannels, key = { it.url }) { channel ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { onSelect(channel) },
+                    colors = CardDefaults.cardColors(containerColor = Panel),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        ChannelLogo(channel.logoUrl, channel.kind)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(channel.name, color = TextMain, fontWeight = FontWeight.SemiBold)
+                            Text("${channel.country} • ${channel.kind}", color = MutedText, fontSize = 11.sp)
+                        }
+                        IconButton(onClick = { onFavorite(channel) }) {
+                            Icon(Icons.Default.Favorite, null, tint = if (channel.favorite) Gold else MutedText)
+                        }
+                        IconButton(onClick = { onEdit(channel) }) {
+                            Icon(Icons.Default.Edit, "ویرایش", tint = SecondaryText)
+                        }
+                        IconButton(onClick = { onDelete(channel) }) {
+                            Icon(Icons.Default.Delete, null, tint = Color(0xFFE57373))
                         }
                     }
                 }
