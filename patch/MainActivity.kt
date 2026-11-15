@@ -21,6 +21,7 @@ import android.util.Rational
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -40,6 +41,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +58,14 @@ import androidx.media3.ui.PlayerView
 import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONArray
 import org.json.JSONObject
+import android.util.Xml
+import org.xmlpull.v1.XmlPullParser
+import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+import java.util.zip.GZIPInputStream
 
 private var Gold by mutableStateOf(Color(0xFFD6AD62))
 private var Background by mutableStateOf(Color(0xFF0B0D13))
@@ -70,7 +81,8 @@ data class Channel(
     val kind: String = "تلویزیون",
     val favorite: Boolean = false,
     val logoUrl: String = "",
-    val groupTitle: String = ""
+    val groupTitle: String = "",
+    val tvgId: String = ""
 )
 
 class MainActivity : ComponentActivity() {
@@ -106,7 +118,7 @@ fun SalarTvApp() {
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
                     add(Channel(o.optString("name"), o.optString("url"), o.optString("country"),
-                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle")))
+                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"), o.optString("tvgId")))
                 }
             }
         }
@@ -116,7 +128,7 @@ fun SalarTvApp() {
         channels.forEach { c ->
             arr.put(JSONObject().put("name", c.name).put("url", c.url)
                 .put("country", c.country).put("kind", c.kind).put("favorite", c.favorite)
-                .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle))
+                .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle).put("tvgId", c.tvgId))
         }
         prefs.edit().putString("channels", arr.toString()).apply()
     }
@@ -126,6 +138,18 @@ fun SalarTvApp() {
         val bundled = runCatching {
             context.assets.open("channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
         }.getOrDefault(emptyList())
+        val bundledByUrl = bundled.associateBy { it.url }
+        for (index in channels.indices) {
+            val old = channels[index]
+            val fresh = bundledByUrl[old.url] ?: continue
+            channels[index] = old.copy(
+                tvgId = old.tvgId.ifBlank { fresh.tvgId },
+                logoUrl = old.logoUrl.ifBlank { fresh.logoUrl },
+                groupTitle = old.groupTitle.ifBlank { fresh.groupTitle },
+                country = if (old.country == "سایر") fresh.country else old.country,
+                kind = if (old.kind == "تلویزیون" && fresh.kind != "تلویزیون") fresh.kind else old.kind
+            )
+        }
         val existing = channels.map { it.url }.toSet()
         channels.addAll(bundled.filter { it.url !in existing })
         saveChannels()
@@ -136,6 +160,12 @@ fun SalarTvApp() {
     var selected by remember { mutableStateOf<Channel?>(null) }
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
+    var isRecording by remember { mutableStateOf(false) }
+    var showRecordingOptions by remember { mutableStateOf(false) }
+    var recordingDuration by remember { mutableStateOf("60") }
+    var recordingError by remember { mutableStateOf("") }
+    var showFullscreenPlayer by remember { mutableStateOf(false) }
+    var forceLandscape by remember { mutableStateOf(true) }
     var editingChannel by remember { mutableStateOf<Channel?>(null) }
     var brightness by remember { mutableFloatStateOf(0.75f) }
     var useExternalPlayer by remember { mutableStateOf(prefs.getBoolean("external_player_default", false)) }
@@ -214,7 +244,7 @@ fun SalarTvApp() {
             for (i in 0 until restored.length()) {
                 val o = restored.getJSONObject(i)
                 channels.add(Channel(o.optString("name"), o.optString("url"), o.optString("country", "سایر"),
-                    o.optString("kind", "تلویزیون"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle")))
+                    o.optString("kind", "تلویزیون"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"), o.optString("tvgId")))
             }
             saveChannels()
             prefs.edit()
@@ -303,6 +333,40 @@ fun SalarTvApp() {
                             factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
                         )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = {
+                                    showFullscreenPlayer = true
+                                    forceLandscape = true
+                                    (context as? Activity)?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Fullscreen, null)
+                                Spacer(Modifier.width(6.dp))
+                                Text("تمام‌صفحه")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    val activity = context as? Activity
+                                    if (isRecording) {
+                                        activity?.startService(Intent(context, HlsRecorderService::class.java).setAction(HlsRecorderService.ACTION_STOP))
+                                        isRecording = false
+                                    } else if (selected!!.url.contains(".m3u8", ignoreCase = true)) {
+                                        recordingError = ""
+                                        showRecordingOptions = true
+                                    } else {
+                                        android.widget.Toast.makeText(context, "ضبط مستقیم فقط برای لینک‌های HLS / M3U8 پشتیبانی می‌شود.", android.widget.Toast.LENGTH_LONG).show()
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = if (isRecording) Color(0xFFFF6B6B) else Gold)
+                            ) {
+                                Icon(if (isRecording) Icons.Default.StopCircle else Icons.Default.FiberManualRecord, null)
+                                Spacer(Modifier.width(6.dp))
+                                Text(if (isRecording) "توقف ضبط" else "تنظیم مدت و ضبط")
+                            }
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             OutlinedButton(
                                 onClick = { (context as? MainActivity)?.enterPlayerPictureInPicture() },
@@ -392,11 +456,13 @@ fun SalarTvApp() {
                         onSources = { page = "افزودن منابع" },
                         onRecordings = { page = "ضبط‌ها" },
                         onLiveDubbing = { page = "دوبله هوشمند زنده" },
+                        onEpg = { page = "راهنمای برنامه‌ها" },
                         onSettings = { page = "تنظیمات" },
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
+                    "راهنمای برنامه‌ها" -> EpgPage(channels)
                     "تنظیمات" -> SettingsPage(
                         themeMode = themeMode,
                         onThemeModeChange = { mode ->
@@ -470,6 +536,88 @@ fun SalarTvApp() {
         )
     }
 
+    if (showFullscreenPlayer && selected != null && !useExternalPlayer) {
+        Dialog(
+            onDismissRequest = {
+                showFullscreenPlayer = false
+                (context as? Activity)?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(Modifier.fillMaxSize().background(Color.Black)) {
+                AndroidView(
+                    factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                    modifier = Modifier.fillMaxSize()
+                )
+                Row(
+                    Modifier.align(Alignment.TopEnd).padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    IconButton(onClick = {
+                        forceLandscape = !forceLandscape
+                        (context as? Activity)?.requestedOrientation =
+                            if (forceLandscape) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                            else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    }) {
+                        Icon(Icons.Default.ScreenRotation, "چرخش تصویر", tint = Color.White)
+                    }
+                    IconButton(onClick = {
+                        showFullscreenPlayer = false
+                        (context as? Activity)?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    }) {
+                        Icon(Icons.Default.FullscreenExit, "خروج از تمام‌صفحه", tint = Color.White)
+                    }
+                }
+            }
+        }
+    }
+
+    if (showRecordingOptions && selected != null) {
+        AlertDialog(
+            onDismissRequest = { showRecordingOptions = false },
+            title = { Text("مدت ضبط شبکه", color = Gold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("مدت را به دقیقه وارد کن. برای ضبط بدون محدودیت زمانی، عدد ۰ را وارد کن.")
+                    OutlinedTextField(
+                        value = recordingDuration,
+                        onValueChange = { recordingDuration = it.filter(Char::isDigit).take(5) },
+                        label = { Text("مدت ضبط (دقیقه)") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("60", "120", "240", "480", "0").forEach { value ->
+                            TextButton(onClick = { recordingDuration = value }) {
+                                Text(if (value == "0") "بدون محدودیت" else "$value دقیقه")
+                            }
+                        }
+                    }
+                    if (recordingError.isNotBlank()) Text(recordingError, color = MaterialTheme.colorScheme.error)
+                    Text("ضبط بدون محدودیت با دکمهٔ توقف ضبط پایان می‌یابد.", color = MutedText, fontSize = 11.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val minutes = recordingDuration.toIntOrNull()
+                    if (minutes == null || minutes !in 0..10080) {
+                        recordingError = "مدت باید بین ۰ تا ۱۰٬۰۸۰ دقیقه باشد."
+                    } else {
+                        val intent = Intent(context, HlsRecorderService::class.java).apply {
+                            putExtra("name", selected!!.name)
+                            putExtra("url", selected!!.url)
+                            putExtra("duration", minutes)
+                        }
+                        runCatching { ContextCompat.startForegroundService(context, intent) }
+                            .onSuccess { isRecording = true; showRecordingOptions = false }
+                            .onFailure { recordingError = "شروع ضبط ممکن نشد: " + (it.message ?: "خطا") }
+                    }
+                }) { Text("شروع ضبط", color = Gold) }
+            },
+            dismissButton = { TextButton(onClick = { showRecordingOptions = false }) { Text("انصراف") } }
+        )
+    }
+
     if (showSchedule) {
         var title by remember { mutableStateOf(selected?.name ?: "") }
         var streamUrl by remember { mutableStateOf(selected?.url ?: "") }
@@ -488,8 +636,8 @@ fun SalarTvApp() {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                     Text("زمان شروع (نمونه: 2026-12-01 20:30)")
                     OutlinedTextField(dateTime, { dateTime = it }, placeholder = { Text("YYYY-MM-DD HH:mm") }, singleLine = true)
-                    OutlinedTextField(duration, { duration = it.filter(Char::isDigit).take(3) },
-                        label = { Text("مدت ضبط به دقیقه (۱ تا ۳۶۰)") }, singleLine = true,
+                    OutlinedTextField(duration, { duration = it.filter(Char::isDigit).take(5) },
+                        label = { Text("مدت ضبط به دقیقه (۰ تا ۱۰٬۰۸۰؛ صفر = بدون محدودیت)") }, singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                     if (scheduleError.isNotBlank()) Text(scheduleError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
                     Text("برای ضبط خودکار، لینک HLS قابل دسترس و اتصال اینترنت پایدار لازم است.",
@@ -501,7 +649,7 @@ fun SalarTvApp() {
                     try {
                         val start = LocalDateTime.parse(dateTime.trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                         val startMillis = start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        val minutes = duration.toIntOrNull()?.coerceIn(1, 360) ?: error("مدت ضبط را بین ۱ تا ۳۶۰ دقیقه وارد کنید.")
+                        val minutes = duration.toIntOrNull()?.takeIf { it in 0..10080 } ?: error("مدت ضبط را بین صفر تا ۱۰٬۰۸۰ دقیقه وارد کنید؛ صفر یعنی ضبط تا توقف دستی.")
                         require(title.isNotBlank()) { "نام برنامه را وارد کنید." }
                         require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
                         require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
@@ -515,7 +663,7 @@ fun SalarTvApp() {
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                         val alarm = context.getSystemService(AlarmManager::class.java)
                         alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
-                        schedules = (schedules + "\n$title | $dateTime | $minutes دقیقه").trim()
+                        schedules = (schedules + "\n$title | $dateTime | " + if (minutes == 0) "بدون محدودیت" else "$minutes دقیقه").trim()
                         prefs.edit().putString("schedules", schedules).apply()
                         showSchedule = false
                     } catch (e: Exception) {
@@ -763,12 +911,13 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
-             onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
+             onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onEpg: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
+        MoreButton("راهنمای برنامه‌ها (EPG)", Icons.Default.CalendarMonth, onEpg)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
         MoreButton("فایل‌های ضبط‌شده", Icons.Default.VideoLibrary, onRecordings)
@@ -932,9 +1081,21 @@ fun AboutPage() {
 
 
 private fun categoryForChannel(channel: Channel): String {
-    if (channel.kind == "رادیو") return "رادیو"
+    if (channel.kind == "رادیو") {
+        val radioGroup = channel.groupTitle.lowercase()
+        return when {
+            "استانی" in radioGroup -> "استانی / " + channel.groupTitle.substringAfterLast("/").trim()
+            "خارج از ایران" in radioGroup || "خارج از کشور" in radioGroup -> "فارسی‌زبان خارج از کشور"
+            "سراسری" in radioGroup || "ایران / رادیو" in radioGroup -> "سراسری"
+            else -> "فارسی‌زبان خارج از کشور"
+        }
+    }
     val value = (channel.name + " " + channel.country + " " + channel.groupTitle).lowercase()
     return when {
+        "اسرائیل / شبکه‌های عربی" in value -> "اسرائیل - عربی"
+        "اسرائیل / شبکه‌های بین‌المللی" in value -> "اسرائیل - بین‌المللی"
+        "اسرائیل / شبکه‌های عبری" in value -> "اسرائیل - عبری"
+        "رسانه‌های عربی بین‌المللی" in value -> "خبر عربی بین‌المللی"
         listOf("خبر", "news", "haber", "bbc", "cnn", "irinn", "voa persian", "congress tv", "revolution tv").any { it in value } -> "خبری"
         listOf("ورزش", "sport", "sports", "varzesh", "trt spor", "persiana fight").any { it in value } -> "ورزشی"
         listOf("کودک", "پویا", "نهال", "kids", "cocuk", "çocuk", "cartoon", "persiana junior").any { it in value } -> "کودک"
@@ -963,10 +1124,13 @@ private fun parseM3u(text: String): List<Channel> {
     var kind = "تلویزیون"
     var logoUrl = ""
     var groupTitle = ""
+    var tvgId = ""
     text.lineSequence().forEach { raw ->
         val line = raw.trim()
         if (line.startsWith("#EXTINF", true)) {
             title = line.substringAfter(",", "شبکه بدون نام").trim().ifBlank { "شبکه بدون نام" }
+            tvgId = Regex("tvg-id=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
+                .find(line)?.groupValues?.getOrNull(1).orEmpty()
             logoUrl = Regex("tvg-logo=\\\"([^\\\"]*)\\\"", RegexOption.IGNORE_CASE)
                 .find(line)?.groupValues?.getOrNull(1).orEmpty()
             val lower = line.lowercase()
@@ -975,10 +1139,11 @@ private fun parseM3u(text: String): List<Channel> {
             val group = groupTitle.lowercase()
             val meta = "$lower $group"
             country = when {
+                "شبکه‌های خبری عربی بین‌المللی" in meta -> "رسانه‌های عربی بین‌المللی"
                 "فارسی‌زبان خارج از ایران" in meta || "فارسی زبان خارج از ایران" in meta -> "فارسی‌زبان خارج از ایران"
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
-                "iran" in meta || "ایران" in meta || "ir/" in meta || "شبکه‌های استانی" in meta -> "ایران"
+                "iran" in meta || "irib" in meta || "ایران" in meta || "ir/" in meta || "شبکه‌های استانی" in meta -> "ایران"
                 "saudi" in meta || "عربستان" in meta || "sa/" in meta -> "عربستان"
                 "uae" in meta || "emirates" in meta || "امارات" in meta || "ae/" in meta -> "امارات"
                 "qatar" in meta || "قطر" in meta || "qa/" in meta -> "قطر"
@@ -1002,9 +1167,260 @@ private fun parseM3u(text: String): List<Channel> {
             }
             kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
-            result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle))
-            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""
+            result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle, tvgId = tvgId))
+            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""; tvgId = ""
         }
     }
     return result.distinctBy { it.url }
+}
+
+
+private data class EpgProgram(
+    val channelId: String,
+    val title: String,
+    val description: String,
+    val startMillis: Long,
+    val stopMillis: Long
+)
+private data class EpgRow(val channelId: String, val channelName: String, val current: EpgProgram?, val next: EpgProgram?)
+
+private fun parseXmlTvDate(value: String): Long? {
+    for (pattern in listOf("yyyyMMddHHmmss Z", "yyyyMMddHHmmss")) {
+        try {
+            return SimpleDateFormat(pattern, Locale.US).apply {
+                isLenient = false
+                timeZone = TimeZone.getTimeZone("UTC")
+            }.parse(value.trim())?.time
+        } catch (_: Exception) { }
+    }
+    return null
+}
+
+private fun readXmlTv(input: InputStream): Pair<Map<String, String>, List<EpgProgram>> {
+    val parser = Xml.newPullParser()
+    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
+    parser.setInput(input, "UTF-8")
+    val channelNames = linkedMapOf<String, String>()
+    val programs = mutableListOf<EpgProgram>()
+    val now = System.currentTimeMillis()
+    var event = parser.eventType
+    while (event != XmlPullParser.END_DOCUMENT) {
+        if (event == XmlPullParser.START_TAG) {
+            when (parser.name) {
+                "channel" -> {
+                    val id = parser.getAttributeValue(null, "id").orEmpty()
+                    var displayName = ""
+                    var depth = 1
+                    while (depth > 0) {
+                        when (parser.next()) {
+                            XmlPullParser.START_TAG -> {
+                                depth++
+                                if (parser.name == "display-name") {
+                                    val candidate = runCatching { parser.nextText() }.getOrDefault("")
+                                    if (displayName.isBlank()) displayName = candidate.trim()
+                                    depth--
+                                }
+                            }
+                            XmlPullParser.END_TAG -> depth--
+                            XmlPullParser.END_DOCUMENT -> depth = 0
+                        }
+                    }
+                    if (id.isNotBlank()) channelNames[id] = displayName.ifBlank { id }
+                }
+                "programme" -> {
+                    val id = parser.getAttributeValue(null, "channel").orEmpty()
+                    val start = parseXmlTvDate(parser.getAttributeValue(null, "start").orEmpty())
+                    val stop = parseXmlTvDate(parser.getAttributeValue(null, "stop").orEmpty())
+                    var title = ""
+                    var description = ""
+                    var depth = 1
+                    while (depth > 0) {
+                        when (parser.next()) {
+                            XmlPullParser.START_TAG -> {
+                                depth++
+                                when (parser.name) {
+                                    "title" -> {
+                                        title = runCatching { parser.nextText() }.getOrDefault("").trim()
+                                        depth--
+                                    }
+                                    "desc" -> {
+                                        description = runCatching { parser.nextText() }.getOrDefault("").trim()
+                                        depth--
+                                    }
+                                }
+                            }
+                            XmlPullParser.END_TAG -> depth--
+                            XmlPullParser.END_DOCUMENT -> depth = 0
+                        }
+                    }
+                    if (id.isNotBlank() && start != null && stop != null &&
+                        stop > now - 2 * 60 * 60 * 1000L &&
+                        start < now + 24 * 60 * 60 * 1000L && title.isNotBlank()) {
+                        programs.add(EpgProgram(id, title, description, start, stop))
+                    }
+                }
+            }
+        }
+        event = parser.next()
+        if (programs.size >= 20000) break
+    }
+    return channelNames to programs
+}
+
+@Composable
+private fun EpgPage(channels: List<Channel>) {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
+    val iranGuide = "https://iptv-org.github.io/epg/guides/ir/tva.tv.epg.xml.gz"
+    val turkeyGuide = "https://iptv-epg.org/files/epg-tr.xml"
+    val israelGuide = "https://iptv-epg.org/files/epg-il.xml"
+    val savedGuide = (prefs.getString("xmltv_url", iranGuide) ?: iranGuide).ifBlank { iranGuide }
+    var xmlUrl by remember { mutableStateOf(savedGuide) }
+    var loadedUrl by remember { mutableStateOf(savedGuide) }
+    var reloadKey by remember { mutableIntStateOf(0) }
+    var rows by remember { mutableStateOf<List<EpgRow>>(emptyList()) }
+    var loading by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf("منبع راهنمای برنامه‌های ایران آماده دریافت است.") }
+
+    fun loadGuide() {
+        val targets = xmlUrl.lines().map { it.trim() }.filter { it.isNotBlank() }
+        if (targets.isEmpty()) {
+            status = "حداقل یک نشانی XMLTV وارد کنید."
+            return
+        }
+        val invalid = targets.firstOrNull {
+            !it.startsWith("https://", true) && !it.startsWith("http://", true)
+        }
+        if (invalid != null) {
+            status = "نشانی نامعتبر است: $invalid"
+            return
+        }
+        val normalized = targets.distinct().joinToString("\n")
+        prefs.edit().putString("xmltv_url", normalized).apply()
+        xmlUrl = normalized
+        loadedUrl = normalized
+        reloadKey++
+    }
+
+    fun addGuide(source: String) {
+        val current = xmlUrl.lines().map { it.trim() }.filter { it.isNotBlank() }
+        if (source !in current) xmlUrl = (current + source).joinToString("\n")
+    }
+
+    LaunchedEffect(loadedUrl, reloadKey, channels.size) {
+        if (loadedUrl.isBlank()) return@LaunchedEffect
+        loading = true
+        status = "در حال دریافت و پردازش راهنمای برنامه‌ها…"
+        try {
+            val sources = loadedUrl.lines().map { it.trim() }.filter { it.isNotBlank() }
+            val mergedNames = linkedMapOf<String, String>()
+            val mergedPrograms = mutableListOf<EpgProgram>()
+            val sourceErrors = mutableListOf<String>()
+            for (source in sources) {
+                try {
+                    val parsed = withContext(Dispatchers.IO) {
+                        val connection = (URL(source).openConnection() as HttpURLConnection).apply {
+                            connectTimeout = 15000
+                            readTimeout = 30000
+                            requestMethod = "GET"
+                            setRequestProperty("User-Agent", "SALAR-TV/1.4 Android")
+                            setRequestProperty("Accept-Encoding", "identity")
+                        }
+                        try {
+                            if (connection.responseCode !in 200..299) error("HTTP ${connection.responseCode}")
+                            val raw = connection.inputStream
+                            val input = if (source.substringBefore("?").endsWith(".gz", true)) GZIPInputStream(raw) else raw
+                            input.use { readXmlTv(it) }
+                        } finally {
+                            connection.disconnect()
+                        }
+                    }
+                    mergedNames.putAll(parsed.first)
+                    mergedPrograms.addAll(parsed.second)
+                } catch (e: Exception) {
+                    sourceErrors += source.substringAfterLast("/").take(48) + ": " + (e.message ?: "خطای دریافت")
+                }
+            }
+            if (mergedPrograms.isEmpty()) {
+                error(if (sourceErrors.isEmpty()) "هیچ برنامه‌ای در منابع پیدا نشد." else sourceErrors.joinToString("؛ "))
+            }
+
+            val now = System.currentTimeMillis()
+            val appById = channels.filter { it.tvgId.isNotBlank() }.associateBy { it.tvgId }
+            val allRows = mergedPrograms.groupBy { it.channelId }.mapNotNull { (id, list) ->
+                val ordered = list.distinctBy { "${id}|${it.startMillis}|${it.stopMillis}|${it.title}" }.sortedBy { it.startMillis }
+                val current = ordered.firstOrNull { it.startMillis <= now && it.stopMillis > now }
+                val next = ordered.firstOrNull { it.startMillis > now }
+                if (current == null && next == null) null
+                else EpgRow(id, appById[id]?.name ?: mergedNames[id] ?: id, current, next)
+            }.sortedBy { it.channelName.lowercase(Locale.ROOT) }
+
+            val matchedRows = if (appById.isEmpty()) emptyList() else allRows.filter { it.channelId in appById.keys }
+            rows = if (matchedRows.isNotEmpty()) matchedRows else allRows
+            status = buildString {
+                append("${rows.size} شبکه دارای برنامه جاری یا بعدی هستند.")
+                if (matchedRows.isNotEmpty()) append(" ${matchedRows.size} مورد با شناسه فهرست SALAR TV تطبیق یافت.")
+                else append(" تطبیق شناسه با فهرست فعلی پیدا نشد؛ راهنما به‌صورت عمومی نمایش داده می‌شود.")
+                if (sourceErrors.isNotEmpty()) append(" منابع ناموفق: ${sourceErrors.joinToString("؛ ")}")
+            }
+        } catch (e: Exception) {
+            rows = emptyList()
+            status = "دریافت راهنما ناموفق بود: ${e.message ?: "خطای نامشخص"}"
+        } finally {
+            loading = false
+        }
+    }
+
+    val clock = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("راهنمای برنامه‌ها (EPG)", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("هر خط یک نشانی XMLTV است؛ فایل‌های فشرده ‎.gz نیز پشتیبانی می‌شوند. برنامه جاری و بعدی بر اساس شناسه شبکه تطبیق داده می‌شود.",
+            color = SecondaryText, fontSize = 12.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = { addGuide(iranGuide) }) { Text("راهنمای ایران") }
+            OutlinedButton(onClick = { addGuide(turkeyGuide) }) { Text("راهنمای ترکیه") }
+            OutlinedButton(onClick = { addGuide(israelGuide) }) { Text("راهنمای اسرائیل") }
+        }
+        OutlinedTextField(
+            value = xmlUrl, onValueChange = { xmlUrl = it }, modifier = Modifier.fillMaxWidth(),
+            label = { Text("نشانی‌های XMLTV (هر خط یک منبع)") },
+            placeholder = { Text("https://example.com/guide.xml.gz") },
+            minLines = 2, maxLines = 4
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { loadGuide() }, enabled = !loading,
+                colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
+                Text("دریافت / به‌روزرسانی", color = Color.Black)
+            }
+            if (loadedUrl.isNotBlank()) {
+                TextButton(onClick = { reloadKey++ }, enabled = !loading) { Text("تلاش دوباره", color = Gold) }
+            }
+        }
+        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Gold)
+        Text(status, color = if (status.contains("ناموفق") || status.contains("نامعتبر")) Color(0xFFFFCC80) else SecondaryText,
+            fontSize = 12.sp)
+        if (rows.isNotEmpty()) {
+            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(rows) { row ->
+                    Card(colors = CardDefaults.cardColors(containerColor = Panel),
+                        shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Text(row.channelName, color = Gold, fontWeight = FontWeight.Bold)
+                            row.current?.let { p ->
+                                Text("اکنون: ${p.title}", color = TextMain, fontWeight = FontWeight.SemiBold)
+                                Text("${clock.format(Date(p.startMillis))} تا ${clock.format(Date(p.stopMillis))}",
+                                    color = MutedText, fontSize = 10.sp)
+                                if (p.description.isNotBlank()) Text(p.description, color = SecondaryText, fontSize = 11.sp, maxLines = 3)
+                            }
+                            row.next?.let { p ->
+                                Text("بعدی: ${p.title}", color = TextMain)
+                                Text("${clock.format(Date(p.startMillis))} تا ${clock.format(Date(p.stopMillis))}",
+                                    color = MutedText, fontSize = 10.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

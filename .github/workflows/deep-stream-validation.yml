@@ -1,0 +1,91 @@
+name: SALAR TV Deep Stream Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 7,8 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run only at 09:00 Europe/Berlin
+        id: localtime
+        if: github.event_name == 'schedule'
+        run: |
+          python - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          now = datetime.now(ZoneInfo("Europe/Berlin"))
+          print("Berlin local time:", now.isoformat())
+          if now.hour != 9:
+              print("Skipping the duplicate UTC cron trigger; the other trigger covers 09:00 Berlin.")
+              with open(__import__("os").environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write("skip=true\n")
+          PY
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate AI broker JavaScript syntax
+        run: node --check server/index.mjs
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Discover and prepare Persian radio candidates
+        if: steps.localtime.outputs.skip != 'true'
+        run: python3 scripts/build_radio_directory_candidates.py
+
+      - name: Enrich Israel, Arab and Azerbaijan candidates with verified raster logos
+        if: steps.localtime.outputs.skip != 'true'
+        continue-on-error: true
+        run: python scripts/enrich_candidate_logos.py
+
+      - name: Upload candidate logo audit and enriched playlists
+        if: always() && steps.localtime.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Candidate-Logos
+          path: |
+            candidate-logo-report.json
+            patch/arab-israel-candidates.m3u
+            patch/azerbaijan-candidates.m3u
+            patch/radio-candidates.m3u
+            patch/endpoint-replacement-candidates.m3u
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Validate primary and candidate streams deeply
+        if: steps.localtime.outputs.skip != 'true'
+        run: python scripts/deep_stream_check.py
+
+      - name: Upload detailed stream validation reports
+        if: always() && steps.localtime.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Deep-Stream-Validation
+          path: deep-stream-reports/
+          if-no-files-found: error
+          retention-days: 30

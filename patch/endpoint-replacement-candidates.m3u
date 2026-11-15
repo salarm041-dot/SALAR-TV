@@ -1,0 +1,33 @@
+# Alternate stream endpoints found in public channel playlists; candidate-only pending deep validation.
+#EXTINF:-1 tvg-id="KanEducational.il" group-title="اسرائیل / آموزشی",כאן חינוכית 23 | Kan Educational (alternate)
+https://kan23.media.kan.org.il/hls/live/2024691/2024691/master.m3u8
+#EXTINF:-1 tvg-id="Channel24.il" group-title="اسرائیل / سرگرمی",Mako 24 (alternate)
+https://mako-streaming.akamaized.net/direct/hls/live/2035340/ch24live/video_10801920_p_1.m3u8
+#EXTINF:-1 tvg-id="WallaNews.il" group-title="اسرائیل / خبری",Walla News (alternate)
+https://live.wcdn.co.il/news/prog_index.m3u8
+#EXTINF:-1 tvg-id="Kabbalah96.il" group-title="اسرائیل / دینی",Kabbalah 96 (alternate)
+https://edge3.uk.kab.tv/live/tv66-heb-high/playlist.m3u8
+#EXTINF:-1 tvg-id="Makan33.il" group-title="اسرائیل / خبری عربی",Makan 33 (alternate)
+https://makan.media.kan.org.il/hls/live/2024680/2024680/source1_1.2k/chunklist.m3u8
+#EXTINF:-1 tvg-id="MohabatTV.us" group-title="فارسی‌زبان خارج از ایران / مذهبی",شبکه محبت (alternate)
+https://5ad386ff92705.streamlock.net/live_transcodermh/ngrp:mohabat.stream_all/playlist.m3u8
+#EXTINF:-1 tvg-id="HomePlus.ir" group-title="فارسی‌زبان خارج از ایران / سرگرمی",Home Plus (alternate)
+https://homeplushls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="iCCPlus.ir" group-title="فارسی‌زبان خارج از ایران / سرگرمی",iCC+ (alternate)
+https://icchls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="IranNama.ir" group-title="فارسی‌زبان خارج از ایران / عمومی",Iran Nama (alternate)
+https://iran613hls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="CafeTradeTV.ir" group-title="فارسی‌زبان خارج از ایران / اقتصادی",Cafe Trade TV (alternate)
+https://cafetradehls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="AfraSeries.ir" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Afra Series (alternate)
+https://afrashls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="PersianaTwo.fr" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Persiana Two (alternate)
+https://twohls.persiana.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="KnessetChannel.il" group-title="اسرائیل / پارلمان",Knesset Channel (alternate)
+https://kneset.gostreaming.tv/p2-kneset/_definst_/myStream/chunklist.m3u8
+#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / موسیقی و سرگرمی",Tapesh 2 (new Persian satellite candidate)
+https://maxtvhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="4UTV.tr" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",4U TV (new Persian satellite candidate)
+https://hls.4utv.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="4UFamily.tr" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",4U Family (new Persian satellite candidate)
+https://familyhls.4utv.live/hls/stream.m3u8
