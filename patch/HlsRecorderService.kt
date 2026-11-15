@@ -13,7 +13,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class HlsRecorderService : Service() {
-    companion object { const val ACTION_STOP = "com.salar.tv.action.STOP_RECORDING" }
+    companion object {
+        const val ACTION_STOP = "com.salar.tv.action.STOP_RECORDING"
+        @Volatile var isRecordingActive: Boolean = false
+            private set
+    }
     @Volatile private var running = false
     @Volatile private var recordingGeneration = 0L
     private var worker: Thread? = null
@@ -26,6 +30,7 @@ class HlsRecorderService : Service() {
             synchronized(this) {
                 recordingGeneration += 1
                 running = false
+                isRecordingActive = false
                 worker?.interrupt()
                 worker = null
             }
@@ -42,6 +47,7 @@ class HlsRecorderService : Service() {
             recordingGeneration += 1
             worker?.interrupt()
             running = true
+            isRecordingActive = true
             recordingGeneration
         }
         val recordingWorker = Thread {
@@ -116,6 +122,7 @@ class HlsRecorderService : Service() {
                 val shouldStop = synchronized(this) {
                     if (recordingGeneration == myGeneration) {
                         running = false
+                        isRecordingActive = false
                         worker = null
                         true
                     } else false
@@ -260,6 +267,7 @@ class HlsRecorderService : Service() {
     override fun onDestroy() {
         recordingGeneration += 1
         running = false
+        isRecordingActive = false
         worker?.interrupt()
         worker = null
         super.onDestroy()
