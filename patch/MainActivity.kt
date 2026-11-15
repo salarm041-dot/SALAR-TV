@@ -161,6 +161,9 @@ fun SalarTvApp() {
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
     var isRecording by remember { mutableStateOf(false) }
+    var showRecordingOptions by remember { mutableStateOf(false) }
+    var recordingDuration by remember { mutableStateOf("60") }
+    var recordingError by remember { mutableStateOf("") }
     var showFullscreenPlayer by remember { mutableStateOf(false) }
     var forceLandscape by remember { mutableStateOf(true) }
     var editingChannel by remember { mutableStateOf<Channel?>(null) }
@@ -350,14 +353,8 @@ fun SalarTvApp() {
                                         activity?.startService(Intent(context, HlsRecorderService::class.java).setAction(HlsRecorderService.ACTION_STOP))
                                         isRecording = false
                                     } else if (selected!!.url.contains(".m3u8", ignoreCase = true)) {
-                                        val intent = Intent(context, HlsRecorderService::class.java).apply {
-                                            putExtra("name", selected!!.name)
-                                            putExtra("url", selected!!.url)
-                                            putExtra("duration", 60)
-                                        }
-                                        runCatching { ContextCompat.startForegroundService(context, intent) }
-                                            .onSuccess { isRecording = true }
-                                            .onFailure { android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطا"), android.widget.Toast.LENGTH_LONG).show() }
+                                        recordingError = ""
+                                        showRecordingOptions = true
                                     } else {
                                         android.widget.Toast.makeText(context, "ضبط مستقیم فقط برای لینک‌های HLS / M3U8 پشتیبانی می‌شود.", android.widget.Toast.LENGTH_LONG).show()
                                     }
@@ -367,7 +364,7 @@ fun SalarTvApp() {
                             ) {
                                 Icon(if (isRecording) Icons.Default.StopCircle else Icons.Default.FiberManualRecord, null)
                                 Spacer(Modifier.width(6.dp))
-                                Text(if (isRecording) "توقف ضبط" else "ضبط ۶۰ دقیقه")
+                                Text(if (isRecording) "توقف ضبط" else "تنظیم مدت و ضبط")
                             }
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -575,6 +572,52 @@ fun SalarTvApp() {
         }
     }
 
+    if (showRecordingOptions && selected != null) {
+        AlertDialog(
+            onDismissRequest = { showRecordingOptions = false },
+            title = { Text("مدت ضبط شبکه", color = Gold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("مدت را به دقیقه وارد کن. برای ضبط بدون محدودیت زمانی، عدد ۰ را وارد کن.")
+                    OutlinedTextField(
+                        value = recordingDuration,
+                        onValueChange = { recordingDuration = it.filter(Char::isDigit).take(5) },
+                        label = { Text("مدت ضبط (دقیقه)") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("60", "120", "240", "480", "0").forEach { value ->
+                            TextButton(onClick = { recordingDuration = value }) {
+                                Text(if (value == "0") "بدون محدودیت" else "$value دقیقه")
+                            }
+                        }
+                    }
+                    if (recordingError.isNotBlank()) Text(recordingError, color = MaterialTheme.colorScheme.error)
+                    Text("ضبط بدون محدودیت با دکمهٔ توقف ضبط پایان می‌یابد.", color = MutedText, fontSize = 11.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val minutes = recordingDuration.toIntOrNull()
+                    if (minutes == null || minutes !in 0..10080) {
+                        recordingError = "مدت باید بین ۰ تا ۱۰٬۰۸۰ دقیقه باشد."
+                    } else {
+                        val intent = Intent(context, HlsRecorderService::class.java).apply {
+                            putExtra("name", selected!!.name)
+                            putExtra("url", selected!!.url)
+                            putExtra("duration", minutes)
+                        }
+                        runCatching { ContextCompat.startForegroundService(context, intent) }
+                            .onSuccess { isRecording = true; showRecordingOptions = false }
+                            .onFailure { recordingError = "شروع ضبط ممکن نشد: " + (it.message ?: "خطا") }
+                    }
+                }) { Text("شروع ضبط", color = Gold) }
+            },
+            dismissButton = { TextButton(onClick = { showRecordingOptions = false }) { Text("انصراف") } }
+        )
+    }
+
     if (showSchedule) {
         var title by remember { mutableStateOf(selected?.name ?: "") }
         var streamUrl by remember { mutableStateOf(selected?.url ?: "") }
@@ -594,7 +637,7 @@ fun SalarTvApp() {
                     Text("زمان شروع (نمونه: 2026-12-01 20:30)")
                     OutlinedTextField(dateTime, { dateTime = it }, placeholder = { Text("YYYY-MM-DD HH:mm") }, singleLine = true)
                     OutlinedTextField(duration, { duration = it.filter(Char::isDigit).take(3) },
-                        label = { Text("مدت ضبط به دقیقه (۱ تا ۳۶۰)") }, singleLine = true,
+                        label = { Text("مدت ضبط به دقیقه (۱ تا ۱۰٬۰۸۰)") }, singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                     if (scheduleError.isNotBlank()) Text(scheduleError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
                     Text("برای ضبط خودکار، لینک HLS قابل دسترس و اتصال اینترنت پایدار لازم است.",
@@ -606,7 +649,7 @@ fun SalarTvApp() {
                     try {
                         val start = LocalDateTime.parse(dateTime.trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                         val startMillis = start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        val minutes = duration.toIntOrNull()?.coerceIn(1, 360) ?: error("مدت ضبط را بین ۱ تا ۳۶۰ دقیقه وارد کنید.")
+                        val minutes = duration.toIntOrNull()?.takeIf { it in 1..10080 } ?: error("مدت ضبط را بین ۱ تا ۱۰٬۰۸۰ دقیقه وارد کنید.")
                         require(title.isNotBlank()) { "نام برنامه را وارد کنید." }
                         require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
                         require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
