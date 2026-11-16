@@ -22,6 +22,7 @@ PLAYLISTS = [
     ROOT / "patch/irib-national-candidates.m3u",
     ROOT / "patch/turkey-candidates.m3u",
     ROOT / "patch/radio-directory-candidates.m3u",
+    ROOT / "patch/discovered-country-candidates.m3u",
 ]
 API = "https://iptv-org.github.io/api/logos.json"
 UA = "Mozilla/5.0 SALAR-TV-logo-audit/1.1"
