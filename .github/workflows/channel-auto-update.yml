@@ -38,6 +38,9 @@ jobs:
       - name: Discover and refresh Persian radio candidates
         run: python3 scripts/build_radio_directory_candidates.py
 
+      - name: Discover fresh channels from selected countries
+        run: python3 scripts/discover_selected_country_channels.py
+
       - name: Verify candidate channel logos
         continue-on-error: true
         run: python3 scripts/enrich_candidate_logos.py
