@@ -15,6 +15,7 @@ SOURCES = [
     ("patch/irib-national-candidates.m3u", "irib-national-candidates.json"),
     ("patch/turkey-candidates.m3u", "turkey-candidates.json"),
     ("patch/radio-directory-candidates.m3u", "radio-directory-candidates.json"),
+    ("patch/discovered-country-candidates.m3u", "discovered-country-candidates.json"),
 ]
 DEFINITE_DEAD = {"endpoint_missing"}  # only HTTP 404/410
 
