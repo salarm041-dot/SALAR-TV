@@ -1,0 +1,72 @@
+name: SALAR TV Daily Channel Auto Update
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Daily at 06:15 UTC (07:15 Berlin in winter / 08:15 in summer).
+    - cron: "15 6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - "patch/*-candidates.m3u"
+      - ".github/workflows/channel-auto-update.yml"
+
+concurrency:
+  group: salar-tv-daily-channel-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Discover and refresh Persian radio candidates
+        run: python3 scripts/build_radio_directory_candidates.py
+
+      - name: Verify candidate channel logos
+        continue-on-error: true
+        run: python3 scripts/enrich_candidate_logos.py
+
+      - name: Deep-check current channels and selected-country candidates
+        run: python3 scripts/deep_stream_check.py
+
+      - name: Safely repair and extend the canonical playlist
+        run: python3 scripts/auto_update_channels.py
+
+      - name: Upload daily audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Daily-Channel-Audit
+          path: |
+            deep-stream-reports/
+            candidate-logo-report.json
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Commit verified playlist changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add patch/channels.m3u
+          if git diff --cached --quiet; then
+            echo "No verified channel changes today."
+          else
+            git commit -m "chore: daily verified channel directory refresh"
+            git push origin HEAD:main
+          fi
