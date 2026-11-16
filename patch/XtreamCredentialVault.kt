@@ -57,7 +57,9 @@ object XtreamCredentialVault {
         if (!isStoredUrl(storedUrl)) return storedUrl
         val uri = Uri.parse(storedUrl)
         val sourceId = uri.host ?: error("شناسه منبع Xtream معتبر نیست.")
-        val streamId = uri.lastPathSegment ?: error("شناسه شبکه Xtream موجود نیست.")
+        val streamPath = uri.lastPathSegment ?: error("شناسه شبکه Xtream موجود نیست.")
+        val extension = if (streamPath.endsWith(".m3u8", true)) ".m3u8" else ".ts"
+        val streamId = streamPath.removeSuffix(extension)
         val encoded = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(sourceId, null)
             ?: error("اطلاعات ورود این سرور روی این دستگاه ذخیره نشده است.")
         val packed = Base64.decode(encoded, Base64.NO_WRAP)
@@ -69,7 +71,7 @@ object XtreamCredentialVault {
         val server = credentials.getString("server").trimEnd('/')
         val username = URLEncoder.encode(credentials.getString("username"), "UTF-8")
         val password = URLEncoder.encode(credentials.getString("password"), "UTF-8")
-        return "$server/live/$username/$password/$streamId.ts"
+        return "$server/live/$username/$password/$streamId$extension"
     }
 
     /** Migrates old /live/user/pass/id.ts URLs; never keeps plaintext if encryption fails. */
@@ -85,7 +87,7 @@ object XtreamCredentialVault {
         val sourceId = UUID.randomUUID().toString()
         return runCatching {
             store(context, sourceId, server, parts[1], parts[2])
-            buildStoredUrl(sourceId, streamId)
+            buildStoredUrl(sourceId, finalPart)
         }.getOrElse { "salarxtream-error://credentials-migration-failed" }
     }
 
