@@ -118,11 +118,20 @@ fun SalarTvApp() {
             val raw = prefs.getString("channels", "[]") ?: "[]"
             runCatching {
                 val arr = JSONArray(raw)
+                var migrated = false
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
-                    add(Channel(o.optString("name"), XtreamCredentialVault.migrateLegacyUrl(context, o.optString("url")), o.optString("country"),
+                    val oldUrl = o.optString("url")
+                    val safeUrl = XtreamCredentialVault.migrateLegacyUrl(context, oldUrl)
+                    if (safeUrl != oldUrl) {
+                        o.put("url", safeUrl)
+                        migrated = true
+                    }
+                    add(Channel(o.optString("name"), safeUrl, o.optString("country"),
                         o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"), o.optString("tvgId")))
                 }
+                // Persist immediately so old credential-bearing URLs are not left in plaintext.
+                if (migrated) prefs.edit().putString("channels", arr.toString()).commit()
             }
         }
     }
@@ -364,6 +373,9 @@ fun SalarTvApp() {
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
         if (uri != null) runCatching {
+            // Save the migrated in-memory channel and schedule identifiers before exporting.
+            saveChannels()
+            saveScheduledRecordings()
             val backup = JSONObject()
                 .put("format", "SALAR-TV-BACKUP")
                 .put("version", 1)
