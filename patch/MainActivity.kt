@@ -306,6 +306,7 @@ fun SalarTvApp() {
                     }
                 }
                 saveChannels()
+                prefs.edit().putLong("last_channel_refresh_at", System.currentTimeMillis()).apply()
                 channelRefreshStatus = if (added == 0) {
                     "فهرست به‌روز است؛ شبکه جدیدی پیدا نشد."
                 } else {
@@ -324,6 +325,15 @@ fun SalarTvApp() {
             }
         }
     }
+    // Refresh the canonical directory automatically when it is at least 24 hours old.
+    // The server-side daily workflow keeps the canonical playlist current even while the app is closed.
+    LaunchedEffect(Unit) {
+        val lastRefresh = prefs.getLong("last_channel_refresh_at", 0L)
+        if (System.currentTimeMillis() - lastRefresh >= 24L * 60L * 60L * 1000L) {
+            refreshChannelDirectory()
+        }
+    }
+
     val m3uLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
         runCatching {
