@@ -90,6 +90,7 @@ jobs:
 
       - name: Apply corrected app source and recording module
         run: |
+          install -D patch/XtreamCredentialVault.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/XtreamCredentialVault.kt"
           install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
           install -D patch/MultiViewPage.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MultiViewPage.kt"
           echo "Installed independent multi-view playback screen"
