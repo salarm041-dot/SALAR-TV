@@ -11,7 +11,8 @@ import org.json.JSONArray
 class RecordingAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         val received = intent ?: return
-        val url = received.getStringExtra("url") ?: return
+        val originalUrl = received.getStringExtra("url") ?: return
+        val url = XtreamCredentialVault.migrateLegacyUrl(context, originalUrl)
         val scheduleId = received.getIntExtra("schedule_id", Int.MIN_VALUE)
         val service = Intent(context, HlsRecorderService::class.java).apply {
             putExtra("name", received.getStringExtra("name") ?: "SALAR TV")
@@ -68,11 +69,13 @@ class RecordingBootReceiver : BroadcastReceiver() {
 
             val requestCode = item.optInt("requestCode", Int.MIN_VALUE)
             val title = item.optString("title", "SALAR TV").ifBlank { "SALAR TV" }
-            val url = item.optString("url", "")
+            val originalUrl = item.optString("url", "")
+            val url = XtreamCredentialVault.migrateLegacyUrl(context, originalUrl)
+            if (url != originalUrl) { item.put("url", url); changed = true }
             val startMillis = item.optLong("startMillis", 0L)
             val duration = item.optInt("durationMinutes", 60).coerceIn(0, 10080)
 
-            if (requestCode == Int.MIN_VALUE || !(url.startsWith("https://") || url.startsWith("http://")) || startMillis <= 0L) {
+            if (requestCode == Int.MIN_VALUE || !XtreamCredentialVault.isSupportedStoredUrl(url) || startMillis <= 0L) {
                 item.put("status", "restore_failed")
                 changed = true
                 continue
