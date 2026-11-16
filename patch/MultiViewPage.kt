@@ -136,7 +136,7 @@ fun MultiViewPage(channels: List<Channel>) {
                                     val player = players[targetSlot]
                                     player.stop()
                                     player.clearMediaItems()
-                                    player.setMediaItem(MediaItem.fromUri(channel.url))
+                                    player.setMediaItem(MediaItem.fromUri(XtreamCredentialVault.resolve(context, channel.url)))
                                     player.prepare()
                                     player.playWhenReady = true
                                     choosingSlot = -1
