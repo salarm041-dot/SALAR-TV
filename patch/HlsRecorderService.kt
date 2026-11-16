@@ -42,10 +42,16 @@ class HlsRecorderService : Service() {
             return START_NOT_STICKY
         }
         val name = intent?.getStringExtra("name") ?: "SALAR TV"
-        val streamUrl = intent?.getStringExtra("url") ?: return START_NOT_STICKY
+        val storedStreamUrl = intent?.getStringExtra("url") ?: return START_NOT_STICKY
         val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(0, 10080)
         createChannel()
         startForeground(4102, notification("در حال ضبط: $name"))
+        val streamUrl = runCatching { XtreamCredentialVault.resolve(this, storedStreamUrl) }.getOrElse {
+            updateNotification("ضبط شروع نشد؛ اطلاعات ورود منبع در دسترس نیست.")
+            stopForeground(true)
+            stopSelf()
+            return START_NOT_STICKY
+        }
         activeScheduleId = intent?.getIntExtra("schedule_id", Int.MIN_VALUE) ?: Int.MIN_VALUE
         val myScheduleId = activeScheduleId
         updateScheduleStatus(myScheduleId, "recording")
