@@ -120,7 +120,7 @@ fun SalarTvApp() {
                 val arr = JSONArray(raw)
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
-                    add(Channel(o.optString("name"), o.optString("url"), o.optString("country"),
+                    add(Channel(o.optString("name"), XtreamCredentialVault.migrateLegacyUrl(context, o.optString("url")), o.optString("country"),
                         o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"), o.optString("tvgId")))
                 }
             }
@@ -184,11 +184,16 @@ fun SalarTvApp() {
         mutableStateListOf<ScheduledRecording>().apply {
             runCatching {
                 val saved = JSONArray(prefs.getString("schedules_json", "[]") ?: "[]")
+                var migrated = false
                 for (i in 0 until saved.length()) {
                     val item = saved.getJSONObject(i)
+                    val oldUrl = item.optString("url")
+                    val safeUrl = XtreamCredentialVault.migrateLegacyUrl(context, oldUrl)
+                    if (safeUrl != oldUrl) { item.put("url", safeUrl); migrated = true }
                     add(ScheduledRecording(item.optInt("requestCode"), item.optString("title"),
-                        item.optString("url"), item.optLong("startMillis"), item.optInt("durationMinutes", 60), item.optString("status", "scheduled")))
+                        safeUrl, item.optLong("startMillis"), item.optInt("durationMinutes", 60), item.optString("status", "scheduled")))
                 }
+                if (migrated) prefs.edit().putString("schedules_json", saved.toString()).apply()
             }
         }
     }
@@ -365,6 +370,7 @@ fun SalarTvApp() {
                 .put("channels", JSONArray(prefs.getString("channels", "[]") ?: "[]"))
                 .put("schedules", prefs.getString("schedules", "") ?: "")
                 .put("schedules_json", prefs.getString("schedules_json", "[]") ?: "[]")
+                .put("xtream_credentials_included", false)
                 .put("external_player_default", prefs.getBoolean("external_player_default", false))
                 .put("theme_mode", prefs.getString("theme_mode", "dark") ?: "dark")
             context.contentResolver.openOutputStream(uri)?.use { it.write(backup.toString(2).toByteArray(Charsets.UTF_8)) }
@@ -384,13 +390,13 @@ fun SalarTvApp() {
             channels.clear()
             for (i in 0 until restored.length()) {
                 val o = restored.getJSONObject(i)
-                channels.add(Channel(o.optString("name"), o.optString("url"), o.optString("country", "سایر"),
+                channels.add(Channel(o.optString("name"), XtreamCredentialVault.migrateLegacyUrl(context, o.optString("url")), o.optString("country", "سایر"),
                     o.optString("kind", "تلویزیون"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"), o.optString("tvgId")))
             }
             saveChannels()
             prefs.edit()
                 .putString("schedules", backup.optString("schedules", ""))
-                .putString("schedules_json", backup.optString("schedules_json", "[]"))
+                .putString("schedules_json", XtreamCredentialVault.migrateScheduleJson(context, backup.optString("schedules_json", "[]")))
                 .putBoolean("external_player_default", backup.optBoolean("external_player_default", false))
                 .putString("theme_mode", backup.optString("theme_mode", "dark"))
                 .apply()
@@ -569,7 +575,16 @@ fun SalarTvApp() {
                     Text("صدای پخش", color = Gold, fontSize = 12.sp)
                     Slider(value = player.volume, onValueChange = { player.volume = it }, valueRange = 0f..1f)
                     LaunchedEffect(selected!!.url, useExternalPlayer) {
-                        val streamAddress = selected!!.url
+                        val storedAddress = selected!!.url
+                        val isXtreamSource = XtreamCredentialVault.isStoredUrl(storedAddress)
+                        val streamAddress = runCatching { XtreamCredentialVault.resolve(context, storedAddress) }.getOrElse {
+                            android.widget.Toast.makeText(context, "اطلاعات ورود این منبع در این دستگاه موجود نیست؛ سرور را دوباره اضافه کنید.", android.widget.Toast.LENGTH_LONG).show()
+                            player.pause()
+                            return@LaunchedEffect
+                        }
+                        if (useExternalPlayer && isXtreamSource) {
+                            android.widget.Toast.makeText(context, "برای محافظت از اطلاعات ورود، منابع Xtream فقط در پخش‌کننده داخلی اجرا می‌شوند.", android.widget.Toast.LENGTH_LONG).show()
+                        }
                         val officialWebPage = streamAddress.contains("ott.iranintl.com", ignoreCase = true) ||
                             streamAddress.contains("iranintl.com/live", ignoreCase = true)
                         if (officialWebPage) {
@@ -580,7 +595,7 @@ fun SalarTvApp() {
                             }.onFailure {
                                 android.widget.Toast.makeText(context, "صفحه رسمی پخش ایران اینترنشنال باز نشد.", android.widget.Toast.LENGTH_LONG).show()
                             }
-                        } else if (useExternalPlayer) {
+                        } else if (useExternalPlayer && !isXtreamSource) {
                             player.pause()
                             runCatching {
                                 val mimeType = if (selected!!.kind == "رادیو") "audio/*" else "application/vnd.apple.mpegurl"
@@ -856,7 +871,7 @@ fun SalarTvApp() {
                         val startMillis = start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                         val minutes = duration.toIntOrNull()?.takeIf { it in 0..10080 } ?: error("مدت ضبط را بین صفر تا ۱۰٬۰۸۰ دقیقه وارد کنید؛ صفر یعنی ضبط تا توقف دستی.")
                         require(title.isNotBlank()) { "نام برنامه را وارد کنید." }
-                        require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
+                        require(XtreamCredentialVault.isSupportedStoredUrl(streamUrl.trim())) { "لینک معتبر HLS یا منبع ذخیره‌شده وارد کنید." }
                         require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
                         val requestCode = (title.trim() + streamUrl.trim() + startMillis).hashCode()
                         val alarmIntent = Intent(context, RecordingAlarmReceiver::class.java).apply {
@@ -1057,6 +1072,7 @@ fun ChannelList(
 
 @Composable
 fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: () -> Unit) {
+    val context = LocalContext.current
     var mode by remember { mutableStateOf("url") }
     var name by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("") }
@@ -1105,11 +1121,12 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
                 OutlinedTextField(server, { server = it }, label = { Text("آدرس سرور (با پورت در صورت نیاز)") }, placeholder = { Text("http://example.com:8080") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
                 OutlinedTextField(username, { username = it }, label = { Text("نام کاربری") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                 OutlinedTextField(password, { password = it }, label = { Text("رمز عبور") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                Text("اطلاعات ورود برای دریافت فهرست استفاده می‌شود و در تنظیمات ذخیره نمی‌شود.", color = MutedText, fontSize = 11.sp)
+                Text("نام کاربری و رمز به‌صورت رمزنگاری‌شده روی همین دستگاه نگهداری می‌شوند و داخل لینک شبکه یا فایل پشتیبان قرار نمی‌گیرند.", color = MutedText, fontSize = 11.sp)
                 Button(enabled = !busy, onClick = {
                     val base = server.trim().trimEnd('/')
                     if (!(base.startsWith("http://") || base.startsWith("https://")) || username.isBlank() || password.isBlank()) status = "آدرس سرور، نام کاربری و رمز عبور را کامل وارد کنید."
                     else {
+                        val sourceId = java.util.UUID.randomUUID().toString()
                         busy = true; status = "در حال اتصال و دریافت شبکه‌های زنده…"
                         scope.launch {
                             val result = withContext(Dispatchers.IO) { runCatching {
@@ -1135,14 +1152,22 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
                                     val id = item.optString("stream_id")
                                     if (id.isBlank() || id == "null") continue
                                     val streamName = item.optString("name", "شبکه $id")
-                                    val streamUrl = "$base/live/$u/$p/$id.ts"
+                                    val streamUrl = XtreamCredentialVault.buildStoredUrl(sourceId, id)
                                     imported.add(Channel(streamName, streamUrl, country, "تلویزیون", logoUrl = item.optString("stream_icon"), groupTitle = categoryNames[item.optString("category_id")].orEmpty().ifBlank { "سرور IPTV" }))
                                 }
                                 if (imported.isEmpty()) error("فهرست شبکه زنده‌ای از سرور دریافت نشد.")
                                 imported
                             } }
-                            result.onSuccess { imported -> imported.forEach(onAdd); status = "تعداد ${imported.size} شبکه زنده دریافت و اضافه شد." }
-                            result.onFailure { err -> status = "اتصال ناموفق: ${err.message ?: "خطای ناشناخته"}" }
+                            result.onSuccess { imported ->
+                                runCatching { XtreamCredentialVault.store(context, sourceId, base, username.trim(), password) }
+                                    .onSuccess {
+                                        imported.forEach(onAdd)
+                                        password = ""
+                                        status = "تعداد ${imported.size} شبکه زنده دریافت و با ذخیره امن اطلاعات ورود اضافه شد."
+                                    }
+                                    .onFailure { err -> status = "ذخیره امن اطلاعات ورود ممکن نشد؛ هیچ شبکه‌ای اضافه نشد: " + (err.message ?: "خطای امنیتی") }
+                            }
+                            result.onFailure { err -> status = "اتصال ناموفق: " + (err.message ?: "خطای ناشناخته") }
                             busy = false
                         }
                     }
