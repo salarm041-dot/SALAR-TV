@@ -88,6 +88,7 @@ jobs:
       - name: Apply corrected app source and recording module
         run: |
           install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
+          install -D patch/MultiViewPage.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MultiViewPage.kt"
           install -D patch/HlsRecorderService.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HlsRecorderService.kt"
           install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
           install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
