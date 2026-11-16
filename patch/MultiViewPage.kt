@@ -24,6 +24,12 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 
+private val MultiGold = Color(0xFFD6AD62)
+private val MultiPanel = Color(0xFF171B26)
+private val MultiTextMain = Color(0xFFF5F1E8)
+private val MultiSecondaryText = Color.LightGray
+private val MultiMutedText = Color.Gray
+
 @Composable
 fun MultiViewPage(channels: List<Channel>) {
     val context = LocalContext.current
@@ -60,13 +66,13 @@ fun MultiViewPage(channels: List<Channel>) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("پخش هم‌زمان شبکه‌ها", color = Gold, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+                Text("پخش هم‌زمان شبکه‌ها", color = MultiGold, fontSize = 19.sp, fontWeight = FontWeight.Bold)
                 Text("هر پنجره پخش‌کننده مستقل دارد؛ صدای یک پنجره در هر لحظه فعال است.",
-                    color = SecondaryText, fontSize = 11.sp)
+                    color = MultiSecondaryText, fontSize = 11.sp)
             }
             if (fullScreenSlot >= 0) {
                 IconButton(onClick = { fullScreenSlot = -1 }) {
-                    Icon(Icons.Default.ArrowBack, "بازگشت", tint = Gold)
+                    Icon(Icons.Default.ArrowBack, "بازگشت", tint = MultiGold)
                 }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -109,7 +115,7 @@ fun MultiViewPage(channels: List<Channel>) {
         }
         Text(
             "اجرای هم‌زمان ۴ جریان به اینترنت و توان پردازشی گوشی وابسته است؛ بعضی منابع نیز اتصال هم‌زمان را محدود می‌کنند.",
-            color = MutedText, fontSize = 10.sp
+            color = MultiMutedText, fontSize = 10.sp
         )
     }
 
@@ -138,10 +144,10 @@ fun MultiViewPage(channels: List<Channel>) {
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
-                                    Text(channel.name, color = TextMain, fontWeight = FontWeight.SemiBold)
+                                    Text(channel.name, color = MultiTextMain, fontWeight = FontWeight.SemiBold)
                                     Text(
                                         listOf(channel.country, channel.groupTitle).filter { it.isNotBlank() }.joinToString(" • "),
-                                        color = MutedText, fontSize = 10.sp
+                                        color = MultiMutedText, fontSize = 10.sp
                                     )
                                 }
                             }
@@ -166,20 +172,20 @@ private fun MultiViewTile(
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier, shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Panel)) {
+        colors = CardDefaults.cardColors(containerColor = MultiPanel)) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(channel?.name ?: "پنجره ${slot + 1}", color = TextMain, fontSize = 11.sp,
+                Text(channel?.name ?: "پنجره ${slot + 1}", color = MultiTextMain, fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f), maxLines = 1)
                 IconButton(onClick = onAudio, modifier = Modifier.size(32.dp)) {
                     Icon(if (isAudioActive) Icons.Default.VolumeUp else Icons.Default.VolumeOff,
-                        contentDescription = "انتخاب صدای فعال", tint = if (isAudioActive) Gold else MutedText)
+                        contentDescription = "انتخاب صدای فعال", tint = if (isAudioActive) MultiGold else MultiMutedText)
                 }
                 IconButton(onClick = onFullscreen, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Default.Fullscreen, contentDescription = "تمام‌صفحه", tint = Gold)
+                    Icon(Icons.Default.Fullscreen, contentDescription = "تمام‌صفحه", tint = MultiGold)
                 }
             }
             Box(modifier = Modifier.fillMaxWidth().weight(1f).background(Color.Black),
@@ -195,7 +201,7 @@ private fun MultiViewTile(
                 }
             }
             TextButton(onClick = onChoose, modifier = Modifier.fillMaxWidth()) {
-                Text(if (channel == null) "انتخاب شبکه" else "تغییر شبکه", color = Gold, fontSize = 11.sp)
+                Text(if (channel == null) "انتخاب شبکه" else "تغییر شبکه", color = MultiGold, fontSize = 11.sp)
             }
         }
     }
