@@ -17,6 +17,7 @@ SOURCES = [
     ROOT / "patch/irib-national-candidates.m3u",
     ROOT / "patch/turkey-candidates.m3u",
     ROOT / "patch/radio-directory-candidates.m3u",
+    ROOT / "patch/discovered-country-candidates.m3u",
 ]
 
 
@@ -62,6 +63,7 @@ def main():
         SOURCES[4]: REPORTS / "irib-national-candidates.json",
         SOURCES[5]: REPORTS / "turkey-candidates.json",
         SOURCES[6]: REPORTS / "radio-directory-candidates.json",
+        SOURCES[7]: REPORTS / "discovered-country-candidates.json",
     }
     if not MAIN.exists():
         raise SystemExit(f"Main playlist not found: {MAIN}")
