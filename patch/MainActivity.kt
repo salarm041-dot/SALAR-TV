@@ -413,7 +413,7 @@ fun SalarTvApp() {
                 .putString("theme_mode", backup.optString("theme_mode", "dark"))
                 .apply()
             themeMode = backup.optString("theme_mode", "dark")
-            android.widget.Toast.makeText(context, "شبکه‌ها و تنظیمات پشتیبان بازیابی شدند.", android.widget.Toast.LENGTH_LONG).show()
+            android.widget.Toast.makeText(context, "شبکه‌ها و تنظیمات بازیابی شدند. برای استفاده از سرورهای Xtream در دستگاه جدید، اطلاعات ورود را دوباره وارد کنید.", android.widget.Toast.LENGTH_LONG).show()
         }.onFailure { error ->
             android.widget.Toast.makeText(context, error.message ?: "بازیابی پشتیبان ناموفق بود.", android.widget.Toast.LENGTH_LONG).show()
         }
