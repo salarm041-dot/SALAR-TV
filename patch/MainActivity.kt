@@ -618,11 +618,13 @@ fun SalarTvApp() {
                         onRecordings = { page = "ضبط‌ها" },
                         onScheduledList = { page = "زمان‌بندی‌ها" },
                         onLiveDubbing = { page = "دوبله هوشمند زنده" },
+                        onMultiView = { page = "پخش همزمان" },
                         onEpg = { page = "راهنمای برنامه‌ها" },
                         onSettings = { page = "تنظیمات" },
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
                     )
+                    "پخش همزمان" -> MultiViewPage(channels)
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "راهنمای برنامه‌ها" -> EpgPage(channels)
                     "تنظیمات" -> SettingsPage(
@@ -1155,11 +1157,12 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
-             onRecordings: () -> Unit, onScheduledList: () -> Unit, onLiveDubbing: () -> Unit, onEpg: () -> Unit, onSettings: () -> Unit,
+             onRecordings: () -> Unit, onScheduledList: () -> Unit, onLiveDubbing: () -> Unit, onMultiView: () -> Unit, onEpg: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
+        MoreButton("پخش هم‌زمان ۲ یا ۴ شبکه", Icons.Default.Tv, onMultiView)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("راهنمای برنامه‌ها (EPG)", Icons.Default.CalendarMonth, onEpg)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
