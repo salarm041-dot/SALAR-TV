@@ -234,7 +234,8 @@ fun SalarTvApp() {
         if (MutedText != nextMuted) MutedText = nextMuted
     }
 
-    val aiAudioCapture = remember { SalarAiAudioCapture() }\n    val player = remember { ExoPlayer.Builder(context, SalarAiRenderersFactory(aiAudioCapture)).build() }
+    val aiAudioCapture = remember { SalarAiAudioCapture() }
+    val player = remember { ExoPlayer.Builder(context, SalarAiRenderersFactory(context, aiAudioCapture)).build() }
     var selectedQuality by remember { mutableStateOf(prefs.getString("player_quality", "خودکار") ?: "خودکار") }
     var qualityMenuExpanded by remember { mutableStateOf(false) }
     LaunchedEffect(selectedQuality) {
