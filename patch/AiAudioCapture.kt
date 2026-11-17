@@ -1,6 +1,7 @@
 package com.salar.tv
 
 import android.content.Context
+import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.audio.AudioSink
@@ -11,13 +12,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
-/**
- * Bounded, non-blocking PCM tap for the primary Media3 player.
- *
- * The audio render thread only copies PCM into a small queue. Network I/O,
- * resampling and AI work must happen on a separate worker consuming pollChunk().
- * Capture is opt-in and disabled by default.
- */
+/** Raw PCM frame copied from the primary Media3 audio sink. */
 data class SalarPcmChunk(
     val pcm: ByteArray,
     val sampleRateHz: Int,
@@ -25,6 +20,11 @@ data class SalarPcmChunk(
     val encoding: Int
 )
 
+/**
+ * Bounded, non-blocking PCM tap. The render thread only copies complete frames;
+ * conversion, network I/O and AI work must run on a separate consumer thread.
+ * Capture is opt-in and disabled by default.
+ */
 @OptIn(UnstableApi::class)
 class SalarAiAudioCapture(
     private val queueCapacity: Int = 32,
@@ -54,16 +54,20 @@ class SalarAiAudioCapture(
             val pcmEncoding = encoding
             if (rate <= 0 || channels <= 0) return
 
+            // Keep PCM16 chunks frame-aligned for safe multi-channel decoding.
+            val frameSize = if (pcmEncoding == C.ENCODING_PCM_16BIT) channels * 2 else 1
             val source = buffer.duplicate()
-            while (source.hasRemaining()) {
-                val count = minOf(source.remaining(), maxChunkBytes)
+            while (source.remaining() >= frameSize) {
+                val available = minOf(source.remaining(), maxChunkBytes)
+                val count = available - (available % frameSize)
+                if (count <= 0) break
                 val bytes = ByteArray(count)
                 source.get(bytes)
                 val chunk = SalarPcmChunk(bytes, rate, channels, pcmEncoding)
                 if (!queue.offer(chunk)) {
                     queue.poll()
+                    dropped.incrementAndGet()
                     if (!queue.offer(chunk)) dropped.incrementAndGet()
-                    else dropped.incrementAndGet()
                 }
             }
         }
