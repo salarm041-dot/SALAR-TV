@@ -96,6 +96,8 @@ jobs:
           echo "Installed independent multi-view playback screen"
           install -D patch/HlsRecorderService.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HlsRecorderService.kt"
           install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
+          install -D patch/AiAudioCapture.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/AiAudioCapture.kt"
+          echo "Installed opt-in bounded AI PCM capture processor"
           install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
           install -D patch/ic_salar_tv.xml "$PROJECT_DIR/app/src/main/res/drawable/ic_salar_tv.xml"
           install -D patch/ic_launcher_fallback.xml "$PROJECT_DIR/app/src/main/res/mipmap/ic_launcher.xml"
