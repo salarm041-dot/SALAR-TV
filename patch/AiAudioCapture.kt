@@ -93,6 +93,7 @@ class SalarAiAudioCapture(
 /** Installs the PCM tap in the primary player's audio sink without changing video rendering. */
 @OptIn(UnstableApi::class)
 class SalarAiRenderersFactory(
+    context: Context,
     private val capture: SalarAiAudioCapture
 ) : DefaultRenderersFactory(context) {
     override fun buildAudioSink(
