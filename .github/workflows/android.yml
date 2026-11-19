@@ -98,6 +98,8 @@ jobs:
           install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
           install -D patch/AiAudioCapture.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/AiAudioCapture.kt"
           install -D patch/SalarPcm16MonoResampler.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/SalarPcm16MonoResampler.kt"
+          install -D patch/SalarRealtimeTranscriptionClient.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/SalarRealtimeTranscriptionClient.kt"
+          echo "Installed Realtime transcription WebSocket client"
           echo "Installed bounded AI PCM capture and PCM16 mono 24kHz conversion"
           install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
           install -D patch/ic_salar_tv.xml "$PROJECT_DIR/app/src/main/res/drawable/ic_salar_tv.xml"
@@ -107,6 +109,15 @@ jobs:
           import sys, re
           from pathlib import Path
           p = Path(sys.argv[1])
+          app_gradle = Path(sys.argv[1]).parent / "build.gradle.kts"
+          gradle = app_gradle.read_text()
+          okhttp = '    implementation("com.squareup.okhttp3:okhttp:4.12.0")'
+          if okhttp not in gradle:
+              anchor = '    implementation("androidx.documentfile:documentfile:1.0.1")'
+              if anchor not in gradle:
+                  raise SystemExit("Could not find safe dependency insertion point for OkHttp")
+              gradle = gradle.replace(anchor, anchor + "\\n" + okhttp)
+              app_gradle.write_text(gradle)
           s = p.read_text()
           s = s.replace('<uses-permission android:name="android.permission.INTERNET" />',
               '<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
