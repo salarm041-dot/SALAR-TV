@@ -26,6 +26,9 @@ class SalarLiveSubtitleEngine(
     @Volatile private var transport: SalarRealtimeTranscriptionClient? = null
     private var worker: Thread? = null
     private val resampler = SalarPcm16MonoResampler()
+    private val translationExecutor = java.util.concurrent.Executors.newSingleThreadExecutor { task ->
+        Thread(task, "Salar-Subtitle-Translate").apply { isDaemon = true }
+    }
 
     fun start() {
         if (!running.compareAndSet(false, true)) return
@@ -52,7 +55,7 @@ class SalarLiveSubtitleEngine(
                 onPartialTranscript = { _, _ -> },
                 onFinalTranscript = { _, transcript ->
                     if (running.get() && transcript.isNotBlank()) {
-                        Thread({
+                        translationExecutor.execute {
                             try {
                                 val translated = postJson("$base/v1/live/translate-subtitle",
                                     JSONObject()
@@ -64,7 +67,7 @@ class SalarLiveSubtitleEngine(
                             } catch (e: Exception) {
                                 if (running.get()) onError("ترجمهٔ زیرنویس: ${e.message ?: "خطای نامشخص"}")
                             }
-                        }, "Salar-Subtitle-Translate").apply { isDaemon = true; start() }
+                        }
                     }
                 },
                 onState = { state ->
@@ -123,6 +126,7 @@ class SalarLiveSubtitleEngine(
             capture.stop()
             transport?.close()
             transport = null
+            translationExecutor.shutdownNow()
             resampler.reset()
             if (running.get()) onStatus("زیرنویس متوقف شد")
         }
