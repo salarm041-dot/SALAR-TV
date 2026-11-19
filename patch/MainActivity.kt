@@ -16,6 +16,8 @@ import java.net.URLEncoder
 import android.app.Activity
 import java.io.File
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.Build
 import android.app.PictureInPictureParams
 import android.util.Rational
@@ -235,6 +237,33 @@ fun SalarTvApp() {
     }
 
     val aiAudioCapture = remember { SalarAiAudioCapture() }
+    var liveSubtitleText by remember { mutableStateOf("") }
+    var liveSubtitleStatus by remember { mutableStateOf("آمادهٔ اتصال") }
+    var liveSubtitleEngine by remember { mutableStateOf<SalarLiveSubtitleEngine?>(null) }
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
+    fun startLiveSubtitle(brokerUrl: String) {
+        if (brokerUrl.isBlank()) {
+            liveSubtitleStatus = "ابتدا نشانی سرور هوش مصنوعی را وارد کنید"
+            return
+        }
+        liveSubtitleEngine?.stop()
+        liveSubtitleText = ""
+        val engine = SalarLiveSubtitleEngine(
+            capture = aiAudioCapture,
+            brokerBaseUrl = brokerUrl,
+            onPersianSubtitle = { text -> mainHandler.post { liveSubtitleText = text } },
+            onStatus = { status -> mainHandler.post { liveSubtitleStatus = status } },
+            onError = { error -> mainHandler.post { liveSubtitleStatus = "خطا: $error" } }
+        )
+        liveSubtitleEngine = engine
+        engine.start()
+    }
+    fun stopLiveSubtitle() {
+        liveSubtitleEngine?.stop()
+        liveSubtitleEngine = null
+        aiAudioCapture.stop()
+        liveSubtitleStatus = "زیرنویس متوقف شد"
+    }
     val player = remember { ExoPlayer.Builder(context, SalarAiRenderersFactory(context, aiAudioCapture)).build() }
     var selectedQuality by remember { mutableStateOf(prefs.getString("player_quality", "خودکار") ?: "خودکار") }
     var qualityMenuExpanded by remember { mutableStateOf(false) }
@@ -252,7 +281,7 @@ fun SalarTvApp() {
             .build()
         prefs.edit().putString("player_quality", selectedQuality).apply()
     }
-    DisposableEffect(Unit) { onDispose { player.release(); aiAudioCapture.clear() } }
+    DisposableEffect(Unit) { onDispose { liveSubtitleEngine?.stop(); player.release(); aiAudioCapture.clear() } }
 
     var selectedM3uName by remember { mutableStateOf("") }
     var refreshingChannels by remember { mutableStateOf(false) }
@@ -490,10 +519,25 @@ fun SalarTvApp() {
                             })
                     }
                     if (!useExternalPlayer) {
-                        AndroidView(
-                            factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
-                            modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
-                        )
+                        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
+                            AndroidView(
+                                factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            if (liveSubtitleText.isNotBlank()) {
+                                Text(
+                                    liveSubtitleText,
+                                    color = Color.White,
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    lineHeight = 24.sp,
+                                    modifier = Modifier.align(Alignment.BottomCenter)
+                                        .fillMaxWidth().padding(horizontal = 18.dp, vertical = 44.dp)
+                                        .background(Color.Black.copy(alpha = 0.78f), RoundedCornerShape(8.dp))
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                )
+                            }
+                        }
                         Box {
                             OutlinedButton(onClick = { qualityMenuExpanded = true }) {
                                 Icon(Icons.Default.HighQuality, contentDescription = null)
@@ -663,7 +707,12 @@ fun SalarTvApp() {
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
                     )
                     "پخش همزمان" -> MultiViewPage(channels)
-                    "دوبله هوشمند زنده" -> LiveDubbingPage()
+                    "دوبله هوشمند زنده" -> LiveDubbingPage(
+                        subtitleStatus = liveSubtitleStatus,
+                        currentSubtitle = liveSubtitleText,
+                        onStartSubtitle = { url -> startLiveSubtitle(url) },
+                        onStopSubtitle = { stopLiveSubtitle() }
+                    )
                     "راهنمای برنامه‌ها" -> EpgPage(channels)
                     "تنظیمات" -> SettingsPage(
                         themeMode = themeMode,
@@ -782,6 +831,19 @@ fun SalarTvApp() {
                     factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                     modifier = Modifier.fillMaxSize()
                 )
+                if (liveSubtitleText.isNotBlank()) {
+                    Text(
+                        liveSubtitleText,
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        lineHeight = 28.sp,
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                            .fillMaxWidth().padding(horizontal = 28.dp, vertical = 58.dp)
+                            .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(10.dp))
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                    )
+                }
                 Row(
                     Modifier.align(Alignment.TopEnd).padding(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -1259,10 +1321,16 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
 }
 
 @Composable
-fun LiveDubbingPage() {
+fun LiveDubbingPage(
+    subtitleStatus: String,
+    currentSubtitle: String,
+    onStartSubtitle: (String) -> Unit,
+    onStopSubtitle: () -> Unit
+) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var subtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", false)) }
+    var brokerUrl by remember { mutableStateOf(prefs.getString("ai_broker_url", "") ?: "") }
     var enabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
     var keepOriginal by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
     var voice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
@@ -1271,28 +1339,62 @@ fun LiveDubbingPage() {
         Text("مترجم و دوبلور هوشمند زنده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("وضعیت موتور هوش مصنوعی", color = Gold, fontWeight = FontWeight.Bold)
-                Text("هنوز به سرویس تشخیص گفتار، ترجمه و تولید صدای زنده متصل نشده است.",
-                    color = Color(0xFFFFCC80), fontSize = 12.sp)
-                Text("این صفحه تنظیمات قابلیت را نگه می‌دارد؛ دوبله واقعی پس از اتصال موتور پردازش صدا فعال می‌شود.",
-                    color = SecondaryText, fontSize = 12.sp)
+                Text("وضعیت زیرنویس زنده", color = Gold, fontWeight = FontWeight.Bold)
+                Text(subtitleStatus, color = if (subtitleStatus.startsWith("خطا")) Color(0xFFFF8A80) else SecondaryText, fontSize = 12.sp)
+                if (currentSubtitle.isNotBlank()) {
+                    Text("آخرین زیرنویس:", color = Gold, fontSize = 11.sp)
+                    Text(currentSubtitle, color = TextMain, fontSize = 14.sp)
+                }
             }
         }
+        Text("نشانی سرور هوش مصنوعی", color = Gold, fontWeight = FontWeight.Bold)
+        OutlinedTextField(
+            value = brokerUrl,
+            onValueChange = {
+                brokerUrl = it
+                prefs.edit().putString("ai_broker_url", it.trim()).apply()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            placeholder = { Text("https://your-ai-server.example") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            label = { Text("نشانی پایهٔ سرور (بدون مسیر API)") }
+        )
+        Text("این نشانی باید به سرور واسط SALAR TV با کلید API تنظیم‌شده روی میزبان اشاره کند؛ کلید اصلی را داخل برنامه وارد نکنید.",
+            color = MutedText, fontSize = 11.sp)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("زیرنویس هوشمند فارسی", color = TextMain)
-                Text("تشخیص گفتار و نمایش ترجمه؛ مستقل از صدای دوبله", color = MutedText, fontSize = 11.sp)
+                Text("صدای داخلی پخش‌کننده؛ بدون استفاده از میکروفون", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = subtitleEnabled, onCheckedChange = {
                 subtitleEnabled = it
                 prefs.edit().putBoolean("live_subtitle_enabled", it).apply()
+                if (it) onStartSubtitle(brokerUrl) else onStopSubtitle()
             })
         }
+        Button(
+            onClick = { if (subtitleEnabled) onStartSubtitle(brokerUrl) else {
+                subtitleEnabled = true
+                prefs.edit().putBoolean("live_subtitle_enabled", true).apply()
+                onStartSubtitle(brokerUrl)
+            } },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = brokerUrl.isNotBlank()
+        ) { Text("اتصال / تلاش دوباره برای زیرنویس") }
+        OutlinedButton(
+            onClick = {
+                subtitleEnabled = false
+                prefs.edit().putBoolean("live_subtitle_enabled", false).apply()
+                onStopSubtitle()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("توقف زیرنویس") }
         Divider(color = Gold.copy(alpha = 0.25f))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("دوبله هوشمند فارسی", color = TextMain)
-                Text("ترجمه صوتی؛ قابل استفاده مستقل یا همراه زیرنویس", color = MutedText, fontSize = 11.sp)
+                Text("ترجمهٔ صوتی؛ هنوز اتصال پخش صدای دوبله تکمیل نشده است", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = enabled, onCheckedChange = {
                 enabled = it
@@ -1323,11 +1425,10 @@ fun LiveDubbingPage() {
             volume = it
             prefs.edit().putFloat("live_dubbing_volume", it).apply()
         }, valueRange = 0f..1f)
-        Text("زبان‌های ورودی موردنظر: انگلیسی، ترکی استانبولی و ترکی آذربایجانی؛ خروجی فارسی.",
+        Text("زبان‌های ورودی: انگلیسی، ترکی استانبولی، ترکی آذربایجانی، عربی و فارسی؛ خروجی فارسی.",
             color = SecondaryText, fontSize = 12.sp)
     }
 }
-
 
 @Composable
 fun ScheduledRecordingsPage(
