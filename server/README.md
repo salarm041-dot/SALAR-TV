@@ -6,6 +6,7 @@ This small server keeps the permanent OpenAI API key off the Android APK and iss
 
 - `GET /health`
 - `POST /v1/live/subtitle-session`
+- `POST /v1/live/translate-subtitle`
 - `POST /v1/live/persian-dub-session`
 
 ### Source-language live captions
@@ -20,6 +21,33 @@ This small server keeps the permanent OpenAI API key off the Android APK and iss
 ```
 
 The Android client must connect to the Realtime transcription WebSocket using the returned short-lived secret and stream **24 kHz mono PCM16** audio. The dedicated transcription session intentionally omits `turn_detection`: `gpt-live-transcribe` does not support server VAD or semantic VAD. The client must commit audio turns itself when needed, and should handle both incremental `conversation.item.input_audio_transcription.delta` and final `conversation.item.input_audio_transcription.completed` events.
+
+
+### Translate a completed caption into Persian
+
+`POST /v1/live/translate-subtitle` accepts one completed source-language transcript and returns a Persian translation. Call it for completed speech turns rather than every partial transcription delta.
+
+Request:
+
+```json
+{
+  "text": "The broadcast transcript for one completed speech segment.",
+  "sourceLanguage": "en",
+  "installId": "non-secret-installation-id"
+}
+```
+
+Response:
+
+```json
+{
+  "translated_text": "ترجمهٔ فارسی جمله",
+  "source_language": "en",
+  "model": "gpt-4.1-mini"
+}
+```
+
+The endpoint rejects empty text and text longer than 2,500 characters. The permanent API key stays on the broker server. Translation latency and quality must be measured with real broadcast material before describing captions as live or production-ready.
 
 ### Persian live dubbing session
 
