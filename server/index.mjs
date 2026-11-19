@@ -95,6 +95,60 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+
+  if (req.method === "POST" && req.url === "/v1/live/translate-subtitle") {
+    if (!OPENAI_API_KEY) {
+      return send(res, 503, { error: "server_not_configured", message: "OPENAI_API_KEY is not configured on the server." });
+    }
+    try {
+      const body = await readJson(req);
+      const sourceText = typeof body.text === "string" ? body.text.trim() : "";
+      if (!sourceText || sourceText.length > 2500) {
+        return send(res, 400, { error: "invalid_text", message: "text must contain between 1 and 2500 characters." });
+      }
+      const sourceLanguage = typeof body.sourceLanguage === "string"
+        ? body.sourceLanguage.slice(0, 32)
+        : "unknown";
+      const safetyId = crypto.createHash("sha256")
+        .update(String(body.installId || "salar-tv-anonymous"))
+        .digest("hex");
+      const upstream = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${OPENAI_API_KEY}`,
+          "content-type": "application/json",
+          "OpenAI-Safety-Identifier": safetyId
+        },
+        body: JSON.stringify({
+          model: "gpt-4.1-mini",
+          instructions: "Translate the supplied broadcast transcript into natural, fluent Iranian Persian (Farsi). Return only the Persian translation, with no quotation marks, labels, explanations, or added information. Preserve names, numbers, dates, and technical terms. If the source text is already Persian, return it unchanged.",
+          input: `Source language: ${sourceLanguage}\nTranscript:\n${sourceText}`,
+          max_output_tokens: 1200
+        })
+      });
+      const result = await upstream.json();
+      if (!upstream.ok) {
+        return send(res, upstream.status, { error: "upstream_error", details: result });
+      }
+      const translatedText = (result.output || [])
+        .flatMap((item) => item.content || [])
+        .filter((item) => item.type === "output_text")
+        .map((item) => item.text || "")
+        .join("")
+        .trim();
+      if (!translatedText) {
+        return send(res, 502, { error: "empty_translation", message: "The translation service returned no text." });
+      }
+      return send(res, 200, {
+        translated_text: translatedText,
+        source_language: sourceLanguage,
+        model: "gpt-4.1-mini"
+      });
+    } catch (error) {
+      return send(res, 400, { error: "invalid_request", message: error.message });
+    }
+  }
+
   if (req.method !== "POST" || req.url !== "/v1/live/subtitle-session") {
     return send(res, 404, { error: "not_found" });
   }
