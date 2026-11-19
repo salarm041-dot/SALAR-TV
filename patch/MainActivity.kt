@@ -242,6 +242,14 @@ fun SalarTvApp() {
     var liveSubtitleEngine by remember { mutableStateOf<SalarLiveSubtitleEngine?>(null) }
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
     fun startLiveSubtitle(brokerUrl: String) {
+        if (useExternalPlayer) {
+            liveSubtitleStatus = "برای دریافت صدای شبکه، پخش‌کنندهٔ داخلی را انتخاب کنید"
+            return
+        }
+        if (selected == null) {
+            liveSubtitleStatus = "ابتدا یک شبکه را در پخش‌کنندهٔ داخلی اجرا کنید"
+            return
+        }
         if (brokerUrl.isBlank()) {
             liveSubtitleStatus = "ابتدا نشانی سرور هوش مصنوعی را وارد کنید"
             return
@@ -262,6 +270,7 @@ fun SalarTvApp() {
         liveSubtitleEngine?.stop()
         liveSubtitleEngine = null
         aiAudioCapture.stop()
+        liveSubtitleText = ""
         liveSubtitleStatus = "زیرنویس متوقف شد"
     }
     val player = remember { ExoPlayer.Builder(context, SalarAiRenderersFactory(context, aiAudioCapture)).build() }
