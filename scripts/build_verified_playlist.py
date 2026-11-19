@@ -23,7 +23,8 @@ SOURCES = [
 
 def read_report(path: Path) -> set[str]:
     if not path.exists():
-        raise SystemExit(f"Missing deep-validation report: {path}")
+        print(f"Skipping candidate group without completed deep-validation report: {path.name}")
+        return set()
     data = json.loads(path.read_text(encoding="utf-8"))
     return {
         row["url"]
