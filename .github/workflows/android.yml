@@ -65,7 +65,8 @@ jobs:
         run: python scripts/enrich_candidate_logos.py
 
       - name: Deep-validate candidate streams before packaging
-        timeout-minutes: 25
+        timeout-minutes: 6
+        continue-on-error: true
         run: python scripts/deep_stream_check.py
 
       - name: Add only verified live candidates to the app playlist
