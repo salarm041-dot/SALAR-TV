@@ -113,7 +113,7 @@ jobs:
           import sys, re
           from pathlib import Path
           p = Path(sys.argv[1])
-          app_gradle = Path(sys.argv[1]).parent / "build.gradle.kts"
+          app_gradle = Path(sys.argv[1]).parents[2] / "build.gradle.kts"
           gradle = app_gradle.read_text()
           okhttp = '    implementation("com.squareup.okhttp3:okhttp:4.12.0")'
           if okhttp not in gradle:
