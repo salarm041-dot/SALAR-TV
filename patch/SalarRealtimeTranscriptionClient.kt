@@ -8,6 +8,7 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
+import java.util.ArrayDeque
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -28,6 +29,9 @@ class SalarRealtimeTranscriptionClient(
         .build()
     private val closed = AtomicBoolean(false)
     @Volatile private var socket: WebSocket? = null
+    private val transcriptLock = Any()
+    private val committedItems = ArrayDeque<String>()
+    private val completedItems = HashMap<String, String>()
 
     fun connect() {
         if (clientSecret.isBlank()) {
@@ -58,11 +62,38 @@ class SalarRealtimeTranscriptionClient(
                                 event.optString("delta")
                             )
                         }
+                        "input_audio_buffer.committed" -> {
+                            val itemId = event.optString("item_id")
+                            if (itemId.isNotBlank()) {
+                                val ready = synchronized(transcriptLock) {
+                                    committedItems.addLast(itemId)
+                                    drainCompletedInOrder()
+                                }
+                                ready.forEach { onFinalTranscript(it.first, it.second) }
+                            }
+                        }
                         "conversation.item.input_audio_transcription.completed" -> {
-                            onFinalTranscript(
-                                event.optString("item_id"),
-                                event.optString("transcript")
-                            )
+                            val itemId = event.optString("item_id")
+                            val transcript = event.optString("transcript")
+                            if (itemId.isNotBlank()) {
+                                val ready = synchronized(transcriptLock) {
+                                    completedItems[itemId] = transcript
+                                    drainCompletedInOrder()
+                                }
+                                ready.forEach { onFinalTranscript(it.first, it.second) }
+                            }
+                        }
+                        "conversation.item.input_audio_transcription.failed" -> {
+                            val itemId = event.optString("item_id")
+                            if (itemId.isNotBlank()) {
+                                val ready = synchronized(transcriptLock) {
+                                    completedItems[itemId] = ""
+                                    drainCompletedInOrder()
+                                }
+                                ready.forEach { onFinalTranscript(it.first, it.second) }
+                            }
+                            val detail = event.optJSONObject("error")?.optString("message")
+                            onError(detail?.takeIf { it.isNotBlank() } ?: "تشخیص گفتار برای یک بخش ناموفق بود")
                         }
                         "error" -> {
                             val error = event.optJSONObject("error")
@@ -83,6 +114,23 @@ class SalarRealtimeTranscriptionClient(
                 onState("disconnected")
             }
         })
+    }
+
+    /**
+     * Completed transcript events can arrive out of order. Release them only
+     * after the corresponding committed-item order is known and earlier items
+     * have completed, so Persian translation follows broadcast chronology.
+     */
+    private fun drainCompletedInOrder(): List<Pair<String, String>> {
+        val ready = ArrayList<Pair<String, String>>()
+        while (committedItems.isNotEmpty()) {
+            val nextId = committedItems.peekFirst()
+            if (!completedItems.containsKey(nextId)) break
+            committedItems.removeFirst()
+            val transcript = completedItems.remove(nextId).orEmpty()
+            if (transcript.isNotBlank()) ready.add(nextId to transcript)
+        }
+        return ready
     }
 
     /** Send already-resampled, mono, signed 16-bit little-endian PCM at 24 kHz. */
