@@ -118,7 +118,7 @@ jobs:
               anchor = '    implementation("androidx.documentfile:documentfile:1.0.1")'
               if anchor not in gradle:
                   raise SystemExit("Could not find safe dependency insertion point for OkHttp")
-              gradle = gradle.replace(anchor, anchor + "\\n" + okhttp)
+              gradle = gradle.replace(anchor, anchor + chr(10) + okhttp)
               app_gradle.write_text(gradle)
           s = p.read_text()
           s = s.replace('<uses-permission android:name="android.permission.INTERNET" />',
