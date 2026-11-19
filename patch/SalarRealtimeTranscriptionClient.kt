@@ -37,7 +37,6 @@ class SalarRealtimeTranscriptionClient(
         val request = Request.Builder()
             .url("wss://api.openai.com/v1/realtime?intent=transcription")
             .header("Authorization", "Bearer $clientSecret")
-            .header("OpenAI-Beta", "realtime=v1")
             .build()
 
         socket = http.newWebSocket(request, object : WebSocketListener() {
