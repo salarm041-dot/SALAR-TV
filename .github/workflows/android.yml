@@ -99,6 +99,8 @@ jobs:
           install -D patch/AiAudioCapture.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/AiAudioCapture.kt"
           install -D patch/SalarPcm16MonoResampler.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/SalarPcm16MonoResampler.kt"
           install -D patch/SalarRealtimeTranscriptionClient.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/SalarRealtimeTranscriptionClient.kt"
+          install -D patch/SalarLiveSubtitleEngine.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/SalarLiveSubtitleEngine.kt"
+          echo "Installed player-audio to Persian subtitle pipeline"
           echo "Installed Realtime transcription WebSocket client"
           echo "Installed bounded AI PCM capture and PCM16 mono 24kHz conversion"
           install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
