@@ -123,10 +123,18 @@ class HlsRecorderService : Service() {
                     catch (_: InterruptedException) { if (!isCurrent(myGeneration)) break }
                 }
                 if (isCurrent(myGeneration)) {
-                    if (saved <= 0 || output == null) finalStatus = "failed"
-                    updateNotification(if (saved > 0 && output != null) {
-                        "ضبط ذخیره شد: " + output!!.name
-                    } else "ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
+                    if (saved <= 0 || output == null) {
+                        finalStatus = "failed"
+                        updateNotification("ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
+                    } else {
+                        val publicUri = runCatching { publishRecordingToMovies(output!!) }.getOrNull()
+                        if (publicUri == null) {
+                            finalStatus = "completed_private"
+                            updateNotification("ضبط در حافظه داخلی برنامه ذخیره شد؛ انتشار در پوشه عمومی ناموفق بود: " + output!!.name)
+                        } else {
+                            updateNotification("ضبط در پوشه فیلم‌ها ذخیره شد: " + output!!.name)
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 finalStatus = "failed"
@@ -155,6 +163,43 @@ class HlsRecorderService : Service() {
         }
         if (isCurrent(myGeneration)) recordingWorker.start()
         return START_NOT_STICKY
+    }
+
+    /**
+     * Publish a completed recording to the user's public Movies/SALAR TV folder.
+     * MediaStore + RELATIVE_PATH is supported from Android 10 (API 29).
+     * Keep the app-private original as a recovery copy.
+     */
+    @android.annotation.TargetApi(29)
+    private fun publishRecordingToMovies(source: File): android.net.Uri {
+        require(android.os.Build.VERSION.SDK_INT >= 29) { "انتشار عمومی ضبط به Android 10 یا بالاتر نیاز دارد." }
+        val mime = when (source.extension.lowercase()) {
+            "mp4", "m4v" -> "video/mp4"
+            "mkv" -> "video/x-matroska"
+            else -> "video/mp2t"
+        }
+        val values = android.content.ContentValues().apply {
+            put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, source.name)
+            put(android.provider.MediaStore.MediaColumns.MIME_TYPE, mime)
+            put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_MOVIES + "/SALAR TV")
+            put(android.provider.MediaStore.MediaColumns.IS_PENDING, 1)
+        }
+        val resolver = contentResolver
+        val collection = android.provider.MediaStore.Video.Media.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val uri = resolver.insert(collection, values) ?: error("ساخت فایل عمومی در حافظه ناموفق بود.")
+        try {
+            resolver.openOutputStream(uri, "w")?.use { output ->
+                source.inputStream().use { input -> input.copyTo(output) }
+            } ?: error("مسیر نوشتن فایل عمومی در دسترس نیست.")
+            val ready = android.content.ContentValues().apply {
+                put(android.provider.MediaStore.MediaColumns.IS_PENDING, 0)
+            }
+            resolver.update(uri, ready, null, null)
+            return uri
+        } catch (error: Exception) {
+            runCatching { resolver.delete(uri, null, null) }
+            throw error
+        }
     }
 
     private fun updateScheduleStatus(scheduleId: Int, status: String) {
