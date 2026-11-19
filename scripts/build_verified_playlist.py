@@ -56,6 +56,9 @@ def parse_entries(path: Path):
 
 
 def main():
+    # The deep-validation step may be intentionally skipped; still create the
+    # report directory so an empty promotion report can be written safely.
+    REPORTS.mkdir(parents=True, exist_ok=True)
     report_files = {
         SOURCES[0]: REPORTS / "israel-arab-country-candidates.json",
         SOURCES[1]: REPORTS / "azerbaijan-candidates.json",
