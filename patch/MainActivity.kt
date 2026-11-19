@@ -290,7 +290,18 @@ fun SalarTvApp() {
             .build()
         prefs.edit().putString("player_quality", selectedQuality).apply()
     }
-    DisposableEffect(Unit) { onDispose { liveSubtitleEngine?.stop(); player.release(); aiAudioCapture.clear() } }
+    DisposableEffect(Unit) { onDispose { liveSubtitleEngine?.stop(); player.playWhenReady = false; player.stop(); player.clearMediaItems(); player.release(); aiAudioCapture.clear() } }
+    LaunchedEffect(selected?.url) {
+        if (selected == null) {
+            liveSubtitleEngine?.stop()
+            liveSubtitleEngine = null
+            aiAudioCapture.stop()
+            player.playWhenReady = false
+            player.pause()
+            player.stop()
+            player.clearMediaItems()
+        }
+    }
 
     var selectedM3uName by remember { mutableStateOf("") }
     var refreshingChannels by remember { mutableStateOf(false) }
@@ -506,7 +517,16 @@ fun SalarTvApp() {
         ) { padding ->
             Column(Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
                 if (selected != null) {
-                    TextButton(onClick = { selected = null }) { Icon(Icons.Default.ArrowBack, null); Text("بازگشت") }
+                    TextButton(onClick = {
+                        liveSubtitleEngine?.stop()
+                        liveSubtitleEngine = null
+                        aiAudioCapture.stop()
+                        player.playWhenReady = false
+                        player.pause()
+                        player.stop()
+                        player.clearMediaItems()
+                        selected = null
+                    }) { Icon(Icons.Default.ArrowBack, null); Text("بازگشت") }
                     Text(selected!!.name, color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Text("انتخاب پخش‌کننده", color = Gold, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -641,6 +661,14 @@ fun SalarTvApp() {
                     Text("صدای پخش", color = Gold, fontSize = 12.sp)
                     Slider(value = player.volume, onValueChange = { player.volume = it }, valueRange = 0f..1f)
                     LaunchedEffect(selected!!.url, useExternalPlayer) {
+                        // Always tear down the previous item before switching source/player mode.
+                        liveSubtitleEngine?.stop()
+                        liveSubtitleEngine = null
+                        aiAudioCapture.stop()
+                        player.playWhenReady = false
+                        player.pause()
+                        player.stop()
+                        player.clearMediaItems()
                         val storedAddress = selected!!.url
                         val isXtreamSource = XtreamCredentialVault.isStoredUrl(storedAddress)
                         val streamAddress = runCatching { XtreamCredentialVault.resolve(context, storedAddress) }.getOrElse {
@@ -654,7 +682,10 @@ fun SalarTvApp() {
                         val officialWebPage = streamAddress.contains("ott.iranintl.com", ignoreCase = true) ||
                             streamAddress.contains("iranintl.com/live", ignoreCase = true)
                         if (officialWebPage) {
+                            player.playWhenReady = false
                             player.pause()
+                            player.stop()
+                            player.clearMediaItems()
                             runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(streamAddress))
                                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -662,7 +693,10 @@ fun SalarTvApp() {
                                 android.widget.Toast.makeText(context, "صفحه رسمی پخش ایران اینترنشنال باز نشد.", android.widget.Toast.LENGTH_LONG).show()
                             }
                         } else if (useExternalPlayer && !isXtreamSource) {
+                            player.playWhenReady = false
                             player.pause()
+                            player.stop()
+                            player.clearMediaItems()
                             runCatching {
                                 val mimeType = if (selected!!.kind == "رادیو") "audio/*" else "application/vnd.apple.mpegurl"
                                 val viewIntent = Intent(Intent.ACTION_VIEW).apply {
@@ -1534,6 +1568,11 @@ fun MoreButton(label: String, icon: androidx.compose.ui.graphics.vector.ImageVec
 
 @Composable
 fun AboutPage() {
+    val context = LocalContext.current
+    val versionName = remember {
+        runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
+            .getOrNull() ?: "نامشخص"
+    }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Icon(Icons.Default.Tv, null, tint = Gold, modifier = Modifier.size(64.dp))
@@ -1541,7 +1580,7 @@ fun AboutPage() {
         Text("سازنده و مالک: سید سالار موسوی ملکی", color = TextMain)
         Text("ایمیل: Salar.m041@gmail.com", color = SecondaryText)
         Text("اینستاگرام: Salar_mousavi_41", color = SecondaryText)
-        Text("نسخه 1.3.0", color = MutedText)
+        Text("نسخه $versionName", color = MutedText)
     }
 }
 
