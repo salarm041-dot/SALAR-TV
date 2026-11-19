@@ -34,6 +34,7 @@ const server = http.createServer(async (req, res) => {
       persian_dubbing_ready: Boolean(OPENAI_API_KEY)
     });
   }
+
   if (req.method === "POST" && req.url === "/v1/live/persian-dub-session") {
     if (!OPENAI_API_KEY) {
       return send(res, 503, { error: "server_not_configured", message: "OPENAI_API_KEY is not configured on the server." });
@@ -124,8 +125,7 @@ const server = http.createServer(async (req, res) => {
           audio: {
             input: {
               format: { type: "audio/pcm", rate: 24000 },
-              transcription: { model: "gpt-live-transcribe", languages },
-              turn_detection: { type: "server_vad", threshold: 0.5, prefix_padding_ms: 300, silence_duration_ms: 500 }
+              transcription: { model: "gpt-live-transcribe", languages }
             }
           }
         }
@@ -140,7 +140,8 @@ const server = http.createServer(async (req, res) => {
       client_secret: result.value,
       expires_at: result.expires_at,
       session_id: result.session?.id,
-      model: "gpt-live-transcribe"
+      model: "gpt-live-transcribe",
+      input_format: "pcm_s16le_24000_mono"
     });
   } catch (error) {
     return send(res, 400, { error: "invalid_request", message: error.message });
