@@ -19,7 +19,7 @@ This small server keeps the permanent OpenAI API key off the Android APK and iss
 }
 ```
 
-The Android client must connect to the Realtime transcription WebSocket using the returned short-lived secret and stream **24 kHz mono PCM16** audio.
+The Android client must connect to the Realtime transcription WebSocket using the returned short-lived secret and stream **24 kHz mono PCM16** audio. The dedicated transcription session intentionally omits `turn_detection`: `gpt-live-transcribe` does not support server VAD or semantic VAD. The client must commit audio turns itself when needed, and should handle both incremental `conversation.item.input_audio_transcription.delta` and final `conversation.item.input_audio_transcription.completed` events.
 
 ### Persian live dubbing session
 
@@ -40,13 +40,15 @@ The dedicated `gpt-realtime-translate` model is not used for Persian output: its
 
 ## Remaining Android integration work
 
-The server endpoints are implemented, but live dubbing is **not yet an end-to-end app feature**. These Android components remain to be completed and tested:
+The server endpoints are implemented, but live captions and dubbing are **not yet end-to-end app features**. These Android components remain to be completed and tested:
 
 1. Capture decoded audio from SALAR TV's own Media3 player (not the phone microphone).
 2. Resample/downmix to 24 kHz mono PCM16 and stream continuously to the Realtime WebSocket.
-3. Receive translated audio and transcript events.
-4. Play translated PCM while ducking/mixing the original player audio.
-5. Display translated subtitle deltas and provide independent controls for subtitles, dubbed audio, original audio, and volume.
+3. Receive and order transcript deltas/final events by `item_id`.
+4. Translate source-language transcript text into Persian for subtitle display.
+5. Receive translated audio and transcript events for dubbing.
+6. Play translated PCM while ducking/mixing the original player audio.
+7. Display translated subtitle deltas and provide independent controls for subtitles, dubbed audio, original audio, and volume.
 
 The Android app also needs a configured broker URL. Do not put an OpenAI API key in the APK.
 
