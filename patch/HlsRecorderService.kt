@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
 
 class HlsRecorderService : Service() {
     companion object {
@@ -18,27 +19,23 @@ class HlsRecorderService : Service() {
         @Volatile var isRecordingActive: Boolean = false
             private set
     }
-    @Volatile private var running = false
-    @Volatile private var recordingGeneration = 0L
-    private var worker: Thread? = null
-    private var activeScheduleId: Int = Int.MIN_VALUE
+    private class RecordingTask(val id: String, val scheduleId: Int) {
+        @Volatile var running: Boolean = true
+        @Volatile var worker: Thread? = null
+    }
+    private val activeTasks = ConcurrentHashMap<String, RecordingTask>()
 
     private data class ByteRange(val length: Long, val offset: Long?)
     private data class MediaPart(val uri: String, val range: ByteRange? = null)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
-            synchronized(this) {
-                recordingGeneration += 1
-                running = false
-                isRecordingActive = false
-                updateScheduleStatus(activeScheduleId, "stopped")
-                activeScheduleId = Int.MIN_VALUE
-                worker?.interrupt()
-                worker = null
-            }
-            stopForeground(true)
-            stopSelf()
+            val requestedId = intent.getStringExtra("recording_id")
+            val targets = if (requestedId.isNullOrBlank()) activeTasks.values.toList() else listOfNotNull(activeTasks[requestedId])
+            targets.forEach { task -> task.running = false; updateScheduleStatus(task.scheduleId, "stopped"); task.worker?.interrupt() }
+            isRecordingActive = activeTasks.values.any { it.running }
+            if (!isRecordingActive) { stopForeground(true); stopSelf() }
+            else updateNotification("در حال ضبط هم‌زمان " + activeTasks.values.count { it.running } + " شبکه")
             return START_NOT_STICKY
         }
         val name = intent?.getStringExtra("name") ?: "SALAR TV"
@@ -52,16 +49,13 @@ class HlsRecorderService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        activeScheduleId = intent?.getIntExtra("schedule_id", Int.MIN_VALUE) ?: Int.MIN_VALUE
-        val myScheduleId = activeScheduleId
+        val myScheduleId = intent?.getIntExtra("schedule_id", Int.MIN_VALUE) ?: Int.MIN_VALUE
+        val recordingId = intent.getStringExtra("recording_id") ?: if (myScheduleId != Int.MIN_VALUE) "schedule:$myScheduleId" else "manual:" + storedStreamUrl.hashCode()
+        val task = RecordingTask(recordingId, myScheduleId)
+        if (activeTasks.putIfAbsent(recordingId, task) != null) { updateNotification("این منبع هم‌اکنون در حال ضبط است."); return START_NOT_STICKY }
+        isRecordingActive = true
         updateScheduleStatus(myScheduleId, "recording")
-        val myGeneration = synchronized(this) {
-            recordingGeneration += 1
-            worker?.interrupt()
-            running = true
-            isRecordingActive = true
-            recordingGeneration
-        }
+        updateNotification("در حال ضبط هم‌زمان " + activeTasks.size + " شبکه")
         val recordingWorker = Thread {
             val folder = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: filesDir
             if (!folder.exists()) folder.mkdirs()
@@ -73,7 +67,7 @@ class HlsRecorderService : Service() {
             var saved = 0L
             var finalStatus = "completed"
             try {
-                while (isCurrent(myGeneration) && (deadline == Long.MAX_VALUE || System.currentTimeMillis() < deadline)) {
+                while (isCurrent(recordingId) && (deadline == Long.MAX_VALUE || System.currentTimeMillis() < deadline)) {
                     val masterText = downloadText(streamUrl)
                     val mediaUrl = resolveMediaPlaylist(streamUrl, masterText)
                     val mediaText = if (mediaUrl == streamUrl) masterText else downloadText(mediaUrl)
@@ -142,24 +136,15 @@ class HlsRecorderService : Service() {
                     updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
                 }
             } finally {
-                val shouldStop = synchronized(this) {
-                    if (recordingGeneration == myGeneration) {
-                        running = false
-                        isRecordingActive = false
-                        worker = null
-                        true
-                    } else false
-                }
-                if (shouldStop) {
-                    updateScheduleStatus(myScheduleId, finalStatus)
-                    if (activeScheduleId == myScheduleId) activeScheduleId = Int.MIN_VALUE
-                    stopForeground(STOP_FOREGROUND_DETACH)
-                    stopSelfResult(startId)
-                }
+                activeTasks.remove(recordingId, task)
+                updateScheduleStatus(myScheduleId, if (task.running) finalStatus else "stopped")
+                isRecordingActive = activeTasks.values.any { it.running }
+                if (isRecordingActive) updateNotification("در حال ضبط هم‌زمان " + activeTasks.values.count { it.running } + " شبکه")
+                else { stopForeground(STOP_FOREGROUND_DETACH); stopSelfResult(startId) }
             }
         }
         synchronized(this) {
-            if (recordingGeneration == myGeneration) worker = recordingWorker
+            task.worker = recordingWorker
         }
         if (isCurrent(myGeneration)) recordingWorker.start()
         return START_NOT_STICKY
@@ -339,15 +324,12 @@ class HlsRecorderService : Service() {
         } finally { connection.disconnect() }
     }
 
-    private fun isCurrent(generation: Long): Boolean =
-        running && recordingGeneration == generation
+    private fun isCurrent(recordingId: String): Boolean = activeTasks[recordingId]?.running == true
 
     override fun onDestroy() {
-        recordingGeneration += 1
-        running = false
+        activeTasks.values.forEach { task -> task.running = false; task.worker?.interrupt() }
+        activeTasks.clear()
         isRecordingActive = false
-        worker?.interrupt()
-        worker = null
         super.onDestroy()
     }
 
