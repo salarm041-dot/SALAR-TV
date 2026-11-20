@@ -44,6 +44,15 @@ fun MultiViewPage(channels: List<Channel>) {
     var activeAudioSlot by remember { mutableIntStateOf(0) }
     var choosingSlot by remember { mutableIntStateOf(-1) }
     var fullScreenSlot by remember { mutableIntStateOf(-1) }
+    var channelSearchQuery by remember { mutableStateOf("") }
+    val matchingChannels = remember(tvChannels, channelSearchQuery) {
+        val query = channelSearchQuery.trim()
+        if (query.isBlank()) tvChannels else tvChannels.filter { channel ->
+            channel.name.contains(query, ignoreCase = true) ||
+                channel.country.contains(query, ignoreCase = true) ||
+                channel.groupTitle.contains(query, ignoreCase = true)
+        }
+    }
 
     DisposableEffect(players) {
         onDispose {
@@ -125,30 +134,53 @@ fun MultiViewPage(channels: List<Channel>) {
             onDismissRequest = { choosingSlot = -1 },
             title = { Text("انتخاب شبکه برای پنجره ${targetSlot + 1}") },
             text = {
-                if (tvChannels.isEmpty()) {
-                    Text("هنوز شبکه تلویزیونی در فهرست وجود ندارد.")
-                } else {
-                    LazyColumn(modifier = Modifier.heightIn(max = 440.dp)) {
-                        items(tvChannels, key = { it.url }) { channel ->
-                            TextButton(
-                                onClick = {
-                                    selectedChannels[targetSlot] = channel
-                                    val player = players[targetSlot]
-                                    player.stop()
-                                    player.clearMediaItems()
-                                    player.setMediaItem(MediaItem.fromUri(XtreamCredentialVault.resolve(context, channel.url)))
-                                    player.prepare()
-                                    player.playWhenReady = true
-                                    choosingSlot = -1
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    Text(channel.name, color = MultiTextMain, fontWeight = FontWeight.SemiBold)
-                                    Text(
-                                        listOf(channel.country, channel.groupTitle).filter { it.isNotBlank() }.joinToString(" • "),
-                                        color = MultiMutedText, fontSize = 10.sp
-                                    )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = channelSearchQuery,
+                        onValueChange = { channelSearchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        label = { Text("جستجوی نام شبکه، کشور یا دسته") }
+                    )
+                    if (tvChannels.isEmpty()) {
+                        Text("هنوز شبکه تلویزیونی در فهرست وجود ندارد.")
+                    } else if (matchingChannels.isEmpty()) {
+                        Text("شبکه‌ای با این عبارت پیدا نشد.")
+                    } else {
+                        LazyColumn(modifier = Modifier.heightIn(max = 380.dp)) {
+                            items(matchingChannels, key = { it.url }) { channel ->
+                                TextButton(
+                                    onClick = {
+                                        val duplicate = selectedChannels.indices.any { index ->
+                                            index != targetSlot && selectedChannels[index]?.url == channel.url
+                                        }
+                                        if (duplicate) {
+                                            android.widget.Toast.makeText(
+                                                context,
+                                                "این شبکه در پنجرهٔ دیگری انتخاب شده است.",
+                                                android.widget.Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            selectedChannels[targetSlot] = channel
+                                            val player = players[targetSlot]
+                                            player.stop()
+                                            player.clearMediaItems()
+                                            player.setMediaItem(MediaItem.fromUri(XtreamCredentialVault.resolve(context, channel.url)))
+                                            player.prepare()
+                                            player.playWhenReady = true
+                                            choosingSlot = -1
+                                            channelSearchQuery = ""
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        Text(channel.name, color = MultiTextMain, fontWeight = FontWeight.SemiBold)
+                                        Text(
+                                            listOf(channel.country, channel.groupTitle).filter { it.isNotBlank() }.joinToString(" • "),
+                                            color = MultiMutedText, fontSize = 10.sp
+                                        )
+                                    }
                                 }
                             }
                         }
