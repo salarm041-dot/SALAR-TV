@@ -44,6 +44,15 @@ fun MultiViewPage(channels: List<Channel>) {
     var activeAudioSlot by remember { mutableIntStateOf(0) }
     var choosingSlot by remember { mutableIntStateOf(-1) }
     var fullScreenSlot by remember { mutableIntStateOf(-1) }
+    var channelQuery by remember { mutableStateOf("") }
+    val filteredChannels = remember(tvChannels, channelQuery) {
+        val query = channelQuery.trim()
+        if (query.isEmpty()) tvChannels else tvChannels.filter { channel ->
+            channel.name.contains(query, ignoreCase = true) ||
+                channel.country.contains(query, ignoreCase = true) ||
+                channel.groupTitle.contains(query, ignoreCase = true)
+        }
+    }
 
     DisposableEffect(players) {
         onDispose {
@@ -128,28 +137,48 @@ fun MultiViewPage(channels: List<Channel>) {
                 if (tvChannels.isEmpty()) {
                     Text("هنوز شبکه تلویزیونی در فهرست وجود ندارد.")
                 } else {
-                    LazyColumn(modifier = Modifier.heightIn(max = 440.dp)) {
-                        items(tvChannels, key = { it.url }) { channel ->
-                            TextButton(
-                                onClick = {
-                                    selectedChannels[targetSlot] = channel
-                                    val player = players[targetSlot]
-                                    player.stop()
-                                    player.clearMediaItems()
-                                    player.setMediaItem(MediaItem.fromUri(XtreamCredentialVault.resolve(context, channel.url)))
-                                    player.prepare()
-                                    player.playWhenReady = true
-                                    choosingSlot = -1
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    Text(channel.name, color = MultiTextMain, fontWeight = FontWeight.SemiBold)
-                                    Text(
-                                        listOf(channel.country, channel.groupTitle).filter { it.isNotBlank() }.joinToString(" • "),
-                                        color = MultiMutedText, fontSize = 10.sp
-                                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = channelQuery,
+                            onValueChange = { channelQuery = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            label = { Text("جستجوی نام شبکه") },
+                            placeholder = { Text("نام فارسی یا انگلیسی، کشور یا دسته") }
+                        )
+                        LazyColumn(modifier = Modifier.heightIn(max = 390.dp)) {
+                            items(filteredChannels, key = { it.url }) { channel ->
+                                val alreadyInAnotherTile = selectedChannels.withIndex().any {
+                                    it.index != targetSlot && it.value?.url == channel.url
                                 }
+                                TextButton(
+                                    enabled = !alreadyInAnotherTile,
+                                    onClick = {
+                                        selectedChannels[targetSlot] = channel
+                                        val player = players[targetSlot]
+                                        player.stop()
+                                        player.clearMediaItems()
+                                        player.setMediaItem(MediaItem.fromUri(XtreamCredentialVault.resolve(context, channel.url)))
+                                        player.prepare()
+                                        player.playWhenReady = true
+                                        channelQuery = ""
+                                        choosingSlot = -1
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        Text(channel.name, color = if (alreadyInAnotherTile) MultiMutedText else MultiTextMain,
+                                            fontWeight = FontWeight.SemiBold)
+                                        Text(
+                                            if (alreadyInAnotherTile) "این شبکه در پنجره دیگری انتخاب شده است"
+                                            else listOf(channel.country, channel.groupTitle).filter { it.isNotBlank() }.joinToString(" • "),
+                                            color = MultiMutedText, fontSize = 10.sp
+                                        )
+                                    }
+                                }
+                            }
+                            if (filteredChannels.isEmpty()) {
+                                item { Text("شبکه‌ای با این عبارت پیدا نشد.", color = MultiMutedText) }
                             }
                         }
                     }
