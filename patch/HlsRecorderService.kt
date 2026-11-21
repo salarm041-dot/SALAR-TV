@@ -149,18 +149,19 @@ class HlsRecorderService : Service() {
                     updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
                 }
             } finally {
-                val stopId = synchronized(this) {
+                synchronized(this) {
                     activeTasks.remove(recordingId, task)
                     activeRecordingIds.remove(recordingId)
                     updateScheduleStatus(myScheduleId, if (task.running) finalStatus else "stopped")
                     isRecordingActive = activeTasks.values.any { it.running }
-                    if (isRecordingActive) null else latestStartId
-                }
-                if (stopId == null) {
-                    updateNotification("در حال ضبط هم‌زمان " + activeTasks.values.count { it.running } + " شبکه")
-                } else {
-                    stopForeground(STOP_FOREGROUND_DETACH)
-                    stopSelfResult(stopId)
+                    if (isRecordingActive) {
+                        updateNotification("در حال ضبط هم‌زمان " + activeTasks.values.count { it.running } + " شبکه")
+                    } else {
+                        // Keep the empty-check and foreground teardown atomic with onStartCommand.
+                        // A new recording cannot slip in between stopForeground and stopSelfResult.
+                        stopForeground(STOP_FOREGROUND_DETACH)
+                        stopSelfResult(latestStartId)
+                    }
                 }
             }
         }
