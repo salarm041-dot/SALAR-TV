@@ -137,7 +137,7 @@ jobs:
           if "android:configChanges=" not in tag:
               tag = tag[:-1] + ' android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">'
           s = s[:match.start()] + tag + s[match.end():]
-          provider = '        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider_paths" /></provider>\\n    </application>'
+          provider = '        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider_paths" /></provider>\n    </application>'
           if "androidx.core.content.FileProvider" not in s:
               s = s.replace('    </application>', provider)
           p.write_text(s)
