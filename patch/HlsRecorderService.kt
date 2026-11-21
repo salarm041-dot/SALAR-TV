@@ -18,6 +18,8 @@ class HlsRecorderService : Service() {
         const val ACTION_STOP = "com.salar.tv.action.STOP_RECORDING"
         @Volatile var isRecordingActive: Boolean = false
             private set
+        val activeRecordingIds: MutableSet<String> = ConcurrentHashMap.newKeySet<String>()
+        fun manualRecordingId(url: String): String = "manual:" + url.hashCode()
     }
     private class RecordingTask(val id: String, val scheduleId: Int) {
         @Volatile var running: Boolean = true
@@ -52,7 +54,9 @@ class HlsRecorderService : Service() {
         val myScheduleId = intent?.getIntExtra("schedule_id", Int.MIN_VALUE) ?: Int.MIN_VALUE
         val recordingId = intent.getStringExtra("recording_id") ?: if (myScheduleId != Int.MIN_VALUE) "schedule:$myScheduleId" else "manual:" + storedStreamUrl.hashCode()
         val task = RecordingTask(recordingId, myScheduleId)
+        if (activeTasks.size >= 2) { updateNotification("در این نسخه حداکثر دو شبکه را هم‌زمان ضبط کنید."); return START_NOT_STICKY }
         if (activeTasks.putIfAbsent(recordingId, task) != null) { updateNotification("این منبع هم‌اکنون در حال ضبط است."); return START_NOT_STICKY }
+        activeRecordingIds.add(recordingId)
         isRecordingActive = true
         updateScheduleStatus(myScheduleId, "recording")
         updateNotification("در حال ضبط هم‌زمان " + activeTasks.size + " شبکه")
@@ -137,6 +141,7 @@ class HlsRecorderService : Service() {
                 }
             } finally {
                 activeTasks.remove(recordingId, task)
+                activeRecordingIds.remove(recordingId)
                 updateScheduleStatus(myScheduleId, if (task.running) finalStatus else "stopped")
                 isRecordingActive = activeTasks.values.any { it.running }
                 if (isRecordingActive) updateNotification("در حال ضبط هم‌زمان " + activeTasks.values.count { it.running } + " شبکه")
