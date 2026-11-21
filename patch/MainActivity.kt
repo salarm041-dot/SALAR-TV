@@ -175,10 +175,11 @@ fun SalarTvApp() {
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
     var isRecording by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(selected) {
         while (true) {
-            isRecording = HlsRecorderService.isRecordingActive
-            delay(1000)
+            val selectedId = selected?.let { HlsRecorderService.manualRecordingId(it.url) }
+            isRecording = selectedId != null && selectedId in HlsRecorderService.activeRecordingIds
+            delay(500)
         }
     }
     var showRecordingOptions by remember { mutableStateOf(false) }
@@ -613,7 +614,10 @@ fun SalarTvApp() {
                                 onClick = {
                                     val activity = context as? Activity
                                     if (isRecording) {
-                                        activity?.startService(Intent(context, HlsRecorderService::class.java).setAction(HlsRecorderService.ACTION_STOP))
+                                        val recordingId = HlsRecorderService.manualRecordingId(selected!!.url)
+                                        activity?.startService(Intent(context, HlsRecorderService::class.java)
+                                            .setAction(HlsRecorderService.ACTION_STOP)
+                                            .putExtra("recording_id", recordingId))
                                         isRecording = false
                                     } else if (selected!!.url.contains(".m3u8", ignoreCase = true)) {
                                         recordingError = ""
@@ -945,6 +949,7 @@ fun SalarTvApp() {
                             putExtra("name", selected!!.name)
                             putExtra("url", selected!!.url)
                             putExtra("duration", minutes)
+                            putExtra("recording_id", HlsRecorderService.manualRecordingId(selected!!.url))
                         }
                         runCatching { ContextCompat.startForegroundService(context, intent) }
                             .onSuccess { isRecording = true; showRecordingOptions = false }
