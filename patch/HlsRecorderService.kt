@@ -46,9 +46,13 @@ class HlsRecorderService : Service() {
         createChannel()
         startForeground(4102, notification("در حال ضبط: $name"))
         val streamUrl = runCatching { XtreamCredentialVault.resolve(this, storedStreamUrl) }.getOrElse {
-            updateNotification("ضبط شروع نشد؛ اطلاعات ورود منبع در دسترس نیست.")
-            stopForeground(true)
-            stopSelf()
+            updateNotification("ضبط این شبکه شروع نشد؛ اطلاعات ورود منبع در دسترس نیست.")
+            if (activeTasks.isEmpty()) {
+                stopForeground(true)
+                stopSelfResult(startId)
+            } else {
+                isRecordingActive = activeTasks.values.any { it.running }
+            }
             return START_NOT_STICKY
         }
         val myScheduleId = intent?.getIntExtra("schedule_id", Int.MIN_VALUE) ?: Int.MIN_VALUE
@@ -334,6 +338,7 @@ class HlsRecorderService : Service() {
     override fun onDestroy() {
         activeTasks.values.forEach { task -> task.running = false; task.worker?.interrupt() }
         activeTasks.clear()
+        activeRecordingIds.clear()
         isRecordingActive = false
         super.onDestroy()
     }
