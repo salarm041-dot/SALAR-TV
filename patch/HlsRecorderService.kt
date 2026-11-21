@@ -70,8 +70,12 @@ class HlsRecorderService : Service() {
         updateScheduleStatus(myScheduleId, "recording")
         updateNotification("در حال ضبط هم‌زمان " + activeTasks.size + " شبکه")
         val recordingWorker = Thread {
-            val folder = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: filesDir
-            if (!folder.exists()) folder.mkdirs()
+            val requestedStorageIndex = RecordingStorage.selectedIndex(this@HlsRecorderService)
+            val folder = RecordingStorage.selectedDirectory(this@HlsRecorderService)
+            if (!folder.exists() && !folder.mkdirs()) error("ساخت پوشه ضبط در حافظه انتخاب‌شده ممکن نشد.")
+            if (requestedStorageIndex > 0 && folder == (getExternalFilesDirs(android.os.Environment.DIRECTORY_MOVIES).firstOrNull())) {
+                updateNotification("حافظه جانبی در دسترس نیست؛ ضبط در حافظه داخلی انجام می‌شود.")
+            }
             val safeName = name.replace(Regex("[^\\p{L}\\p{N}_-]"), "_").take(40)
             val deadline = if (durationMinutes == 0) Long.MAX_VALUE else System.currentTimeMillis() + durationMinutes * 60_000L
             val seen = HashSet<String>()
@@ -134,12 +138,16 @@ class HlsRecorderService : Service() {
                         finalStatus = "failed"
                         updateNotification("ضبط انجام نشد؛ قطعه قابل ذخیره دریافت نشد.")
                     } else {
-                        val publicUri = runCatching { publishRecordingToMovies(output!!) }.getOrNull()
-                        if (publicUri == null) {
-                            finalStatus = "completed_private"
-                            updateNotification("ضبط در حافظه داخلی برنامه ذخیره شد؛ انتشار در پوشه عمومی ناموفق بود: " + output!!.name)
+                        if (requestedStorageIndex == 0) {
+                            val publicUri = runCatching { publishRecordingToMovies(output!!) }.getOrNull()
+                            if (publicUri == null) {
+                                finalStatus = "completed_private"
+                                updateNotification("ضبط در حافظه داخلی برنامه ذخیره شد؛ انتشار در پوشه عمومی ناموفق بود: " + output!!.name)
+                            } else {
+                                updateNotification("ضبط در پوشه فیلم‌ها ذخیره شد: " + output!!.name)
+                            }
                         } else {
-                            updateNotification("ضبط در پوشه فیلم‌ها ذخیره شد: " + output!!.name)
+                            updateNotification("ضبط در حافظه جانبی ذخیره شد: " + output!!.name)
                         }
                     }
                 }

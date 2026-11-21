@@ -218,6 +218,7 @@ fun SalarTvApp() {
         }
         prefs.edit().putString("schedules_json", saved.toString()).apply()
     }
+    var recordingStorageIndex by remember { mutableIntStateOf(prefs.getInt("recording_storage_index", 0)) }
     var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "dark") ?: "dark") }
     val systemDark = isSystemInDarkTheme()
     val useDarkTheme = when (themeMode) { "light" -> false; "system" -> systemDark; else -> true }
@@ -766,6 +767,13 @@ fun SalarTvApp() {
                         onThemeModeChange = { mode ->
                             themeMode = mode
                             prefs.edit().putString("theme_mode", mode).apply()
+                        },
+                        storageOptions = RecordingStorage.options(context).map { it.index to it.label },
+                        selectedStorageIndex = recordingStorageIndex,
+                        onStorageChange = { index ->
+                            recordingStorageIndex = index
+                            prefs.edit().putInt("recording_storage_index", index).apply()
+                            android.widget.Toast.makeText(context, "محل ذخیره ضبط‌های بعدی تغییر کرد.", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     )
                     "زمان‌بندی‌ها" -> ScheduledRecordingsPage(
@@ -798,8 +806,7 @@ fun SalarTvApp() {
                         }
                     )
                     "ضبط‌ها" -> RecordingsPage(
-                        files = (context.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES)
-                            ?: context.filesDir).listFiles()?.filter { it.isFile && it.extension.lowercase() in setOf("ts", "mp4", "m4v", "mkv") }
+                        files = RecordingStorage.selectedDirectory(context).listFiles()?.filter { it.isFile && it.extension.lowercase() in setOf("ts", "mp4", "m4v", "mkv") }
                             ?.sortedByDescending { it.lastModified() } ?: emptyList(),
                         onPlay = { file ->
                             useExternalPlayer = false
@@ -1356,7 +1363,13 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
 }
 
 @Composable
-fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
+fun SettingsPage(
+    themeMode: String,
+    onThemeModeChange: (String) -> Unit,
+    storageOptions: List<Pair<Int, String>>,
+    selectedStorageIndex: Int,
+    onStorageChange: (Int) -> Unit
+) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("تنظیمات ظاهری", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text("حالت نمایش برنامه", color = TextMain, fontWeight = FontWeight.SemiBold)
@@ -1384,6 +1397,36 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
             }
         }
         Text("انتخاب شما ذخیره می‌شود و پس از اجرای دوباره برنامه نیز باقی می‌ماند.",
+            color = MutedText, fontSize = 11.sp)
+
+        Spacer(Modifier.height(8.dp))
+        Text("محل ذخیره‌سازی ضبط‌ها", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("ضبط‌های جدید در حافظه انتخاب‌شده ذخیره می‌شوند. انتخاب کارت حافظه فقط هنگام اتصال و آماده‌بودن آن نمایش داده می‌شود.",
+            color = SecondaryText, fontSize = 12.sp)
+        if (storageOptions.isEmpty()) {
+            Text("هیچ حافظه قابل استفاده‌ای شناسایی نشد.", color = Color(0xFFFFCC80))
+        } else {
+            storageOptions.forEach { (index, label) ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { onStorageChange(index) },
+                    colors = CardDefaults.cardColors(containerColor = Panel),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(if (index == 0) Icons.Default.Smartphone else Icons.Default.SdCard,
+                            null, tint = Gold)
+                        Spacer(Modifier.width(12.dp))
+                        Text(label, color = TextMain, modifier = Modifier.weight(1f))
+                        RadioButton(selected = selectedStorageIndex == index, onClick = { onStorageChange(index) })
+                    }
+                }
+            }
+            if (storageOptions.none { it.first == selectedStorageIndex }) {
+                Text("حافظه انتخاب‌شده در دسترس نیست؛ ضبط موقتاً در حافظه داخلی انجام می‌شود. با اتصال دوباره کارت حافظه، آن را انتخاب کنید.",
+                    color = Color(0xFFFFCC80), fontSize = 12.sp)
+            }
+        }
+        Text("فایل‌ها در پوشه اختصاصی SALAR TV در حافظه انتخاب‌شده نگهداری می‌شوند. برای تغییر محل، ضبط‌های در حال اجرا را ابتدا متوقف کنید؛ تغییر محل روی ضبط‌های بعدی اعمال می‌شود.",
             color = MutedText, fontSize = 11.sp)
     }
 }
