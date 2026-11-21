@@ -805,7 +805,26 @@ fun SalarTvApp() {
                             useExternalPlayer = false
                             selected = Channel(file.nameWithoutExtension, Uri.fromFile(file).toString(), "ضبط‌شده", "تلویزیون")
                         },
-                        onDelete = { file -> file.delete(); page = "ضبط‌ها" }
+                        onDelete = { file ->
+                            if (!file.delete()) android.widget.Toast.makeText(context, "حذف فایل ناموفق بود.", android.widget.Toast.LENGTH_SHORT).show()
+                            page = "ضبط‌ها"
+                        },
+                        onRename = { file, requestedName ->
+                            val safeName = requestedName.trim()
+                                .replace(Regex("[\\\\/:*?\\\"<>|]"), "_")
+                                .take(80)
+                            if (safeName.isBlank()) {
+                                android.widget.Toast.makeText(context, "نام فایل معتبر نیست.", android.widget.Toast.LENGTH_SHORT).show()
+                            } else {
+                                val target = File(file.parentFile, safeName + "." + file.extension)
+                                when {
+                                    target.exists() -> android.widget.Toast.makeText(context, "فایلی با این نام وجود دارد.", android.widget.Toast.LENGTH_SHORT).show()
+                                    file.renameTo(target) -> android.widget.Toast.makeText(context, "نام فایل تغییر کرد.", android.widget.Toast.LENGTH_SHORT).show()
+                                    else -> android.widget.Toast.makeText(context, "تغییر نام فایل ناموفق بود.", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            page = "ضبط‌ها"
+                        }
                     )
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> ChannelList(channels.filter { it.kind == "تلویزیون" }, onSelect = { selected = it },
@@ -1538,10 +1557,18 @@ fun ScheduledRecordingsPage(
 }
 
 @Composable
-fun RecordingsPage(files: List<File>, onPlay: (File) -> Unit, onDelete: (File) -> Unit) {
+fun RecordingsPage(
+    files: List<File>,
+    onPlay: (File) -> Unit,
+    onDelete: (File) -> Unit,
+    onRename: (File, String) -> Unit
+) {
+    var renameTarget by remember { mutableStateOf<File?>(null) }
+    var renameText by remember { mutableStateOf("") }
+    val context = LocalContext.current
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("فایل‌های ضبط‌شده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text("برای پخش هر فایل، دکمه اجرا را بزنید.", color = SecondaryText, fontSize = 12.sp)
+        Text("پخش، تغییر نام، اشتراک‌گذاری و حذف فایل‌ها", color = SecondaryText, fontSize = 12.sp)
         if (files.isEmpty()) Text("هنوز فایلی ضبط نشده است.", color = SecondaryText)
         files.forEach { file ->
             Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
@@ -1553,12 +1580,61 @@ fun RecordingsPage(files: List<File>, onPlay: (File) -> Unit, onDelete: (File) -
                     IconButton(onClick = { onPlay(file) }) {
                         Icon(Icons.Default.PlayArrow, "پخش فایل ضبط‌شده", tint = Gold)
                     }
+                    IconButton(onClick = { renameTarget = file; renameText = file.nameWithoutExtension }) {
+                        Icon(Icons.Default.Edit, "تغییر نام فایل", tint = Gold)
+                    }
+                    IconButton(onClick = {
+                        runCatching {
+                            val uri = androidx.core.content.FileProvider.getUriForFile(
+                                context, context.packageName + ".fileprovider", file
+                            )
+                            val mime = when (file.extension.lowercase()) {
+                                "mp4", "m4v" -> "video/mp4"
+                                "mkv" -> "video/x-matroska"
+                                else -> "video/mp2t"
+                            }
+                            val share = Intent(Intent.ACTION_SEND).apply {
+                                type = mime
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                clipData = android.content.ClipData.newUri(context.contentResolver, file.name, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(share, "اشتراک‌گذاری فایل ضبط‌شده"))
+                        }.onFailure {
+                            android.widget.Toast.makeText(context, "اشتراک‌گذاری فایل انجام نشد: " + (it.message ?: "خطا"), android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }) {
+                        Icon(Icons.Default.Share, "اشتراک‌گذاری فایل", tint = Gold)
+                    }
                     IconButton(onClick = { onDelete(file) }) {
                         Icon(Icons.Default.Delete, "حذف فایل", tint = Color(0xFFE57373))
                     }
                 }
             }
         }
+    }
+    if (renameTarget != null) {
+        AlertDialog(
+            onDismissRequest = { renameTarget = null },
+            title = { Text("تغییر نام فایل ضبط‌شده") },
+            text = {
+                OutlinedTextField(
+                    value = renameText,
+                    onValueChange = { renameText = it },
+                    singleLine = true,
+                    label = { Text("نام جدید") }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    renameTarget?.let { onRename(it, renameText) }
+                    renameTarget = null
+                }) { Text("ذخیره", color = Gold) }
+            },
+            dismissButton = {
+                TextButton(onClick = { renameTarget = null }) { Text("انصراف") }
+            }
+        )
     }
 }
 
