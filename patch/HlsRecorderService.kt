@@ -26,11 +26,16 @@ class HlsRecorderService : Service() {
         @Volatile var worker: Thread? = null
     }
     private val activeTasks = ConcurrentHashMap<String, RecordingTask>()
+    // Latest Android service start ID, including duplicate/rejected requests.
+    // Used when the final active worker exits so the foreground service cannot be stranded.
+    private var latestStartId: Int = 0
 
     private data class ByteRange(val length: Long, val offset: Long?)
     private data class MediaPart(val uri: String, val range: ByteRange? = null)
 
+    @Synchronized
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        latestStartId = startId
         if (intent?.action == ACTION_STOP) {
             val requestedId = intent.getStringExtra("recording_id")
             val targets = if (requestedId.isNullOrBlank()) activeTasks.values.toList() else listOfNotNull(activeTasks[requestedId])
@@ -144,12 +149,19 @@ class HlsRecorderService : Service() {
                     updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
                 }
             } finally {
-                activeTasks.remove(recordingId, task)
-                activeRecordingIds.remove(recordingId)
-                updateScheduleStatus(myScheduleId, if (task.running) finalStatus else "stopped")
-                isRecordingActive = activeTasks.values.any { it.running }
-                if (isRecordingActive) updateNotification("در حال ضبط هم‌زمان " + activeTasks.values.count { it.running } + " شبکه")
-                else { stopForeground(STOP_FOREGROUND_DETACH); stopSelfResult(startId) }
+                val stopId = synchronized(this) {
+                    activeTasks.remove(recordingId, task)
+                    activeRecordingIds.remove(recordingId)
+                    updateScheduleStatus(myScheduleId, if (task.running) finalStatus else "stopped")
+                    isRecordingActive = activeTasks.values.any { it.running }
+                    if (isRecordingActive) null else latestStartId
+                }
+                if (stopId == null) {
+                    updateNotification("در حال ضبط هم‌زمان " + activeTasks.values.count { it.running } + " شبکه")
+                } else {
+                    stopForeground(STOP_FOREGROUND_DETACH)
+                    stopSelfResult(stopId)
+                }
             }
         }
         synchronized(this) {
