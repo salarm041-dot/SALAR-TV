@@ -811,7 +811,8 @@ fun SalarTvApp() {
                         },
                         onRename = { file, requestedName ->
                             val safeName = requestedName.trim()
-                                .replace(Regex("[\\\\/:*?\\\"<>|]"), "_")
+                                .map { if (it.isLetterOrDigit() || it in " _-().") it else '_' }
+                                .joinToString("")
                                 .take(80)
                             if (safeName.isBlank()) {
                                 android.widget.Toast.makeText(context, "نام فایل معتبر نیست.", android.widget.Toast.LENGTH_SHORT).show()
