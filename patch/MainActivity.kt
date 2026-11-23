@@ -451,6 +451,15 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         }
                                     )
                                     DropdownMenuItem(
+                                        text = { Text("پخش چندنمایی") },
+                                        leadingIcon = { Icon(Icons.Default.GridView, null) },
+                                        onClick = {
+                                            playerMenuExpanded = false
+                                            selected = null
+                                            page = "چندنمایی"
+                                        }
+                                    )
+                                    DropdownMenuItem(
                                         text = { Text("تنظیمات دوبله") },
                                         leadingIcon = { Icon(Icons.Default.Translate, null) },
                                         onClick = { showDubbingDialog = true; playerMenuExpanded = false }
@@ -1225,7 +1234,7 @@ fun MultiViewPage(channels: List<Channel>) {
     }
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("چندنمایی هم‌زمان", color = Gold, fontSize = 21.sp, fontWeight = FontWeight.Bold)
-        Text("دو شبکه را از فهرست خود انتخاب کنید. پخش هم‌زمان به توان سخت‌افزاری گوشی و نوع پخش وابسته است.",
+        Text("برای هر پنجره نام شبکه را جستجو و انتخاب کنید. پخش هم‌زمان به توان سخت‌افزاری گوشی و نوع پخش وابسته است.",
             color = SecondaryText, fontSize = 12.sp)
         MultiViewSlot("پنجره اول", channels, first, { first = it }, firstPlayer)
         MultiViewSlot("پنجره دوم", channels, second, { second = it }, secondPlayer)
@@ -1236,26 +1245,64 @@ fun MultiViewPage(channels: List<Channel>) {
 @Composable
 private fun MultiViewSlot(title: String, channels: List<Channel>, selected: Channel?,
                           onSelect: (Channel?) -> Unit, player: ExoPlayer) {
-    var expanded by remember { mutableStateOf(false) }
+    var showPicker by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredChannels = remember(channels, searchQuery) {
+        channels.filter { it.name.contains(searchQuery.trim(), ignoreCase = true) ||
+            it.country.contains(searchQuery.trim(), ignoreCase = true) ||
+            it.groupTitle.contains(searchQuery.trim(), ignoreCase = true) }
+    }
     Card(colors = CardDefaults.cardColors(containerColor = Panel), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(title, color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Box {
-                    TextButton(onClick = { expanded = true }) {
-                        Text(selected?.name ?: "انتخاب شبکه", color = TextMain)
-                        Icon(Icons.Default.ArrowDropDown, null, tint = Gold)
-                    }
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        channels.forEach { channel ->
-                            DropdownMenuItem(text = { Text(channel.name) }, onClick = { onSelect(channel); expanded = false })
-                        }
-                    }
+                TextButton(onClick = { searchQuery = ""; showPicker = true }) {
+                    Text(selected?.name ?: "جستجو و انتخاب شبکه", color = TextMain, maxLines = 1)
+                    Icon(Icons.Default.Search, null, tint = Gold)
                 }
             }
             AndroidView(factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                 modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f))
         }
+    }
+    if (showPicker) {
+        AlertDialog(
+            onDismissRequest = { showPicker = false },
+            title = { Text("جستجوی شبکه برای $title") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        label = { Text("نام شبکه، کشور یا گروه") },
+                        leadingIcon = { Icon(Icons.Default.Search, null) }
+                    )
+                    LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
+                        items(filteredChannels, key = { it.url }) { channel ->
+                            DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text(channel.name)
+                                        Text(listOf(channel.country, channel.groupTitle).filter { it.isNotBlank() }.joinToString(" • "),
+                                            color = MutedText, fontSize = 10.sp)
+                                    }
+                                },
+                                onClick = { onSelect(channel); showPicker = false }
+                            )
+                        }
+                        if (filteredChannels.isEmpty()) {
+                            item { Text("شبکه‌ای با این عبارت پیدا نشد.", color = SecondaryText, modifier = Modifier.padding(12.dp)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showPicker = false }) { Text("بستن") } },
+            dismissButton = {
+                TextButton(onClick = { onSelect(null); showPicker = false }) { Text("پاک‌کردن انتخاب") }
+            }
+        )
     }
 }
 
