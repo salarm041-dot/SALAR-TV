@@ -90,6 +90,32 @@ jobs:
           p.write_text(s)
           PY
 
+      - name: Add on-device Persian translation engine dependencies
+        run: |
+          python3 - "$PROJECT_DIR/app/build.gradle.kts" <<'PY'
+          import re, sys
+          from pathlib import Path
+          p = Path(sys.argv[1])
+          s = p.read_text()
+          dep_block = re.search(r'(?m)^dependencies\\s*\\{', s)
+          if not dep_block:
+              raise SystemExit("dependencies block not found; cannot add ML Kit safely")
+          additions = [
+              '    implementation("com.google.mlkit:translate:17.0.3")',
+              '    implementation("com.google.mlkit:language-id:17.0.6")',
+          ]
+          insert_at = dep_block.end()
+          for dep in additions:
+              if dep.split('"')[1] not in s:
+                  s = s[:insert_at] + "\\n" + dep + s[insert_at:]
+                  insert_at += len(dep) + 1
+          s, count = re.subn(r'minSdk\\s*=\\s*(\\d+)', lambda m: 'minSdk = ' + str(max(23, int(m.group(1)))), s, count=1)
+          if count != 1:
+              raise SystemExit("Could not verify/update minSdk for ML Kit")
+          p.write_text(s)
+          print("ML Kit translation and language identification dependencies configured")
+          PY
+
       - name: Inspect project source
         run: |
           echo "=== PROJECT FILES ==="
