@@ -543,7 +543,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                                 }, label = { Text(voiceOption) })
                                             }
                                         }
-                                        Text("موتور تشخیص گفتار، ترجمه و تولید صدای زنده هنوز به برنامه متصل نشده است؛ این گزینه‌ها فعلاً تنظیمات را ذخیره می‌کنند.",
+                                        Text("ترجمه زیرنویس متنی با موتور ML Kit به برنامه متصل شده است؛ باید زیرنویس شبکه را انتخاب کنید. دوبله صوتی زنده هنوز متصل نیست.",
                                             color = Color(0xFFFFCC80), fontSize = 11.sp)
                                     }
                                 },
@@ -1598,16 +1598,16 @@ fun LiveDubbingPage() {
         Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("وضعیت موتور هوش مصنوعی", color = Gold, fontWeight = FontWeight.Bold)
-                Text("هنوز به سرویس تشخیص گفتار، ترجمه و تولید صدای زنده متصل نشده است.",
+                Text("موتور ترجمه زیرنویس به فارسی با ML Kit متصل شده است؛ ترجمه هنگام پخش و پس از انتخاب زیرنویس متنی شبکه انجام می‌شود.",
                     color = Color(0xFFFFCC80), fontSize = 12.sp)
-                Text("این صفحه تنظیمات قابلیت را نگه می‌دارد؛ دوبله واقعی پس از اتصال موتور پردازش صدا فعال می‌شود.",
+                Text("مدل زبان در اولین استفاده دانلود می‌شود. دوبله صوتی زنده هنوز به موتور تشخیص گفتار و تولید صدا نیاز دارد و در این نسخه فعال نیست.",
                     color = SecondaryText, fontSize = 12.sp)
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("زیرنویس هوشمند فارسی", color = TextMain)
-                Text("تشخیص گفتار و نمایش ترجمه؛ مستقل از صدای دوبله", color = MutedText, fontSize = 11.sp)
+                Text("ترجمه زیرنویس متنی شبکه به فارسی؛ مستقل از صدای دوبله", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = subtitleEnabled, onCheckedChange = {
                 subtitleEnabled = it
