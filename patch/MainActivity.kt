@@ -520,7 +520,15 @@ fun SalarTvApp() {
                         val pending = PendingIntent.getBroadcast(context, requestCode, alarmIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                         val alarm = context.getSystemService(AlarmManager::class.java)
-                        alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarm.canScheduleExactAlarms()) {
+                            context.startActivity(Intent(
+                                android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                Uri.parse("package:${context.packageName}")
+                            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                            scheduleError = "برای اجرای دقیق ضبط خودکار، مجوز «هشدارها و یادآوری‌ها» را فعال کنید؛ سپس دوباره ذخیره را بزنید."
+                            return@TextButton
+                        }
+                        alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
                         schedules = (schedules + "\n$title | $dateTime | $minutes دقیقه").trim()
                         prefs.edit().putString("schedules", schedules).apply()
                         showSchedule = false
