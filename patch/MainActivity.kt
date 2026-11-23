@@ -421,7 +421,11 @@ fun SalarTvApp() {
                         onSettings = { page = "تنظیمات" },
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) },
-                        onPilgrimage = { page = "زیارت آنلاین" }
+                        onPilgrimage = { page = "زیارت آنلاین" },
+                        onMultiView = { page = "چندنمایی" }
+                    )
+                    "چندنمایی" -> MultiViewPage(
+                        channels = channels.filter { it.kind == "تلویزیون" }
                     )
                     "زیارت آنلاین" -> PilgrimagePage(
                         savedChannels = channels,
@@ -897,7 +901,8 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
              onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
-             onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit) {
+             onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit,
+             onMultiView: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(16.dp)) {
@@ -913,6 +918,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
                 }
             }
         }
+        MoreButton("چندنمایی هم‌زمان", Icons.Default.GridView, onMultiView)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
@@ -922,6 +928,58 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         MoreButton("بازیابی نسخه پشتیبان", Icons.Default.Restore, onBackupImport)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
         Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی", color = SecondaryText, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun MultiViewPage(channels: List<Channel>) {
+    val context = LocalContext.current
+    var first by remember { mutableStateOf<Channel?>(channels.getOrNull(0)) }
+    var second by remember { mutableStateOf<Channel?>(channels.getOrNull(1)) }
+    val firstPlayer = remember { ExoPlayer.Builder(context).build() }
+    val secondPlayer = remember { ExoPlayer.Builder(context).build() }
+    DisposableEffect(Unit) { onDispose { firstPlayer.release(); secondPlayer.release() } }
+    LaunchedEffect(first?.url) {
+        first?.let { firstPlayer.setMediaItem(MediaItem.fromUri(it.url)); firstPlayer.prepare(); firstPlayer.playWhenReady = true }
+            ?: firstPlayer.stop()
+    }
+    LaunchedEffect(second?.url) {
+        second?.let { secondPlayer.setMediaItem(MediaItem.fromUri(it.url)); secondPlayer.prepare(); secondPlayer.playWhenReady = true }
+            ?: secondPlayer.stop()
+    }
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("چندنمایی هم‌زمان", color = Gold, fontSize = 21.sp, fontWeight = FontWeight.Bold)
+        Text("دو شبکه را از فهرست خود انتخاب کنید. پخش هم‌زمان به توان سخت‌افزاری گوشی و نوع پخش وابسته است.",
+            color = SecondaryText, fontSize = 12.sp)
+        MultiViewSlot("پنجره اول", channels, first, { first = it }, firstPlayer)
+        MultiViewSlot("پنجره دوم", channels, second, { second = it }, secondPlayer)
+        if (channels.isEmpty()) Text("ابتدا شبکه‌های تلویزیونی را از بخش افزودن منابع اضافه کنید.", color = SecondaryText)
+    }
+}
+
+@Composable
+private fun MultiViewSlot(title: String, channels: List<Channel>, selected: Channel?,
+                          onSelect: (Channel?) -> Unit, player: ExoPlayer) {
+    var expanded by remember { mutableStateOf(false) }
+    Card(colors = CardDefaults.cardColors(containerColor = Panel), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(title, color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Box {
+                    TextButton(onClick = { expanded = true }) {
+                        Text(selected?.name ?: "انتخاب شبکه", color = TextMain)
+                        Icon(Icons.Default.ArrowDropDown, null, tint = Gold)
+                    }
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        channels.forEach { channel ->
+                            DropdownMenuItem(text = { Text(channel.name) }, onClick = { onSelect(channel); expanded = false })
+                        }
+                    }
+                }
+            }
+            AndroidView(factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f))
+        }
     }
 }
 
