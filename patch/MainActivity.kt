@@ -803,7 +803,13 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                 it.country.contains(searchQuery, ignoreCase = true) ||
                 categoryForChannel(it).contains(searchQuery, ignoreCase = true)
         }
-        val sections = visibleChannels.groupBy { "${it.country} / ${categoryForChannel(it)} / ${it.kind}" }.toSortedMap()
+        val sections = visibleChannels.groupBy { channel ->
+            if (channel.kind == "رادیو") {
+                if (channel.country == "ایران") "صدا و سیما" else "خارج از ایران"
+            } else {
+                "${channel.country} / ${categoryForChannel(channel)} / ${channel.kind}"
+            }
+        }.toSortedMap()
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item(key = "channel_search") {
                 OutlinedTextField(
@@ -1312,7 +1318,7 @@ private fun parseM3u(text: String): List<Channel> {
             val group = groupTitle.lowercase()
             val meta = "$lower $group"
             country = when {
-                "فارسی‌زبان خارج از ایران" in meta || "فارسی زبان خارج از ایران" in meta -> "فارسی‌زبان خارج از ایران"
+                "خارج از ایران" in meta -> "خارج از ایران"
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
                 "iran" in meta || "ایران" in meta || "ir/" in meta || "شبکه‌های استانی" in meta -> "ایران"
