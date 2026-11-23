@@ -371,3 +371,13 @@ https://live-aburayhan1107.telewebion.ir/ek/azarbayjangharbi/live/576p/index.m3u
 https://live-aburayhan1104.telewebion.ir/ek/taban/live/576p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ZagrosTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",زاگرس (کرمانشاه)
 https://live-aburayhan1109.telewebion.ir/ek/zagros/live/576p/index.m3u8
+
+# Persian-language live radio streams. Direct audio endpoints selected from currently listed working streams.
+#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو فردا
+https://stream.radiojar.com/cp13r2cpn3quv
+#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو نواهنگ
+https://navairan.com/;stream.nsv
+#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو سیمرغ
+https://stream.zeno.fm/9svfnobkrxrvv
+#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو فاز
+https://free.rcast.net/230792
