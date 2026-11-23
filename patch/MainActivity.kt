@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.compose.ui.viewinterop.AndroidView
@@ -73,6 +74,8 @@ data class Channel(
     val logoUrl: String = "",
     val groupTitle: String = ""
 )
+
+data class SubtitleChoice(val groupIndex: Int, val trackIndex: Int, val label: String)
 
 data class ScheduledRecording(val name: String, val url: String, val startMillis: Long, val durationMinutes: Int) {
     val requestCode: Int get() = (name + url + startMillis).hashCode()
@@ -405,10 +408,125 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         Text("پخش از درگاه رسمی؛ در صورت محدودیت منطقه‌ای یا توقف پخش، ممکن است صفحه باز شود ولی ویدئو اجرا نشود.",
                             color = SecondaryText, fontSize = 11.sp)
                     } else if (!useExternalPlayer) {
-                        AndroidView(
-                            factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
-                            modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
-                        )
+                        var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
+                        var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
+                        var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
+                        var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
+                        var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
+                        var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", false)) }
+                        var menuDubbingVoice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
+                        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
+                            AndroidView(
+                                factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            Box(Modifier.align(Alignment.TopEnd).padding(8.dp)) {
+                                IconButton(
+                                    onClick = { playerMenuExpanded = true },
+                                    modifier = Modifier.background(Color.Black.copy(alpha = 0.62f), RoundedCornerShape(50))
+                                ) {
+                                    Icon(Icons.Default.MoreVert, contentDescription = "تنظیمات پخش", tint = Color.White)
+                                }
+                                DropdownMenu(expanded = playerMenuExpanded, onDismissRequest = { playerMenuExpanded = false }) {
+                                    DropdownMenuItem(
+                                        text = { Text("انتخاب زیرنویس") },
+                                        leadingIcon = { Icon(Icons.Default.Subtitles, null) },
+                                        onClick = {
+                                            subtitleChoices = buildList {
+                                                player.currentTracks.groups.forEachIndexed { groupIndex, group ->
+                                                    if (group.type == androidx.media3.common.C.TRACK_TYPE_TEXT) {
+                                                        for (trackIndex in 0 until group.length) {
+                                                            if (group.isTrackSupported(trackIndex)) {
+                                                                val format = group.getTrackFormat(trackIndex)
+                                                                val language = format.language?.takeIf { it.isNotBlank() } ?: "بدون نام"
+                                                                val label = format.label?.takeIf { it.isNotBlank() } ?: language
+                                                                add(SubtitleChoice(groupIndex, trackIndex, label))
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            showSubtitleDialog = true
+                                            playerMenuExpanded = false
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("تنظیمات دوبله") },
+                                        leadingIcon = { Icon(Icons.Default.Translate, null) },
+                                        onClick = { showDubbingDialog = true; playerMenuExpanded = false }
+                                    )
+                                }
+                            }
+                        }
+                        if (showSubtitleDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showSubtitleDialog = false },
+                                title = { Text("انتخاب زیرنویس") },
+                                text = {
+                                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        Text("خاموش", modifier = Modifier.fillMaxWidth().clickable {
+                                            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                                                .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_TEXT, true)
+                                                .build()
+                                            showSubtitleDialog = false
+                                        }.padding(vertical = 8.dp))
+                                        if (subtitleChoices.isEmpty()) {
+                                            Text("این شبکه در حال حاضر زیرنویس قابل انتخابی ارائه نمی‌کند.", color = SecondaryText)
+                                        } else subtitleChoices.forEach { choice ->
+                                            Text(choice.label, modifier = Modifier.fillMaxWidth().clickable {
+                                                val group = player.currentTracks.groups.getOrNull(choice.groupIndex)
+                                                if (group != null) {
+                                                    player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                                                        .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_TEXT, false)
+                                                        .setOverrideForType(androidx.media3.common.TrackSelectionOverride(
+                                                            group.mediaTrackGroup, listOf(choice.trackIndex)
+                                                        )).build()
+                                                }
+                                                showSubtitleDialog = false
+                                            }.padding(vertical = 8.dp))
+                                        }
+                                    }
+                                },
+                                confirmButton = { TextButton(onClick = { showSubtitleDialog = false }) { Text("بستن") } }
+                            )
+                        }
+                        if (showDubbingDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showDubbingDialog = false },
+                                title = { Text("دوبله فارسی") },
+                                text = {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Text("تنظیمات دوبله برای این پخش", color = Gold, fontWeight = FontWeight.Bold)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text("فعال‌سازی دوبله", modifier = Modifier.weight(1f))
+                                            Switch(checked = menuDubbingEnabled, onCheckedChange = {
+                                                menuDubbingEnabled = it
+                                                prefs.edit().putBoolean("live_dubbing_enabled", it).apply()
+                                            })
+                                        }
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text("زیرنویس هوشمند فارسی", modifier = Modifier.weight(1f))
+                                            Switch(checked = menuSubtitleEnabled, onCheckedChange = {
+                                                menuSubtitleEnabled = it
+                                                prefs.edit().putBoolean("live_subtitle_enabled", it).apply()
+                                            })
+                                        }
+                                        Text("صدای دوبله")
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            listOf("زن", "مرد").forEach { voiceOption ->
+                                                FilterChip(selected = menuDubbingVoice == voiceOption, onClick = {
+                                                    menuDubbingVoice = voiceOption
+                                                    prefs.edit().putString("live_dubbing_voice", voiceOption).apply()
+                                                }, label = { Text(voiceOption) })
+                                            }
+                                        }
+                                        Text("موتور تشخیص گفتار، ترجمه و تولید صدای زنده هنوز به برنامه متصل نشده است؛ این گزینه‌ها فعلاً تنظیمات را ذخیره می‌کنند.",
+                                            color = Color(0xFFFFCC80), fontSize = 11.sp)
+                                    }
+                                },
+                                confirmButton = { TextButton(onClick = { showDubbingDialog = false }) { Text("تمام") } }
+                            )
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             OutlinedButton(
                                 onClick = { (context as? MainActivity)?.enterPlayerPictureInPicture() },
