@@ -1206,34 +1206,52 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
 
 @Composable
 fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
+    var fontScale by remember { mutableFloatStateOf(prefs.getFloat("font_scale", 1f).coerceIn(0.85f, 1.3f)) }
+    var confirmDelete by remember { mutableStateOf(prefs.getBoolean("confirm_before_delete", true)) }
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Text("تنظیمات ظاهری", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text("حالت نمایش برنامه", color = TextMain, fontWeight = FontWeight.SemiBold)
-        Text("ظاهر برنامه را مطابق سلیقه یا تنظیمات دستگاه انتخاب کنید.", color = SecondaryText, fontSize = 12.sp)
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("dark" to "حالت شب", "light" to "حالت روز", "system" to "حالت خودکار").forEach { (value, label) ->
-                Card(
-                    modifier = Modifier.fillMaxWidth().clickable { onThemeModeChange(value) },
-                    colors = CardDefaults.cardColors(containerColor = Panel),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            when (value) {
-                                "dark" -> Icons.Default.DarkMode
-                                "light" -> Icons.Default.LightMode
-                                else -> Icons.Default.SettingsSuggest
-                            }, null, tint = Gold
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Text(label, color = TextMain, modifier = Modifier.weight(1f))
-                        RadioButton(selected = themeMode == value, onClick = { onThemeModeChange(value) })
-                    }
+        Text("ظاهر و شخصی‌سازی", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("انتخاب تم برنامه", color = TextMain, fontWeight = FontWeight.SemiBold)
+        listOf("dark" to "مشکی و طلایی نئونی", "light" to "روشن", "system" to "هماهنگ با دستگاه").forEach { (value, label) ->
+            Card(Modifier.fillMaxWidth().clickable { onThemeModeChange(value) },
+                colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
+                Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(when (value) { "dark" -> Icons.Default.DarkMode; "light" -> Icons.Default.LightMode; else -> Icons.Default.SettingsSuggest }, null, tint = Gold)
+                    Spacer(Modifier.width(12.dp))
+                    Text(label, color = TextMain, modifier = Modifier.weight(1f))
+                    RadioButton(selected = themeMode == value, onClick = { onThemeModeChange(value) })
                 }
             }
         }
-        Text("انتخاب شما ذخیره می‌شود و پس از اجرای دوباره برنامه نیز باقی می‌ماند.",
-            color = MutedText, fontSize = 11.sp)
+        Divider(color = Gold.copy(alpha = 0.3f))
+        Text("اندازه قلم: " + (fontScale * 100).toInt() + "%", color = Gold, fontWeight = FontWeight.Bold)
+        Slider(value = fontScale, onValueChange = {
+            fontScale = it
+            prefs.edit().putFloat("font_scale", it).apply()
+        }, valueRange = 0.85f..1.3f, steps = 8)
+        Text("پیش‌نمایش اندازه نوشته", color = TextMain, fontSize = (16f * fontScale).sp)
+        Divider(color = Gold.copy(alpha = 0.3f))
+        Text("امنیت و ورود", color = Gold, fontWeight = FontWeight.Bold)
+        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
+            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Security, null, tint = Gold)
+                    Spacer(Modifier.width(10.dp))
+                    Text("حفاظت و حریم خصوصی", color = TextMain, fontWeight = FontWeight.Bold)
+                }
+                Text("ورود با حساب آنلاین و قفل PIN در این نسخه هنوز پیاده‌سازی نشده‌اند؛ این بخش برای تکمیل امنیت ورود در نظر گرفته شده است.",
+                    color = SecondaryText, fontSize = 12.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("تأیید پیش از حذف شبکه", color = TextMain, modifier = Modifier.weight(1f))
+                    Switch(checked = confirmDelete, onCheckedChange = {
+                        confirmDelete = it
+                        prefs.edit().putBoolean("confirm_before_delete", it).apply()
+                    })
+                }
+            }
+        }
+        Text("تم و اندازه قلم در دستگاه ذخیره می‌شوند.", color = MutedText, fontSize = 11.sp)
     }
 }
 
