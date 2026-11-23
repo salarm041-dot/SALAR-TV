@@ -387,6 +387,13 @@ jobs:
           cp "$APK" "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
           ls -lh "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
 
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-APK
+          path: SALAR-TV-debug.apk
+          if-no-files-found: error
+
       - name: Android 11 emulator smoke test
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -397,11 +404,4 @@ jobs:
           disable-animations: true
           script: |
             APK="${{ github.workspace }}/SALAR-TV-debug.apk"; test -f "$APK" && adb install -r "$APK" && adb shell am start -n com.salar.tv/.MainActivity && sleep 20 && adb shell dumpsys activity activities | grep -q "com.salar.tv" && (adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv" && { echo "App crashed during startup smoke test"; exit 1; } || echo "Android 11 emulator launch smoke test passed")
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SALAR-TV-APK
-          path: SALAR-TV-debug.apk
-          if-no-files-found: error
 
