@@ -1223,6 +1223,7 @@ fun MultiViewPage(channels: List<Channel>) {
     var second by remember { mutableStateOf<Channel?>(channels.getOrNull(1)) }
     val firstPlayer = remember { ExoPlayer.Builder(context).build() }
     val secondPlayer = remember { ExoPlayer.Builder(context).build() }
+    var fullScreenSlot by remember { mutableStateOf<Int?>(null) }
     DisposableEffect(Unit) { onDispose { firstPlayer.release(); secondPlayer.release() } }
     LaunchedEffect(first?.url) {
         first?.let { firstPlayer.setMediaItem(MediaItem.fromUri(it.url)); firstPlayer.prepare(); firstPlayer.playWhenReady = true }
@@ -1232,19 +1233,43 @@ fun MultiViewPage(channels: List<Channel>) {
         second?.let { secondPlayer.setMediaItem(MediaItem.fromUri(it.url)); secondPlayer.prepare(); secondPlayer.playWhenReady = true }
             ?: secondPlayer.stop()
     }
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("چندنمایی هم‌زمان", color = Gold, fontSize = 21.sp, fontWeight = FontWeight.Bold)
-        Text("برای هر پنجره نام شبکه را جستجو و انتخاب کنید. پخش هم‌زمان به توان سخت‌افزاری گوشی و نوع پخش وابسته است.",
-            color = SecondaryText, fontSize = 12.sp)
-        MultiViewSlot("پنجره اول", channels, first, { first = it }, firstPlayer)
-        MultiViewSlot("پنجره دوم", channels, second, { second = it }, secondPlayer)
-        if (channels.isEmpty()) Text("ابتدا شبکه‌های تلویزیونی را از بخش افزودن منابع اضافه کنید.", color = SecondaryText)
+    if (fullScreenSlot != null) {
+        val fullscreenPlayer = if (fullScreenSlot == 1) firstPlayer else secondPlayer
+        val fullscreenChannel = if (fullScreenSlot == 1) first else second
+        Column(Modifier.fillMaxSize().background(Color.Black)) {
+            Row(
+                Modifier.fillMaxWidth().background(Panel).padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { fullScreenSlot = null }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت", tint = Gold)
+                }
+                Text(fullscreenChannel?.name ?: "پخش تمام‌صفحه", color = TextMain,
+                    fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f), maxLines = 1)
+                IconButton(onClick = { fullScreenSlot = null }) {
+                    Icon(Icons.Default.FullscreenExit, contentDescription = "خروج از تمام‌صفحه", tint = Gold)
+                }
+            }
+            AndroidView(
+                factory = { ctx -> PlayerView(ctx).apply { player = fullscreenPlayer; useController = true } },
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            )
+        }
+    } else {
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("چندنمایی هم‌زمان", color = Gold, fontSize = 21.sp, fontWeight = FontWeight.Bold)
+            Text("برای هر پنجره نام شبکه را جستجو و انتخاب کنید. برای بزرگ‌نمایی هر شبکه، دکمه تمام‌صفحه همان پنجره را بزنید. پخش هم‌زمان به توان سخت‌افزاری گوشی و نوع پخش وابسته است.",
+                color = SecondaryText, fontSize = 12.sp)
+            MultiViewSlot("پنجره اول", channels, first, { first = it }, firstPlayer, { fullScreenSlot = 1 })
+            MultiViewSlot("پنجره دوم", channels, second, { second = it }, secondPlayer, { fullScreenSlot = 2 })
+            if (channels.isEmpty()) Text("ابتدا شبکه‌های تلویزیونی را از بخش افزودن منابع اضافه کنید.", color = SecondaryText)
+        }
     }
 }
 
 @Composable
 private fun MultiViewSlot(title: String, channels: List<Channel>, selected: Channel?,
-                          onSelect: (Channel?) -> Unit, player: ExoPlayer) {
+                          onSelect: (Channel?) -> Unit, player: ExoPlayer, onFullscreen: () -> Unit) {
     var showPicker by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val filteredChannels = remember(channels, searchQuery) {
@@ -1256,6 +1281,9 @@ private fun MultiViewSlot(title: String, channels: List<Channel>, selected: Chan
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(title, color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                IconButton(onClick = onFullscreen) {
+                    Icon(Icons.Default.Fullscreen, contentDescription = "پخش تمام‌صفحه", tint = Gold)
+                }
                 TextButton(onClick = { searchQuery = ""; showPicker = true }) {
                     Text(selected?.name ?: "جستجو و انتخاب شبکه", color = TextMain, maxLines = 1)
                     Icon(Icons.Default.Search, null, tint = Gold)
