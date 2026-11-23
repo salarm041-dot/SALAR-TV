@@ -820,7 +820,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = onPilgrimage, modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
-                    Icon(Icons.Default.Mosque, null, tint = Color.Black)
+                    Icon(Icons.Default.Place, null, tint = Color.Black)
                     Spacer(Modifier.width(8.dp))
                     Text("ورود به زیارت آنلاین", color = Color.Black)
                 }
@@ -857,7 +857,7 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
         if (available.isEmpty()) {
             Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
                 Column(Modifier.fillMaxWidth().padding(14.dp)) {
-                    Icon(Icons.Default.Mosque, null, tint = Gold, modifier = Modifier.size(30.dp))
+                    Icon(Icons.Default.Place, null, tint = Gold, modifier = Modifier.size(30.dp))
                     Text("هنوز لینک پخش زنده‌ای برای $place ثبت نشده است.", color = TextMain, fontWeight = FontWeight.SemiBold)
                     Text("نشانی پخش رسمی یا مجاز را در کادر زیر وارد کن.", color = SecondaryText, fontSize = 12.sp)
                 }
