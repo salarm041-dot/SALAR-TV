@@ -988,7 +988,10 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
     var place by remember { mutableStateOf("مشهد مقدس") }
     var title by remember { mutableStateOf("") }
     var streamUrl by remember { mutableStateOf("") }
-    val places = listOf("مشهد مقدس", "کربلا", "نجف", "مکه مکرمه", "مدینه منوره", "سایر اماکن مذهبی")
+    var customPlace by remember { mutableStateOf("") }
+    val defaultPlaces = listOf("مشهد مقدس", "کربلا", "نجف", "مکه مکرمه", "مدینه منوره", "سایر اماکن مذهبی")
+    val savedPlaces = savedChannels.filter { it.country == "زیارت آنلاین" }.map { it.groupTitle }.filter { it.isNotBlank() }
+    val places = (defaultPlaces + savedPlaces).distinct()
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("زیارت آنلاین", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Text("مکان موردنظر را انتخاب کن. برای جلوگیری از لینک‌های ساختگی، پخش زنده فقط پس از افزودن نشانی معتبر و رسمی فعال می‌شود.",
@@ -997,6 +1000,16 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
             items(places) { item ->
                 FilterChip(selected = place == item, onClick = { place = item }, label = { Text(item) })
             }
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(value = customPlace, onValueChange = { customPlace = it },
+                modifier = Modifier.weight(1f), singleLine = true, label = { Text("افزودن مکان جدید") })
+            TextButton(onClick = {
+                val clean = customPlace.trim()
+                if (clean.isNotBlank() && clean !in places) place = clean
+                customPlace = ""
+            }) { Text("افزودن", color = Gold) }
         }
         val available = savedChannels.filter { it.country == "زیارت آنلاین" && it.groupTitle == place }
         if (available.isEmpty()) {
