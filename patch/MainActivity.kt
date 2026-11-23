@@ -1229,7 +1229,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         MoreButton("تهیه نسخه پشتیبان", Icons.Default.Backup, onBackupExport)
         MoreButton("بازیابی نسخه پشتیبان", Icons.Default.Restore, onBackupImport)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
-        Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی", color = SecondaryText, fontSize = 12.sp)
+        Text("زبان‌های زیرنویس قابل ترجمه به فارسی: انگلیسی، ترکی استانبولی، ترکی آذربایجانی و عبری", color = SecondaryText, fontSize = 12.sp)
     }
 }
 
@@ -1272,7 +1272,7 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
 
                 fun translateFrom(languageTag: String) {
                     if (thisRequest != requestId) return
-                    val sourceLanguage = TranslateLanguage.fromLanguageTag(languageTag)
+                    val normalizedLanguageTag = if (languageTag.equals("iw", ignoreCase = true) || languageTag.startsWith("iw-", ignoreCase = true)) "he" + languageTag.drop(2) else languageTag\n                    val sourceLanguage = TranslateLanguage.fromLanguageTag(normalizedLanguageTag)
                     if (sourceLanguage == null || sourceLanguage !in TranslateLanguage.getAllLanguages()) {
                         translationStatus = "زبان این زیرنویس در موتور ترجمه پشتیبانی نمی‌شود."
                         translatedText = ""
@@ -1652,7 +1652,7 @@ fun LiveDubbingPage() {
             volume = it
             prefs.edit().putFloat("live_dubbing_volume", it).apply()
         }, valueRange = 0f..1f)
-        Text("زبان‌های ورودی موردنظر: انگلیسی، ترکی استانبولی و ترکی آذربایجانی؛ خروجی فارسی.",
+        Text("زبان‌های ورودی موردنظر: انگلیسی، ترکی استانبولی، ترکی آذربایجانی و عبری؛ خروجی فارسی.",
             color = SecondaryText, fontSize = 12.sp)
     }
 }
