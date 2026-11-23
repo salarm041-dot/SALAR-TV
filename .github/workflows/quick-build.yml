@@ -1,0 +1,97 @@
+name: SALAR TV Quick Android Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quick-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract project ZIP
+        run: |
+          mkdir project
+          unzip -q SALAR_TV_Source_Download.zip -d project
+          SETTINGS=$(find project -name settings.gradle.kts -print -quit)
+          test -n "$SETTINGS"
+          echo "PROJECT_DIR=$(dirname "$SETTINGS")" >> "$GITHUB_ENV"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Apply SALAR TV source and recording components
+        run: |
+          install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
+          install -D patch/HlsRecorderService.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HlsRecorderService.kt"
+          install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
+          install -D patch/RecordingBootReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingBootReceiver.kt"
+          install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
+          install -D patch/ic_salar_tv.xml "$PROJECT_DIR/app/src/main/res/drawable/ic_salar_tv.xml"
+          install -D patch/ic_launcher_fallback.xml "$PROJECT_DIR/app/src/main/res/mipmap/ic_launcher.xml"
+          install -D patch/ic_launcher_adaptive.xml "$PROJECT_DIR/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+          python3 - "$PROJECT_DIR/app/src/main/AndroidManifest.xml" "$PROJECT_DIR/app/build.gradle.kts" <<'PY'
+          import re, sys
+          from pathlib import Path
+          manifest = Path(sys.argv[1])
+          s = manifest.read_text()
+          s = s.replace('<uses-permission android:name="android.permission.INTERNET" />',
+              '<uses-permission android:name="android.permission.INTERNET" />\\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
+          s = s.replace('android:icon="@drawable/ic_salar_tv"', 'android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"')
+          s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\\n        <receiver android:name=".RecordingBootReceiver" android:enabled="true" android:exported="false"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter></receiver>\\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\\n    </application>')
+          activity_pattern = r'<activity\\b(?=[^>]*android:name="(?:\\.MainActivity|com\\.salar\\.tv\\.MainActivity)")[^>]*>'
+          match = re.search(activity_pattern, s)
+          if not match:
+              raise SystemExit("MainActivity declaration not found")
+          tag = match.group(0)
+          if "android:supportsPictureInPicture=" not in tag:
+              tag = tag[:-1] + ' android:supportsPictureInPicture="true">'
+          if "android:configChanges=" not in tag:
+              tag = tag[:-1] + ' android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">'
+          manifest.write_text(s[:match.start()] + tag + s[match.end():])
+          gradle = Path(sys.argv[2])
+          g = gradle.read_text()
+          g, vc = re.subn(r'versionCode *= *[0-9]+', 'versionCode = 13', g, count=1)
+          g, vn = re.subn(r'versionName\\s*=\\s*"[^"]+"', 'versionName = "1.3.0"', g, count=1)
+          if vc != 1 or vn != 1:
+              raise SystemExit("Could not update app version")
+          gradle.write_text(g)
+          PY
+
+      - name: Compile debug APK
+        run: gradle --no-daemon --stacktrace -p "$PROJECT_DIR" :app:assembleDebug
+
+      - name: Verify APK
+        run: |
+          APK="$PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          ls -lh "$APK"
+          "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n1)/aapt" dump badging "$APK" | head -n 8
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Quick-Debug
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
