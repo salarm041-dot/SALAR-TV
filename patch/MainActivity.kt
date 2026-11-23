@@ -73,6 +73,10 @@ data class Channel(
     val groupTitle: String = ""
 )
 
+data class ScheduledRecording(val name: String, val url: String, val startMillis: Long, val durationMinutes: Int) {
+    val requestCode: Int get() = (name + url + startMillis).hashCode()
+}
+
 class MainActivity : ComponentActivity() {
     fun enterPlayerPictureInPicture() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -137,6 +141,26 @@ fun SalarTvApp() {
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
     var editingChannel by remember { mutableStateOf<Channel?>(null) }
+    val scheduledRecordings = remember {
+        mutableStateListOf<ScheduledRecording>().apply {
+            runCatching {
+                val stored = JSONArray(prefs.getString("scheduled_recordings", "[]") ?: "[]")
+                for (i in 0 until stored.length()) {
+                    val item = stored.getJSONObject(i)
+                    add(ScheduledRecording(item.optString("name"), item.optString("url"),
+                        item.optLong("startMillis"), item.optInt("durationMinutes", 60)))
+                }
+            }
+        }
+    }
+    fun saveScheduledRecordings() {
+        val stored = JSONArray()
+        scheduledRecordings.forEach { item ->
+            stored.put(JSONObject().put("name", item.name).put("url", item.url)
+                .put("startMillis", item.startMillis).put("durationMinutes", item.durationMinutes))
+        }
+        prefs.edit().putString("scheduled_recordings", stored.toString()).apply()
+    }
     var brightness by remember { mutableFloatStateOf(0.75f) }
     var useExternalPlayer by remember { mutableStateOf(prefs.getBoolean("external_player_default", false)) }
     var rememberPlayerChoice by remember { mutableStateOf(false) }
@@ -194,6 +218,7 @@ fun SalarTvApp() {
                 .put("version", 1)
                 .put("channels", JSONArray(prefs.getString("channels", "[]") ?: "[]"))
                 .put("schedules", prefs.getString("schedules", "") ?: "")
+                .put("scheduled_recordings", prefs.getString("scheduled_recordings", "[]") ?: "[]")
                 .put("external_player_default", prefs.getBoolean("external_player_default", false))
                 .put("theme_mode", prefs.getString("theme_mode", "dark") ?: "dark")
             context.contentResolver.openOutputStream(uri)?.use { it.write(backup.toString(2).toByteArray(Charsets.UTF_8)) }
@@ -219,6 +244,7 @@ fun SalarTvApp() {
             saveChannels()
             prefs.edit()
                 .putString("schedules", backup.optString("schedules", ""))
+                .putString("scheduled_recordings", backup.optString("scheduled_recordings", "[]"))
                 .putBoolean("external_player_default", backup.optBoolean("external_player_default", false))
                 .putString("theme_mode", backup.optString("theme_mode", "dark"))
                 .apply()
@@ -387,7 +413,7 @@ fun SalarTvApp() {
                         onImport = { m3uLauncher.launch(arrayOf("*/*")) }
                     )
                     "بیشتر" -> MorePage(
-                        onSchedule = { showSchedule = true },
+                        onSchedule = { page = "زمان‌بندی‌ها" },
                         onAbout = { page = "درباره ما" },
                         onSources = { page = "افزودن منابع" },
                         onRecordings = { page = "ضبط‌ها" },
@@ -408,6 +434,22 @@ fun SalarTvApp() {
                         onThemeModeChange = { mode ->
                             themeMode = mode
                             prefs.edit().putString("theme_mode", mode).apply()
+                        }
+                    )
+                    "زمان‌بندی‌ها" -> ScheduledRecordingsPage(
+                        items = scheduledRecordings.toList(),
+                        onAdd = { showSchedule = true },
+                        onCancel = { item ->
+                            val alarm = context.getSystemService(AlarmManager::class.java)
+                            val pending = PendingIntent.getBroadcast(context, item.requestCode,
+                                Intent(context, RecordingAlarmReceiver::class.java),
+                                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
+                            if (pending != null) {
+                                alarm.cancel(pending)
+                                pending.cancel()
+                            }
+                            scheduledRecordings.removeAll { it.requestCode == item.requestCode }
+                            saveScheduledRecordings()
                         }
                     )
                     "ضبط‌ها" -> RecordingsPage(
@@ -529,6 +571,12 @@ fun SalarTvApp() {
                             return@TextButton
                         }
                         alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
+                        val newItem = ScheduledRecording(title.trim(), streamUrl.trim(), startMillis, minutes)
+                        require(scheduledRecordings.none { it.requestCode == newItem.requestCode }) {
+                            "این ضبط قبلاً زمان‌بندی شده است."
+                        }
+                        scheduledRecordings.add(newItem)
+                        saveScheduledRecordings()
                         schedules = (schedules + "\n$title | $dateTime | $minutes دقیقه").trim()
                         prefs.edit().putString("schedules", schedules).apply()
                         showSchedule = false
@@ -539,6 +587,37 @@ fun SalarTvApp() {
             },
             dismissButton = { TextButton(onClick = { showSchedule = false }) { Text("انصراف") } }
         )
+    }
+}
+
+@Composable
+fun ScheduledRecordingsPage(items: List<ScheduledRecording>, onAdd: () -> Unit, onCancel: (ScheduledRecording) -> Unit) {
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text("ضبط‌های زمان‌بندی‌شده", color = Gold, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+            Button(onClick = onAdd, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
+                Icon(Icons.Default.Add, contentDescription = null, tint = Color.Black)
+                Text("افزودن", color = Color.Black)
+            }
+        }
+        if (items.isEmpty()) Text("هنوز ضبطی زمان‌بندی نشده است.", color = SecondaryText)
+        else LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(items, key = { it.requestCode }) { item ->
+                Card(colors = CardDefaults.cardColors(containerColor = Panel), modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(item.name, color = TextMain, fontWeight = FontWeight.Bold)
+                        Text(java.text.SimpleDateFormat("yyyy/MM/dd  HH:mm", java.util.Locale.getDefault())
+                            .format(java.util.Date(item.startMillis)) + "  •  " + item.durationMinutes + " دقیقه",
+                            color = SecondaryText, fontSize = 12.sp)
+                        Text(item.url, color = MutedText, fontSize = 10.sp, maxLines = 1)
+                        TextButton(onClick = { onCancel(item) }) {
+                            Icon(Icons.Default.DeleteOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                            Text("لغو زمان‌بندی", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
