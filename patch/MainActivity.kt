@@ -538,9 +538,19 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onDelete = { file -> file.delete(); page = "ضبط‌ها" }
                     )
                     "درباره ما" -> AboutPage()
-                    "تلویزیون" -> ChannelList(channels.filter { it.kind == "تلویزیون" }, onSelect = { selected = it },
-                        onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
-                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                    "تلویزیون" -> TvCountryPage(onCountry = { country -> page = "کشور:$country" })
+                    "کشور:ایران", "کشور:ترکیه", "کشور:آذربایجان", "کشور:سایر" -> {
+                        val country = page.removePrefix("کشور:")
+                        val filtered = channels.filter { c -> c.kind == "تلویزیون" && when (country) {
+                            "ایران" -> c.country.contains("ایران")
+                            "ترکیه" -> c.country.contains("ترکیه")
+                            "آذربایجان" -> c.country.contains("آذربایجان")
+                            else -> c.country !in setOf("ایران", "ترکیه", "آذربایجان", "جمهوری آذربایجان")
+                        } }
+                        ChannelList(filtered, onSelect = { selected = it },
+                            onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
+                            onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                    }
                     "رادیو" -> ChannelList(channels.filter { it.kind == "رادیو" }, onSelect = { selected = it },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
@@ -548,7 +558,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                     else -> HomePage(channels, onSelect = { selected = it }, onAdd = { page = "افزودن منابع" },
-                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
+                        onPage = { destination -> page = destination })
                 }
             }
         }
@@ -698,67 +709,137 @@ fun ScheduledRecordingsPage(items: List<ScheduledRecording>, onAdd: () -> Unit, 
 
 @Composable
 fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> Unit,
-             onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
+             onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {},
+             onPage: (String) -> Unit = {}) {
     val tvCount = channels.count { it.kind == "تلویزیون" }
     val radioCount = channels.count { it.kind == "رادیو" }
-    val favoriteCount = channels.count { it.favorite }
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(22.dp)) {
-            Column(Modifier.fillMaxWidth().background(
-                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF29251D), Panel))
-            ).padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.LiveTv, null, tint = Gold, modifier = Modifier.size(34.dp))
-                    Spacer(Modifier.width(10.dp))
-                    Column {
-                        Text("SALAR TV", color = Gold, fontSize = 25.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
-                        Text("مرکز سرگرمی و پخش زنده شما", color = SecondaryText, fontSize = 12.sp)
+    @Composable
+    fun MainTile(title: String, subtitle: String, icon: androidx.compose.ui.graphics.vector.ImageVector,
+                 accent: Color, modifier: Modifier = Modifier, action: () -> Unit) {
+        Card(
+            modifier = modifier.clickable { action() },
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF111116)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 9.dp)
+        ) {
+            Box(Modifier.fillMaxWidth().background(
+                androidx.compose.ui.graphics.Brush.linearGradient(
+                    listOf(accent.copy(alpha = 0.22f), Color(0xFF17171D), Color(0xFF09090C))
+                )
+            ).padding(18.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(Modifier.size(48.dp).background(accent.copy(alpha = 0.14f), RoundedCornerShape(15.dp)),
+                        contentAlignment = Alignment.Center) {
+                        Icon(icon, null, tint = accent, modifier = Modifier.size(29.dp))
                     }
-                }
-                Text("تلویزیون، رادیو و شبکه‌های جهان", color = TextMain, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                Text("ایران  •  ترکیه  •  جمهوری آذربایجان  •  جهان", color = SecondaryText, fontSize = 12.sp)
-                Button(onClick = onAdd, modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Gold),
-                    shape = RoundedCornerShape(13.dp)) {
-                    Icon(Icons.Default.AddLink, null, tint = Color.Black)
-                    Spacer(Modifier.width(8.dp))
-                    Text("افزودن شبکه یا سرور", color = Color.Black, fontWeight = FontWeight.Bold)
+                    Text(title, color = Color(0xFFFFD978), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(subtitle, color = Color(0xFFBDB8AA), fontSize = 11.sp)
                 }
             }
         }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(Triple(Icons.Default.Tv, "$tvCount", "تلویزیون"), Triple(Icons.Default.Radio, "$radioCount", "رادیو"),
-                Triple(Icons.Default.Favorite, "$favoriteCount", "علاقه‌مندی")).forEach { item ->
-                Card(Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = Panel),
-                    shape = RoundedCornerShape(14.dp)) {
-                    Column(Modifier.fillMaxWidth().padding(vertical = 13.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(item.first, null, tint = Gold, modifier = Modifier.size(22.dp))
-                        Text(item.second, color = TextMain, fontSize = 19.sp, fontWeight = FontWeight.Bold)
-                        Text(item.third, color = MutedText, fontSize = 10.sp)
+    }
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            shape = RoundedCornerShape(26.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF08080B)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+        ) {
+            Box(Modifier.fillMaxWidth().background(
+                androidx.compose.ui.graphics.Brush.linearGradient(
+                    listOf(Color(0xFF3B2A0D), Color(0xFF17120C), Color(0xFF08080B))
+                )
+            ).padding(22.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.LiveTv, null, tint = Color(0xFFFFD45C), modifier = Modifier.size(42.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Column {
+                            Text("SALAR TV", color = Color(0xFFFFD45C), fontSize = 29.sp,
+                                fontWeight = FontWeight.Black, letterSpacing = 3.sp)
+                            Text("سینمای جهان در دستان شما", color = Color(0xFFE7D8B1), fontSize = 12.sp)
+                        }
                     }
+                    Box(Modifier.fillMaxWidth().height(1.dp).background(
+                        androidx.compose.ui.graphics.Brush.horizontalGradient(
+                            listOf(Color.Transparent, Color(0xFFFFD45C), Color(0xFF48D9E8), Color.Transparent)
+                        )
+                    ))
+                    Text("به دنیای پخش زنده خوش آمدید", color = Color.White, fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold)
+                    Text("$tvCount شبکه تلویزیونی  •  $radioCount ایستگاه رادیویی",
+                        color = Color(0xFFC7BFAE), fontSize = 11.sp)
                 }
             }
         }
-        Text("دسترسی سریع", color = Gold, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("تلویزیون" to Icons.Default.Tv, "رادیو" to Icons.Default.Radio, "شبکه‌های من" to Icons.Default.PlaylistPlay).forEach { (label, icon) ->
-                Card(Modifier.weight(1f).clickable { if (label == "شبکه‌های من") onAdd() else channels.firstOrNull { it.kind == label }?.let(onSelect) },
-                    colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(14.dp)) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(icon, null, tint = Gold, modifier = Modifier.size(25.dp))
-                        Text(label, color = TextMain, fontSize = 11.sp)
-                    }
-                }
+        Text("دسترسی به بخش‌ها", color = Color(0xFFFFD45C), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            MainTile("تلویزیون", "شبکه‌های کشورهای جهان", Icons.Default.Tv, Color(0xFFFFD45C),
+                Modifier.weight(1f)) { onPage("تلویزیون") }
+            MainTile("رادیو", "ایستگاه‌های فارسی و جهانی", Icons.Default.Radio, Color(0xFF55DDE0),
+                Modifier.weight(1f)) { onPage("رادیو") }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            MainTile("زیارت آنلاین", "حرم‌ها و اماکن مقدس", Icons.Default.AccountBalance, Color(0xFFE7BC65),
+                Modifier.weight(1f)) { onPage("زیارت آنلاین") }
+            MainTile("تنظیمات", "شخصی‌سازی برنامه", Icons.Default.Settings, Color(0xFFB58BFF),
+                Modifier.weight(1f)) { onPage("تنظیمات") }
+        }
+        Card(
+            modifier = Modifier.fillMaxWidth().clickable { onAdd() },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF17130C))
+        ) {
+            Row(Modifier.fillMaxWidth().padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.AddLink, null, tint = Color(0xFFFFD45C))
+                Spacer(Modifier.width(10.dp))
+                Text("افزودن شبکه یا سرور", color = Color(0xFFFFD978), fontWeight = FontWeight.Bold)
+                Spacer(Modifier.weight(1f))
+                Icon(Icons.Default.ChevronRight, null, tint = Color(0xFFFFD45C))
             }
         }
-        Text("شبکه‌های شما", color = Gold, fontWeight = FontWeight.Bold)
-        if (channels.isEmpty()) {
-            Text("هنوز شبکه‌ای اضافه نشده است. از بخش افزودن منابع، لینک مجاز یا فایل M3U وارد کنید.", color = SecondaryText)
-        } else ChannelList(channels, onSelect, {}, onEdit, onDelete)
     }
 }
 
-
+@Composable
+fun TvCountryPage(onCountry: (String) -> Unit) {
+    data class CountryCard(val name: String, val flag: String, val symbol: String, val detail: String, val color: Color)
+    val countries = listOf(
+        CountryCard("ایران", "🇮🇷", "تخت جمشید", "شبکه‌های صدا و سیمای ایران", Color(0xFF42D6A4)),
+        CountryCard("ترکیه", "🇹🇷", "هلال و ستاره", "شبکه‌های تلویزیونی ترکیه", Color(0xFFFF5A68)),
+        CountryCard("آذربایجان", "🇦🇿", "شعله آتش", "شبکه‌های جمهوری آذربایجان", Color(0xFF42C8E8)),
+        CountryCard("سایر", "🌐", "جهان", "شبکه‌های بین‌المللی و سایر کشورها", Color(0xFFFFD45C))
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("شبکه‌های تلویزیونی", color = Color(0xFFFFD45C), fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
+        Text("کشور موردنظر را انتخاب کنید", color = SecondaryText, fontSize = 12.sp)
+        countries.forEach { country ->
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable { onCountry(country.name) },
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF101015)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Row(
+                    Modifier.fillMaxWidth().background(
+                        androidx.compose.ui.graphics.Brush.horizontalGradient(
+                            listOf(country.color.copy(alpha = 0.23f), Color(0xFF17171D), Color(0xFF09090C))
+                        )
+                    ).padding(18.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(country.flag, fontSize = 38.sp)
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(country.name, color = Color(0xFFFFD978), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text(country.symbol, color = country.color, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(country.detail, color = Color(0xFFBDB8AA), fontSize = 10.sp)
+                    }
+                    Icon(Icons.Default.PlayCircleFilled, null, tint = country.color, modifier = Modifier.size(30.dp))
+                }
+            }
+        }
+    }
+}
 @Composable
 // Reads optional tvg-logo URLs from M3U and renders a safe TV/radio fallback.
 private fun ChannelLogo(logoUrl: String, kind: String) {
