@@ -394,7 +394,13 @@ fun SalarTvApp() {
                         onLiveDubbing = { page = "دوبله هوشمند زنده" },
                         onSettings = { page = "تنظیمات" },
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
-                        onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
+                        onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) },
+                        onPilgrimage = { page = "زیارت آنلاین" }
+                    )
+                    "زیارت آنلاین" -> PilgrimagePage(
+                        savedChannels = channels,
+                        onPlay = { selected = it },
+                        onAdd = { channel -> channels.add(channel); saveChannels() }
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "تنظیمات" -> SettingsPage(
@@ -531,21 +537,61 @@ fun SalarTvApp() {
 @Composable
 fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> Unit,
              onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
+    val tvCount = channels.count { it.kind == "تلویزیون" }
+    val radioCount = channels.count { it.kind == "رادیو" }
+    val favoriteCount = channels.count { it.favorite }
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(18.dp)) {
-            Column(Modifier.fillMaxWidth().padding(18.dp)) {
-                Text("دنیای تلویزیون و رادیو", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text("ایران • ترکیه • جمهوری آذربایجان • جهان", color = SecondaryText)
-                Spacer(Modifier.height(12.dp))
-                Button(onClick = onAdd, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
-                    Icon(Icons.Default.Add, null); Text("افزودن شبکه یا سرور", color = Color.Black)
+        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(22.dp)) {
+            Column(Modifier.fillMaxWidth().background(
+                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF29251D), Panel))
+            ).padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.LiveTv, null, tint = Gold, modifier = Modifier.size(34.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text("SALAR TV", color = Gold, fontSize = 25.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                        Text("مرکز سرگرمی و پخش زنده شما", color = SecondaryText, fontSize = 12.sp)
+                    }
+                }
+                Text("تلویزیون، رادیو و شبکه‌های جهان", color = TextMain, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                Text("ایران  •  ترکیه  •  جمهوری آذربایجان  •  جهان", color = SecondaryText, fontSize = 12.sp)
+                Button(onClick = onAdd, modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold),
+                    shape = RoundedCornerShape(13.dp)) {
+                    Icon(Icons.Default.AddLink, null, tint = Color.Black)
+                    Spacer(Modifier.width(8.dp))
+                    Text("افزودن شبکه یا سرور", color = Color.Black, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(Triple(Icons.Default.Tv, "$tvCount", "تلویزیون"), Triple(Icons.Default.Radio, "$radioCount", "رادیو"),
+                Triple(Icons.Default.Favorite, "$favoriteCount", "علاقه‌مندی")).forEach { item ->
+                Card(Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = Panel),
+                    shape = RoundedCornerShape(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(vertical = 13.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(item.first, null, tint = Gold, modifier = Modifier.size(22.dp))
+                        Text(item.second, color = TextMain, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+                        Text(item.third, color = MutedText, fontSize = 10.sp)
+                    }
+                }
+            }
+        }
+        Text("دسترسی سریع", color = Gold, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("تلویزیون" to Icons.Default.Tv, "رادیو" to Icons.Default.Radio, "شبکه‌های من" to Icons.Default.PlaylistPlay).forEach { (label, icon) ->
+                Card(Modifier.weight(1f).clickable { if (label == "شبکه‌های من") onAdd() else channels.firstOrNull { it.kind == label }?.let(onSelect) },
+                    colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(icon, null, tint = Gold, modifier = Modifier.size(25.dp))
+                        Text(label, color = TextMain, fontSize = 11.sp)
+                    }
                 }
             }
         }
         Text("شبکه‌های شما", color = Gold, fontWeight = FontWeight.Bold)
         if (channels.isEmpty()) {
-            Text("هنوز شبکه‌ای اضافه نشده است. از بخش افزودن منابع، لینک مجاز یا فایل M3U وارد کنید.",
-                color = SecondaryText)
+            Text("هنوز شبکه‌ای اضافه نشده است. از بخش افزودن منابع، لینک مجاز یا فایل M3U وارد کنید.", color = SecondaryText)
         } else ChannelList(channels, onSelect, {}, onEdit, onDelete)
     }
 }
@@ -764,9 +810,22 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
              onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
-             onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
+             onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(16.dp)) {
+            Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                Text("زیارت آنلاین", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text("پخش زنده اماکن مذهبی؛ لینک رسمی هر مکان را می‌توانی اضافه کنی.", color = SecondaryText, fontSize = 12.sp)
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = onPilgrimage, modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
+                    Icon(Icons.Default.Mosque, null, tint = Color.Black)
+                    Spacer(Modifier.width(8.dp))
+                    Text("ورود به زیارت آنلاین", color = Color.Black)
+                }
+            }
+        }
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
@@ -775,8 +834,57 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         MoreButton("تهیه نسخه پشتیبان", Icons.Default.Backup, onBackupExport)
         MoreButton("بازیابی نسخه پشتیبان", Icons.Default.Restore, onBackupImport)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
-        Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی",
+        Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی", color = SecondaryText, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAdd: (Channel) -> Unit) {
+    var place by remember { mutableStateOf("مشهد مقدس") }
+    var title by remember { mutableStateOf("") }
+    var streamUrl by remember { mutableStateOf("") }
+    val places = listOf("مشهد مقدس", "کربلا", "نجف", "مکه مکرمه", "مدینه منوره", "سایر اماکن مذهبی")
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("زیارت آنلاین", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text("مکان موردنظر را انتخاب کن. برای جلوگیری از لینک‌های ساختگی، پخش زنده فقط پس از افزودن نشانی معتبر و رسمی فعال می‌شود.",
             color = SecondaryText, fontSize = 12.sp)
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            items(places) { item ->
+                FilterChip(selected = place == item, onClick = { place = item }, label = { Text(item) })
+            }
+        }
+        val available = savedChannels.filter { it.country == "زیارت آنلاین" && it.groupTitle == place }
+        if (available.isEmpty()) {
+            Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
+                Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Icon(Icons.Default.Mosque, null, tint = Gold, modifier = Modifier.size(30.dp))
+                    Text("هنوز لینک پخش زنده‌ای برای $place ثبت نشده است.", color = TextMain, fontWeight = FontWeight.SemiBold)
+                    Text("نشانی پخش رسمی یا مجاز را در کادر زیر وارد کن.", color = SecondaryText, fontSize = 12.sp)
+                }
+            }
+        } else {
+            available.forEach { channel ->
+                MoreButton(channel.name, Icons.Default.PlayCircle, { onPlay(channel) })
+            }
+        }
+        OutlinedTextField(value = title, onValueChange = { title = it }, modifier = Modifier.fillMaxWidth(),
+            label = { Text("عنوان پخش (مثلاً حرم مطهر)") }, singleLine = true)
+        OutlinedTextField(value = streamUrl, onValueChange = { streamUrl = it }, modifier = Modifier.fillMaxWidth(),
+            label = { Text("لینک مستقیم پخش زنده") }, placeholder = { Text("https://…") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
+        Button(onClick = {
+            val cleanUrl = streamUrl.trim()
+            if (title.isNotBlank() && (cleanUrl.startsWith("https://") || cleanUrl.startsWith("http://"))) {
+                onAdd(Channel(title.trim(), cleanUrl, "زیارت آنلاین", "تلویزیون", groupTitle = place))
+                title = ""
+                streamUrl = ""
+            }
+        }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
+            Icon(Icons.Default.Add, null, tint = Color.Black)
+            Spacer(Modifier.width(8.dp))
+            Text("ذخیره لینک این مکان", color = Color.Black)
+        }
+        Text("توجه: دسترسی و پخش واقعی به معتبر بودن لینک و پشتیبانی قالب آن بستگی دارد.", color = MutedText, fontSize = 11.sp)
     }
 }
 
