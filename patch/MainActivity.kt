@@ -344,6 +344,7 @@ fun SalarTvApp() {
                                     settings.mediaPlaybackRequiresUserGesture = false
                                     webViewClient = android.webkit.WebViewClient()
                                     webChromeClient = android.webkit.WebChromeClient()
+                                    android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
                                     loadUrl(webUrl)
                                 }
                             },
@@ -938,7 +939,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(16.dp)) {
             Column(Modifier.fillMaxWidth().padding(14.dp)) {
                 Text("زیارت آنلاین", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text("پخش زنده اماکن مذهبی؛ لینک رسمی هر مکان را می‌توانی اضافه کنی.", color = SecondaryText, fontSize = 12.sp)
+                Text("منابع رسمی پخش اماکن مذهبی از پیش اضافه شده‌اند؛ مکان یا لینک تازه هم می‌توانی اضافه کنی.", color = SecondaryText, fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = onPilgrimage, modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
@@ -1024,7 +1025,7 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
     val places = (defaultPlaces + savedPlaces).distinct()
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("زیارت آنلاین", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text("مکان موردنظر را انتخاب کن. برای جلوگیری از لینک‌های ساختگی، پخش زنده فقط پس از افزودن نشانی معتبر و رسمی فعال می‌شود.",
+        Text("مکان را انتخاب کن و یکی از پخش‌های رسمی آماده را اجرا کن؛ امکان افزودن مکان و لینک تازه نیز وجود دارد.",
             color = SecondaryText, fontSize = 12.sp)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             items(places) { item ->
