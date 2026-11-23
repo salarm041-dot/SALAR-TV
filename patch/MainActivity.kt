@@ -15,6 +15,7 @@ import java.net.URLEncoder
 import android.app.Activity
 import java.io.File
 import android.os.Bundle
+import android.content.res.Configuration
 import android.os.Build
 import android.app.PictureInPictureParams
 import android.util.Rational
@@ -78,28 +79,51 @@ data class ScheduledRecording(val name: String, val url: String, val startMillis
 }
 
 class MainActivity : ComponentActivity() {
+    var pipMode by mutableStateOf(false)
+        private set
+    var activePlayer: ExoPlayer? = null
+
     fun enterPlayerPictureInPicture() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            runCatching {
-                val params = PictureInPictureParams.Builder()
-                    .setAspectRatio(Rational(16, 9))
-                    .build()
-                enterPictureInPictureMode(params)
-            }.onFailure {
-                android.widget.Toast.makeText(this, "حالت تصویر در تصویر در این دستگاه در دسترس نیست.", android.widget.Toast.LENGTH_SHORT).show()
-            }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        if (activePlayer?.isPlaying != true) {
+            android.widget.Toast.makeText(this, "ابتدا پخش زنده را اجرا کنید.", android.widget.Toast.LENGTH_SHORT).show()
+            return
         }
+        runCatching {
+            val params = PictureInPictureParams.Builder()
+                .setAspectRatio(Rational(16, 9))
+                .build()
+            enterPictureInPictureMode(params)
+        }.onFailure {
+            android.widget.Toast.makeText(this, "ورود به تصویر در تصویر ممکن نشد.", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && activePlayer?.isPlaying == true) {
+            enterPlayerPictureInPicture()
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        pipMode = isInPictureInPictureMode
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { SalarTvApp() }
+        pipMode = isInPictureInPictureMode
+        setContent { SalarTvApp(isInPip = pipMode) }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SalarTvApp() {
+fun SalarTvApp(isInPip: Boolean = false) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     val channels = remember {
@@ -193,7 +217,34 @@ fun SalarTvApp() {
     }
 
     val player = remember { ExoPlayer.Builder(context).build() }
-    DisposableEffect(Unit) { onDispose { player.release() } }
+    DisposableEffect(player) {
+        (context as? MainActivity)?.activePlayer = player
+        onDispose {
+            val activity = context as? MainActivity
+            if (activity?.activePlayer === player) activity.activePlayer = null
+            player.release()
+        }
+    }
+
+    // PiP must render only the video surface. The normal app scaffold and all controls
+    // are removed while the Activity is in picture-in-picture mode.
+    if (isInPip && selected != null && selected!!.kind != "وب" && !useExternalPlayer) {
+        AndroidView(
+            factory = { ctx -> PlayerView(ctx).apply {
+                this.player = player
+                useController = false
+                resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                setKeepContentOnPlayerReset(true)
+            } },
+            update = { view ->
+                if (view.player !== player) view.player = player
+                view.useController = false
+                view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+        return
+    }
 
     var selectedM3uName by remember { mutableStateOf("") }
     val m3uLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -377,17 +428,6 @@ fun SalarTvApp() {
                             }
                         }
                     }
-                    Text("روشنایی تصویر", color = Gold, fontSize = 12.sp)
-                    Slider(value = brightness, onValueChange = {
-                        brightness = it
-                        (context as? Activity)?.window?.let { window ->
-                            val attrs = window.attributes
-                            attrs.screenBrightness = it.coerceIn(0.05f, 1f)
-                            window.attributes = attrs
-                        }
-                    }, valueRange = 0.05f..1f)
-                    Text("صدای پخش", color = Gold, fontSize = 12.sp)
-                    Slider(value = player.volume, onValueChange = { player.volume = it }, valueRange = 0f..1f)
                     LaunchedEffect(selected!!.url, useExternalPlayer, selected!!.kind) {
                         val streamAddress = selected!!.url
                         val officialWebPage = streamAddress.contains("ott.iranintl.com", ignoreCase = true) ||
