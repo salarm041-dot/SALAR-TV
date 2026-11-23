@@ -13,6 +13,7 @@ on:
       - feature/player-controls-recording
       - feature/channel-list-refresh
       - fix/queue-android-validation
+      - feature/shrine-directory-ui
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}-recovery-v3
