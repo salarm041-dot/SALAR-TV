@@ -173,8 +173,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
             Channel("مسجدالنبی — پخش زنده رسمی سنت TV", "https://www.youtube.com/embed/9A1S0xAPVIs?autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مدینه منوره"),
             Channel("پخش زنده ۲۴ ساعته عتبات مقدسه", "https://imamhusseintv.com/en/live/6", "زیارت آنلاین", "وب", groupTitle = "سایر اماکن مذهبی")
         )
+        val arabic = runCatching {
+            context.assets.open("arabic-channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
+        }.getOrDefault(emptyList())
         val existing = channels.map { it.url }.toSet()
-        channels.addAll((bundled + pilgrimage).distinctBy { it.url }.filter { it.url !in existing })
+        channels.addAll((bundled + pilgrimage + arabic).distinctBy { it.url }.filter { it.url !in existing })
         saveChannels()
         prefs.edit().putBoolean("built_in_seeded", true).apply()
     }
@@ -682,7 +685,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onDelete = { file -> file.delete(); page = "ضبط‌ها" }
                     )
                     "درباره ما" -> AboutPage()
-                    "تلویزیون" -> TvCountryPage(onCountry = { country -> page = "کشور:$country" })
+                    "تلویزیون" -> TvCountryPage(onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" })
+                    "شبکه‌های عربی" -> ArabicCountryPage(onCountry = { country -> page = "عربی:$country" })
                     "کشور:ایران", "کشور:ترکیه", "کشور:آذربایجان", "کشور:سایر" -> {
                         val country = page.removePrefix("کشور:")
                         val filtered = channels.filter { c -> c.kind == "تلویزیون" && when (country) {
@@ -701,7 +705,14 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selected = it },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
-                    else -> HomePage(channels, onSelect = { selected = it }, onAdd = { page = "افزودن منابع" },
+                    else -> if (page.startsWith("عربی:")) {
+                        val arabicCountry = page.removePrefix("عربی:")
+                        ChannelList(channels.filter { it.kind == "تلویزیون" && it.country == arabicCountry },
+                            onSelect = { selected = it },
+                            onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
+                            onEdit = { editingChannel = it },
+                            onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                    } else HomePage(channels, onSelect = { selected = it }, onAdd = { page = "افزودن منابع" },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onPage = { destination -> page = destination })
                 }
@@ -945,12 +956,39 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
 }
 
 @Composable
+fun ArabicCountryPage(onCountry: (String) -> Unit) {
+    val countries = listOf(
+        "عربستان" to "🇸🇦", "امارات" to "🇦🇪", "قطر" to "🇶🇦", "کویت" to "🇰🇼",
+        "بحرین" to "🇧🇭", "عمان" to "🇴🇲", "عراق" to "🇮🇶", "اردن" to "🇯🇴",
+        "لبنان" to "🇱🇧", "سوریه" to "🇸🇾", "فلسطین" to "🇵🇸", "مصر" to "🇪🇬",
+        "مراکش" to "🇲🇦", "الجزایر" to "🇩🇿", "تونس" to "🇹🇳", "لیبی" to "🇱🇾",
+        "یمن" to "🇾🇪", "سودان" to "🇸🇩"
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("شبکه‌های عربی بر اساس کشور", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("کشور را انتخاب کنید؛ فهرست شبکه‌ها از قبل داخل برنامه قرار دارد.", color = SecondaryText, fontSize = 12.sp)
+        countries.forEach { (name, flag) ->
+            Card(Modifier.fillMaxWidth().clickable { onCountry(name) },
+                colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(14.dp)) {
+                Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(flag, fontSize = 30.sp)
+                    Spacer(Modifier.width(12.dp))
+                    Text(name, color = TextMain, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Icon(Icons.Default.ChevronRight, null, tint = Gold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun TvCountryPage(onCountry: (String) -> Unit) {
     data class CountryCard(val name: String, val flag: String, val symbol: String, val detail: String, val color: Color)
     val countries = listOf(
         CountryCard("ایران", "🇮🇷", "تخت جمشید", "شبکه‌های صدا و سیمای ایران", Color(0xFF42D6A4)),
         CountryCard("ترکیه", "🇹🇷", "هلال و ستاره", "شبکه‌های تلویزیونی ترکیه", Color(0xFFFF5A68)),
         CountryCard("آذربایجان", "🇦🇿", "شعله آتش", "شبکه‌های جمهوری آذربایجان", Color(0xFF42C8E8)),
+        CountryCard("عربی", "🌍", "شبکه‌های عربی", "فهرست آماده شبکه‌ها به تفکیک ۱۸ کشور", Color(0xFFFFB74D)),
         CountryCard("سایر", "🌐", "جهان", "شبکه‌های بین‌المللی و سایر کشورها", Color(0xFFFFD45C))
     )
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
