@@ -52,6 +52,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
 import androidx.media3.common.TrackSelectionOverride
+import androidx.media3.common.Player
+import androidx.media3.common.text.CueGroup
+import com.google.mlkit.nl.languageid.LanguageIdentification
+import com.google.mlkit.nl.translate.DownloadConditions
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.Translator
+import com.google.mlkit.nl.translate.TranslatorOptions
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.compose.ui.viewinterop.AndroidView
@@ -420,6 +428,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                                 modifier = Modifier.fillMaxSize()
                             )
+                            if (menuSubtitleEnabled) {
+                                LiveSubtitleTranslationOverlay(
+                                    player = player,
+                                    modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(12.dp)
+                                )
+                            }
                             Box(Modifier.align(Alignment.TopEnd).padding(8.dp)) {
                                 IconButton(
                                     onClick = { playerMenuExpanded = true },
@@ -1213,6 +1227,128 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
         MoreButton("بازیابی نسخه پشتیبان", Icons.Default.Restore, onBackupImport)
         MoreButton("درباره سازنده", Icons.Default.Info, onAbout)
         Text("زبان‌های هدف: فارسی، ترکی استانبولی، ترکی آذربایجانی و انگلیسی", color = SecondaryText, fontSize = 12.sp)
+    }
+}
+
+
+@Composable
+private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier = Modifier) {
+    var translatedText by remember(player) { mutableStateOf("") }
+    var translationStatus by remember(player) { mutableStateOf("در انتظار زیرنویس شبکه…") }
+
+    DisposableEffect(player) {
+        val languageIdentifier = LanguageIdentification.getClient()
+        var activeTranslator: Translator? = null
+        var activeSourceLanguage: String? = null
+        var lastSourceText = ""
+        var requestId = 0
+
+        val listener = object : Player.Listener {
+            override fun onCues(cueGroup: CueGroup) {
+                val sourceText = cueGroup.cues
+                    .mapNotNull { it.text?.toString()?.trim()?.takeIf { text -> text.isNotBlank() } }
+                    .joinToString(" ")
+                if (sourceText.isBlank()) {
+                    translatedText = ""
+                    return
+                }
+                if (sourceText == lastSourceText) return
+                lastSourceText = sourceText
+                val thisRequest = ++requestId
+                translationStatus = "در حال تشخیص زبان زیرنویس…"
+
+                val selectedLanguage = player.currentTracks.groups
+                    .asSequence()
+                    .filter { it.type == androidx.media3.common.C.TRACK_TYPE_TEXT }
+                    .mapNotNull { group ->
+                        (0 until group.length)
+                            .firstOrNull { group.isTrackSelected(it) }
+                            ?.let { group.getTrackFormat(it).language }
+                    }
+                    .firstOrNull { !it.isNullOrBlank() && it != "und" }
+
+                fun translateFrom(languageTag: String) {
+                    if (thisRequest != requestId) return
+                    val sourceLanguage = TranslateLanguage.fromLanguageTag(languageTag)
+                    if (sourceLanguage == null || sourceLanguage !in TranslateLanguage.getAllLanguages()) {
+                        translationStatus = "زبان این زیرنویس در موتور ترجمه پشتیبانی نمی‌شود."
+                        translatedText = ""
+                        return
+                    }
+                    if (sourceLanguage == TranslateLanguage.PERSIAN) {
+                        translatedText = sourceText
+                        translationStatus = "زیرنویس فارسی"
+                        return
+                    }
+                    if (activeTranslator == null || activeSourceLanguage != sourceLanguage) {
+                        activeTranslator?.close()
+                        activeTranslator = Translation.getClient(
+                            TranslatorOptions.Builder()
+                                .setSourceLanguage(sourceLanguage)
+                                .setTargetLanguage(TranslateLanguage.PERSIAN)
+                                .build()
+                        )
+                        activeSourceLanguage = sourceLanguage
+                    }
+                    val translator = activeTranslator ?: return
+                    translationStatus = "در حال آماده‌سازی مدل ترجمه…"
+                    translator.downloadModelIfNeeded(DownloadConditions.Builder().build())
+                        .addOnSuccessListener {
+                            if (thisRequest != requestId) return@addOnSuccessListener
+                            translationStatus = "در حال ترجمه…"
+                            translator.translate(sourceText)
+                                .addOnSuccessListener { result ->
+                                    if (thisRequest == requestId) {
+                                        translatedText = result
+                                        translationStatus = ""
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    if (thisRequest == requestId) translationStatus = "ترجمه این بخش انجام نشد."
+                                }
+                        }
+                        .addOnFailureListener {
+                            if (thisRequest == requestId) {
+                                translationStatus = "دانلود مدل ترجمه ناموفق بود؛ اتصال اینترنت را بررسی کنید."
+                            }
+                        }
+                }
+
+                if (!selectedLanguage.isNullOrBlank()) {
+                    translateFrom(selectedLanguage)
+                } else {
+                    languageIdentifier.identifyLanguage(sourceText)
+                        .addOnSuccessListener { detected ->
+                            if (thisRequest != requestId) return@addOnSuccessListener
+                            if (detected == "und") translationStatus = "زبان زیرنویس شناسایی نشد."
+                            else translateFrom(detected)
+                        }
+                        .addOnFailureListener {
+                            if (thisRequest == requestId) translationStatus = "تشخیص زبان زیرنویس ناموفق بود."
+                        }
+                }
+            }
+        }
+        player.addListener(listener)
+        onDispose {
+            player.removeListener(listener)
+            activeTranslator?.close()
+            languageIdentifier.close()
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .background(Color.Black.copy(alpha = 0.78f), RoundedCornerShape(10.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        if (translatedText.isNotBlank()) {
+            Text(translatedText, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+        }
+        if (translationStatus.isNotBlank()) {
+            Text(translationStatus, color = Color(0xFFFFDFA6), fontSize = 10.sp)
+        }
     }
 }
 
