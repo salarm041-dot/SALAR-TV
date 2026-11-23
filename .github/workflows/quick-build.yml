@@ -47,6 +47,7 @@ jobs:
           install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
           install -D patch/RecordingBootReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingBootReceiver.kt"
           install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
+          install -D patch/arabic-channels.m3u "$PROJECT_DIR/app/src/main/assets/arabic-channels.m3u"
           install -D patch/ic_salar_tv.xml "$PROJECT_DIR/app/src/main/res/drawable/ic_salar_tv.xml"
           install -D patch/ic_launcher_fallback.xml "$PROJECT_DIR/app/src/main/res/mipmap/ic_launcher.xml"
           install -D patch/ic_launcher_adaptive.xml "$PROJECT_DIR/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
