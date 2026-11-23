@@ -18,9 +18,9 @@ https://tv-trtavaz.medya.trt.com.tr/master.m3u8
 https://live.itv.az/itv.m3u8
 #EXTINF:-1 tvg-logo="https://atv.az/assets/images/logo_white.png" group-title="آذربایجان / تلویزیون",ATV Azərbaycan
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
-#EXTINF:-1 tvg-logo="https://www.oonternet.com/_panel/upload/content/oonternet-8883943415280.jpeg" group-title="ایران / رادیو",رادیو ایران
+#EXTINF:-1 tvg-logo="https://www.oonternet.com/_panel/upload/content/oonternet-8883943415280.jpeg" group-title="صدا و سیما / رادیو",رادیو ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
-#EXTINF:-1 tvg-logo="https://radiospinner.com/media/logos/180/83710/logo_ZTropL1kFU.png" group-title="ایران / رادیو",رادیو انگلیسی ایران
+#EXTINF:-1 tvg-logo="https://radiospinner.com/media/logos/180/83710/logo_ZTropL1kFU.png" group-title="صدا و سیما / رادیو",رادیو انگلیسی ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-english/playlist.m3u8
 # Iran TV endpoints from a public playlist updated 2026-11-09; may require an Iranian IP.
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1.ir.png" group-title="ایران / تلویزیون",شبکه یک
@@ -373,11 +373,11 @@ https://live-aburayhan1104.telewebion.ir/ek/taban/live/576p/index.m3u8
 https://live-aburayhan1109.telewebion.ir/ek/zagros/live/576p/index.m3u8
 
 # Persian-language live radio streams. Direct audio endpoints selected from currently listed working streams.
-#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو فردا
+#EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو فردا
 https://stream.radiojar.com/cp13r2cpn3quv
-#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو نواهنگ
+#EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو نواهنگ
 https://navairan.com/;stream.nsv
-#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو سیمرغ
+#EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو سیمرغ
 https://stream.zeno.fm/9svfnobkrxrvv
-#EXTINF:-1 group-title="فارسی‌زبان / رادیو",رادیو فاز
+#EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو فاز
 https://free.rcast.net/230792
