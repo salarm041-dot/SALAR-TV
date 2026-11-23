@@ -426,6 +426,9 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
                             AndroidView(
                                 factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                                update = { view ->
+                                    view.subtitleView?.visibility = if (menuSubtitleEnabled) android.view.View.INVISIBLE else android.view.View.VISIBLE
+                                },
                                 modifier = Modifier.fillMaxSize()
                             )
                             if (menuSubtitleEnabled) {
