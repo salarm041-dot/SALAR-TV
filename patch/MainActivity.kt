@@ -130,8 +130,16 @@ fun SalarTvApp() {
         val bundled = runCatching {
             context.assets.open("channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
         }.getOrDefault(emptyList())
+        val pilgrimage = listOf(
+            Channel("حرم مطهر رضوی — پخش زنده رسمی", "https://haram.razavi.ir/live", "زیارت آنلاین", "وب", groupTitle = "مشهد مقدس"),
+            Channel("حرم امام حسین (ع) — پخش زنده رسمی", "https://imamhussain.gov.iq/english/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
+            Channel("حرم امام علی (ع) — پخش زنده رسمی", "https://en.imamali.net/live/", "زیارت آنلاین", "وب", groupTitle = "نجف"),
+            Channel("مسجدالحرام — پخش زنده رسمی قرآن TV", "https://www.youtube.com/embed/kYqGbBqmp8g?autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه"),
+            Channel("مسجدالنبی — پخش زنده رسمی سنت TV", "https://www.youtube.com/embed/9A1S0xAPVIs?autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مدینه منوره"),
+            Channel("پخش زنده ۲۴ ساعته عتبات مقدسه", "https://imamhusseintv.com/en/live/6", "زیارت آنلاین", "وب", groupTitle = "سایر اماکن مذهبی")
+        )
         val existing = channels.map { it.url }.toSet()
-        channels.addAll(bundled.filter { it.url !in existing })
+        channels.addAll((bundled + pilgrimage).distinctBy { it.url }.filter { it.url !in existing })
         saveChannels()
         prefs.edit().putBoolean("built_in_seeded", true).apply()
     }
@@ -305,26 +313,46 @@ fun SalarTvApp() {
                 if (selected != null) {
                     TextButton(onClick = { selected = null }) { Icon(Icons.Default.ArrowBack, null); Text("بازگشت") }
                     Text(selected!!.name, color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text("انتخاب پخش‌کننده", color = Gold, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(selected = !useExternalPlayer, onClick = { useExternalPlayer = false; if (rememberPlayerChoice) prefs.edit().putBoolean("external_player_default", false).apply() },
-                            label = { Text("پخش‌کننده داخلی") },
-                            leadingIcon = { Icon(Icons.Default.PlayCircle, null) })
-                        FilterChip(selected = useExternalPlayer, onClick = { useExternalPlayer = true; if (rememberPlayerChoice) prefs.edit().putBoolean("external_player_default", true).apply() },
-                            label = { Text("پخش‌کننده خارجی") },
-                            leadingIcon = { Icon(Icons.Default.OpenInNew, null) })
+                    if (selected!!.kind != "وب") {
+                        Text("انتخاب پخش‌کننده", color = Gold, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(selected = !useExternalPlayer, onClick = { useExternalPlayer = false; if (rememberPlayerChoice) prefs.edit().putBoolean("external_player_default", false).apply() },
+                                label = { Text("پخش‌کننده داخلی") },
+                                leadingIcon = { Icon(Icons.Default.PlayCircle, null) })
+                            FilterChip(selected = useExternalPlayer, onClick = { useExternalPlayer = true; if (rememberPlayerChoice) prefs.edit().putBoolean("external_player_default", true).apply() },
+                                label = { Text("پخش‌کننده خارجی") },
+                                leadingIcon = { Icon(Icons.Default.OpenInNew, null) })
+                        }
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text("ذخیره به‌عنوان انتخاب پیش‌فرض", color = SecondaryText, fontSize = 12.sp,
+                                modifier = Modifier.weight(1f))
+                            Switch(checked = rememberPlayerChoice,
+                                onCheckedChange = {
+                                    rememberPlayerChoice = it
+                                    if (it) prefs.edit().putBoolean("external_player_default", useExternalPlayer).apply()
+                                    else prefs.edit().remove("external_player_default").apply()
+                                })
+                        }
                     }
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text("ذخیره به‌عنوان انتخاب پیش‌فرض", color = SecondaryText, fontSize = 12.sp,
-                            modifier = Modifier.weight(1f))
-                        Switch(checked = rememberPlayerChoice,
-                            onCheckedChange = {
-                                rememberPlayerChoice = it
-                                if (it) prefs.edit().putBoolean("external_player_default", useExternalPlayer).apply()
-                                else prefs.edit().remove("external_player_default").apply()
-                            })
-                    }
-                    if (!useExternalPlayer) {
+                    if (selected!!.kind == "وب") {
+                        val webUrl = selected!!.url
+                        AndroidView(
+                            factory = { ctx ->
+                                android.webkit.WebView(ctx).apply {
+                                    settings.javaScriptEnabled = true
+                                    settings.domStorageEnabled = true
+                                    settings.mediaPlaybackRequiresUserGesture = false
+                                    webViewClient = android.webkit.WebViewClient()
+                                    webChromeClient = android.webkit.WebChromeClient()
+                                    loadUrl(webUrl)
+                                }
+                            },
+                            update = { view -> if (view.url != webUrl) view.loadUrl(webUrl) },
+                            modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
+                        )
+                        Text("پخش از درگاه رسمی؛ در صورت محدودیت منطقه‌ای یا توقف پخش، ممکن است صفحه باز شود ولی ویدئو اجرا نشود.",
+                            color = SecondaryText, fontSize = 11.sp)
+                    } else if (!useExternalPlayer) {
                         AndroidView(
                             factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
@@ -359,11 +387,13 @@ fun SalarTvApp() {
                     }, valueRange = 0.05f..1f)
                     Text("صدای پخش", color = Gold, fontSize = 12.sp)
                     Slider(value = player.volume, onValueChange = { player.volume = it }, valueRange = 0f..1f)
-                    LaunchedEffect(selected!!.url, useExternalPlayer) {
+                    LaunchedEffect(selected!!.url, useExternalPlayer, selected!!.kind) {
                         val streamAddress = selected!!.url
                         val officialWebPage = streamAddress.contains("ott.iranintl.com", ignoreCase = true) ||
                             streamAddress.contains("iranintl.com/live", ignoreCase = true)
-                        if (officialWebPage) {
+                        if (selected!!.kind == "وب") {
+                            player.pause()
+                        } else if (officialWebPage) {
                             player.pause()
                             runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(streamAddress))
