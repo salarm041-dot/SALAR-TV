@@ -1272,7 +1272,9 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
 
                 fun translateFrom(languageTag: String) {
                     if (thisRequest != requestId) return
-                    val normalizedLanguageTag = if (languageTag.equals("iw", ignoreCase = true) || languageTag.startsWith("iw-", ignoreCase = true)) "he" + languageTag.drop(2) else languageTag\n                    val sourceLanguage = TranslateLanguage.fromLanguageTag(normalizedLanguageTag)
+                    val baseLanguageTag = languageTag.substringBefore("-").lowercase()
+                    val normalizedLanguageTag = if (baseLanguageTag == "iw" || baseLanguageTag == "heb") "he" else languageTag
+                    val sourceLanguage = TranslateLanguage.fromLanguageTag(normalizedLanguageTag)
                     if (sourceLanguage == null || sourceLanguage !in TranslateLanguage.getAllLanguages()) {
                         translationStatus = "زبان این زیرنویس در موتور ترجمه پشتیبانی نمی‌شود."
                         translatedText = ""
