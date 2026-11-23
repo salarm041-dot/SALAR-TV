@@ -752,8 +752,10 @@ fun SalarTvApp() {
                         onEpg = { page = "راهنمای برنامه‌ها" },
                         onSettings = { page = "تنظیمات" },
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
-                        onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) }
+                        onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) },
+                        onShrine = { page = "زیارت آنلاین" }
                     )
+                    "زیارت آنلاین" -> ShrineDirectoryPage(onAddSource = { page = "افزودن منابع" })
                     "پخش همزمان" -> MultiViewPage(channels)
                     "دوبله هوشمند زنده" -> LiveDubbingPage(
                         subtitleStatus = liveSubtitleStatus,
@@ -1343,12 +1345,13 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
              onRecordings: () -> Unit, onScheduledList: () -> Unit, onLiveDubbing: () -> Unit, onMultiView: () -> Unit, onEpg: () -> Unit, onSettings: () -> Unit,
-             onBackupExport: () -> Unit, onBackupImport: () -> Unit) {
+             onBackupExport: () -> Unit, onBackupImport: () -> Unit, onShrine: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("پخش هم‌زمان ۲ یا ۴ شبکه", Icons.Default.Tv, onMultiView)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
+        MoreButton("زیارت آنلاین اماکن مقدس", Icons.Default.Place, onShrine)
         MoreButton("راهنمای برنامه‌ها (EPG)", Icons.Default.CalendarMonth, onEpg)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
         MoreButton("زمان‌بندی ضبط", Icons.Default.CalendarMonth, onSchedule)
@@ -2048,6 +2051,72 @@ private fun EpgPage(channels: List<Channel>) {
                                     color = MutedText, fontSize = 10.sp)
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ShrineDirectoryPage(onAddSource: () -> Unit) {
+    val places = listOf(
+        "مشهد مقدس" to "حرم مطهر امام رضا (ع)",
+        "کربلا" to "حرم مطهر امام حسین (ع) و حضرت عباس (ع)",
+        "نجف اشرف" to "حرم مطهر امیرالمؤمنین (ع)",
+        "مکه مکرمه" to "مسجدالحرام و کعبه",
+        "مدینه منوره" to "مسجدالنبی",
+        "سایر اماکن مذهبی" to "پخش‌های زنده معتبر دیگر"
+    )
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text("زیارت آنلاین", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(
+            "دسته‌بندی مکان‌های زیارتی در SALAR TV",
+            color = SecondaryText,
+            fontSize = 13.sp
+        )
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Panel),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "برای نمایش پخش زنده، باید نشانی معتبر و فعال هر مکان ثبت شود. در این نسخه هنوز فهرست پخش زندهٔ تأییدشده به این بخش متصل نشده است.",
+                    color = SecondaryText,
+                    fontSize = 12.sp
+                )
+                Button(
+                    onClick = onAddSource,
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold)
+                ) {
+                    Icon(Icons.Default.AddLink, contentDescription = null, tint = Color.Black)
+                    Spacer(Modifier.width(8.dp))
+                    Text("افزودن لینک پخش", color = Color.Black)
+                }
+            }
+        }
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(places) { (name, description) ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Panel),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Place, contentDescription = null, tint = Gold)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(name, color = TextMain, fontWeight = FontWeight.Bold)
+                            Text(description, color = SecondaryText, fontSize = 12.sp)
+                        }
+                        Text("در انتظار منبع", color = MutedText, fontSize = 10.sp)
                     }
                 }
             }
