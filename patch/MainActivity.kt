@@ -205,6 +205,17 @@ fun SalarTvApp(isInPip: Boolean = false) {
         prefs.edit().putBoolean("built_in_seeded", true).apply()
     }
 
+    val selectedDynamicCountries = remember {
+        mutableStateListOf<String>().apply {
+            addAll(prefs.getStringSet("home_dynamic_countries", emptySet())?.toList().orEmpty())
+        }
+    }
+    fun rememberDynamicCountry(country: String) {
+        if (country !in selectedDynamicCountries) {
+            selectedDynamicCountries.add(country)
+            prefs.edit().putStringSet("home_dynamic_countries", selectedDynamicCountries.toSet()).apply()
+        }
+    }
     var page by remember { mutableStateOf("خانه") }
     var isRefreshingChannels by remember { mutableStateOf(false) }
     var lastChannelRefresh by remember { mutableStateOf(prefs.getString("last_channel_refresh", "") ?: "") }
@@ -890,7 +901,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> TvCountryPage(onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" })
                     "شبکه‌های عربی" -> ArabicCountryPage(onCountry = { country -> page = "عربی:$country" })
-                    "کشور:ایران", "کشور:ترکیه", "کشور:آذربایجان", "کشور:اسرائیل", "کشور:سایر" -> {
+                    "کشور:سایر" -> OtherCountriesPage(channels) { country ->
+                        rememberDynamicCountry(country)
+                        page = "کشور:$country"
+                    }
+                    else -> if (page.startsWith("کشور:")) {
                         val country = page.removePrefix("کشور:")
                         val arabicCountries = setOf("عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی", "یمن", "سودان")
                         val filtered = channels.filter { c ->
@@ -902,7 +917,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 "سایر" -> c.country == "سایر" || c.country == "خارج از ایران" ||
                                     c.country == "فارسی‌زبان خارج از ایران" ||
                                     (c.country !in setOf("ایران", "ترکیه", "آذربایجان", "جمهوری آذربایجان", "اسرائیل") && c.country !in arabicCountries)
-                                else -> false
+                                else -> c.country == country
                             }
                         }
                         ChannelList(filtered, onSelect = { selectChannel(it) },
@@ -926,7 +941,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                     } else HomePage(channels, onSelect = { selectChannel(it) }, onAdd = { page = "افزودن منابع" },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
-                        onPage = { destination -> page = destination })
+                        onPage = { destination -> page = destination },
+                        dynamicCountries = selectedDynamicCountries.map { it to flagForDynamicCountry(it) }
+                            .filter { pair -> channels.any { it.kind == "تلویزیون" && it.country == pair.first } },
+                        onDynamicCountry = { country -> page = "کشور:$country" })
                 }
             }
         }
@@ -1107,7 +1125,9 @@ fun ScheduledRecordingsPage(items: List<ScheduledRecording>, onAdd: () -> Unit, 
 @Composable
 fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> Unit,
              onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {},
-             onPage: (String) -> Unit = {}) {
+             onPage: (String) -> Unit = {},
+             dynamicCountries: List<Pair<String, String>> = emptyList(),
+             onDynamicCountry: (String) -> Unit = {}) {
     val tvCount = channels.count { it.kind == "تلویزیون" }
     val radioCount = channels.count { it.kind == "رادیو" }
     @Composable
@@ -1181,6 +1201,39 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
             MainTile("تنظیمات", "شخصی‌سازی برنامه", Icons.Default.Settings, Color(0xFFB58BFF),
                 Modifier.weight(1f)) { onPage("تنظیمات") }
         }
+        if (dynamicCountries.isNotEmpty()) {
+            Text("کشورهای انتخاب‌شده", color = Color(0xFFFFD45C), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            dynamicCountries.chunked(2).forEach { pair ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    pair.forEach { (countryName, flag) ->
+                        Card(
+                            modifier = Modifier.weight(1f).clickable { onDynamicCountry(countryName) },
+                            shape = RoundedCornerShape(18.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF111116)),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)
+                        ) {
+                            Row(
+                                Modifier.fillMaxWidth().background(
+                                    androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                        listOf(Color(0xFF5B461B).copy(alpha = 0.32f), Color(0xFF17171D), Color(0xFF09090C))
+                                    )
+                                ).padding(13.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(flag, fontSize = 30.sp)
+                                Spacer(Modifier.width(9.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(countryName, color = Color(0xFFFFD978), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                    Text("شبکه‌های تلویزیونی", color = Color(0xFFBDB8AA), fontSize = 9.sp)
+                                }
+                                Icon(Icons.Default.PlayCircleFilled, null, tint = Color(0xFFFFD45C), modifier = Modifier.size(23.dp))
+                            }
+                        }
+                    }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+        }
         Card(
             modifier = Modifier.fillMaxWidth().clickable { onAdd() },
             shape = RoundedCornerShape(16.dp),
@@ -1250,6 +1303,83 @@ fun ArabicCountryPage(onCountry: (String) -> Unit) {
                         Text("شبکه‌های تلویزیونی $name", color = Color(0xFFBDB8AA), fontSize = 11.sp)
                     }
                     Icon(Icons.Default.PlayCircleFilled, null, tint = accent, modifier = Modifier.size(29.dp))
+                }
+            }
+        }
+    }
+}
+
+private fun flagForDynamicCountry(name: String): String = when (name.trim().lowercase()) {
+    "آلمان", "germany" -> "🇩🇪"
+    "فرانسه", "france" -> "🇫🇷"
+    "انگلستان", "بریتانیا", "united kingdom", "uk" -> "🇬🇧"
+    "ایتالیا", "italy" -> "🇮🇹"
+    "اسپانیا", "spain" -> "🇪🇸"
+    "روسیه", "russia" -> "🇷🇺"
+    "اوکراین", "ukraine" -> "🇺🇦"
+    "ژاپن", "japan" -> "🇯🇵"
+    "کره جنوبی", "south korea" -> "🇰🇷"
+    "هند", "india" -> "🇮🇳"
+    "پاکستان", "pakistan" -> "🇵🇰"
+    "کانادا", "canada" -> "🇨🇦"
+    "آمریکا", "ایالات متحده", "united states", "usa" -> "🇺🇸"
+    "استرالیا", "australia" -> "🇦🇺"
+    "چین", "china" -> "🇨🇳"
+    "هلند", "netherlands" -> "🇳🇱"
+    "سوئد", "sweden" -> "🇸🇪"
+    "سوئیس", "switzerland" -> "🇨🇭"
+    "یونان", "greece" -> "🇬🇷"
+    "اسرائیل", "israel" -> "🇮🇱"
+    else -> "🌐"
+}
+
+@Composable
+fun OtherCountriesPage(channels: List<Channel>, onCountry: (String) -> Unit) {
+    val excluded = setOf(
+        "ایران", "ترکیه", "آذربایجان", "جمهوری آذربایجان", "اسرائیل",
+        "عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن",
+        "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی",
+        "یمن", "سودان", "سایر", "خارج از ایران", "فارسی‌زبان خارج از ایران", ""
+    )
+    val countries = channels.asSequence()
+        .filter { it.kind == "تلویزیون" && it.country !in excluded }
+        .map { it.country.trim() }
+        .filter { it.isNotBlank() }
+        .distinct()
+        .sorted()
+        .toList()
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("سایر کشورها", color = Color(0xFFFFD45C), fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
+        Text("کشورهایی که در فهرست برنامه شبکه تلویزیونی دارند", color = SecondaryText, fontSize = 12.sp)
+        if (countries.isEmpty()) {
+            Text("در حال حاضر کشور دیگری با شبکه ثبت‌شده در فهرست پیدا نشد.", color = SecondaryText)
+        } else {
+            countries.forEachIndexed { index, name ->
+                val accent = listOf(Color(0xFFFFD45C), Color(0xFF55DDE0), Color(0xFFB58BFF))[index % 3]
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { onCountry(name) },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF101015)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().background(
+                            androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                listOf(accent.copy(alpha = 0.22f), Color(0xFF17171D), Color(0xFF09090C))
+                            )
+                        ).padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(flagForDynamicCountry(name), fontSize = 38.sp)
+                        Spacer(Modifier.width(14.dp))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Text(name, color = Color(0xFFFFD978), fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            Text("${channels.count { it.kind == "تلویزیون" && it.country == name }} شبکه تلویزیونی", color = Color(0xFFBDB8AA), fontSize = 10.sp)
+                        }
+                        Icon(Icons.Default.Public, null, tint = accent, modifier = Modifier.size(25.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Icon(Icons.Default.PlayCircleFilled, null, tint = accent, modifier = Modifier.size(26.dp))
+                    }
                 }
             }
         }
