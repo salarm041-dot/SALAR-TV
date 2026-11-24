@@ -1956,22 +1956,33 @@ private fun provinceForChannel(channel: Channel): String {
         ?.takeIf { it.isNotBlank() }?.let { return it }
     return when {
         "آبادان" in name || "خوزستان" in name -> "خوزستان"
+        "افلاک" in name || "لرستان" in name -> "لرستان"
+        "آفتاب" in name || "مرکزی" in name -> "مرکزی"
         "البرز" in name -> "البرز"
+        "اترک" in name || "خراسان شمالی" in name -> "خراسان شمالی"
+        "باران" in name || "گیلان" in name -> "گیلان"
         "بوشهر" in name -> "بوشهر"
+        "دنا" in name || "کهگیلویه" in name || "بویراحمد" in name -> "کهگیلویه و بویراحمد"
+        "اشراق" in name || "زنجان" in name -> "زنجان"
         "فارس" in name -> "فارس"
         "همدان" in name -> "همدان"
+        "هامون" in name || "مکران" in name || "سیستان" in name || "بلوچستان" in name -> "سیستان و بلوچستان"
         "ایلام" in name -> "ایلام"
         "اصفهان" in name -> "اصفهان"
+        "جهانبین" in name || "چهارمحال" in name || "بختیاری" in name -> "چهارمحال و بختیاری"
         "کرمان" in name -> "کرمان"
-        "کیش" in name || "خلیج فارس" in name -> "هرمزگان"
+        "کیش" in name || "خلیج فارس" in name || "هرمزگان" in name -> "هرمزگان"
+        "خاوران" in name || "خراسان جنوبی" in name -> "خراسان جنوبی"
+        "خراسان رضوی" in name || "سبز" in name -> "خراسان رضوی"
         "کردستان" in name -> "کردستان"
         "مهاباد" in name || "آذربایجان غربی" in name -> "آذربایجان غربی"
-        "مکران" in name || "هامون" in name -> "سیستان و بلوچستان"
-        "نور" in name || "تبرستان" in name -> "مازندران"
+        "نور" in name || "تبرستان" in name || "مازندران" in name -> "مازندران"
         "قزوین" in name -> "قزوین"
+        "سبلان" in name || "اردبیل" in name -> "اردبیل"
         "سمنان" in name -> "سمنان"
-        "خراسان رضوی" in name || "سبز" in name -> "خراسان رضوی"
-        "آذربایجان شرقی" in name || "سهند" in name -> "آذربایجان شرقی"
+        "سهند" in name || "آذربایجان شرقی" in name -> "آذربایجان شرقی"
+        "تابان" in name || "یزد" in name -> "یزد"
+        "زاگرس" in name || "کرمانشاه" in name -> "کرمانشاه"
         "شبکه تهران" in name || name == "تهران" -> "تهران"
         else -> "استان نامشخص"
     }
@@ -1988,6 +1999,15 @@ private fun categoryForChannel(channel: Channel): String {
     if (listOf("شبکه‌های استانی", "شبکه های استانی", "استانی").any { it in group }) return "استانی / ${provinceForChannel(channel)}"
     if (listOf("شبکه‌های سراسری", "شبکه های سراسری", "سراسری").any { it in group }) return "شبکه‌های سراسری"
     if (listOf("برون‌مرزی", "برون مرزی", "بین‌الملل", "بین الملل").any { it in group }) return "شبکه‌های برون‌مرزی"
+    val nationalNames = listOf(
+        "شبکه یک", "شبکه ۱", "شبکه دو", "شبکه ۲", "شبکه سه", "شبکه ۳",
+        "شبکه چهار", "شبکه ۴", "شبکه پنج", "شبکه ۵", "شبکه خبر",
+        "شبکه آموزش", "شبکه قرآن", "شبکه ورزش", "شبکه مستند", "شبکه سلامت",
+        "شبکه افق", "شبکه نسیم", "شبکه تماشا", "شبکه نمایش", "شبکه امید",
+        "شبکه کودک", "شبکه پویا", "شبکه نهال", "irib tv1", "irib tv2",
+        "irib tv3", "irib tv4", "irib tv5"
+    )
+    if (nationalNames.any { it in value }) return "شبکه‌های سراسری"
     return when {
         listOf("خبر", "news", "haber", "bbc", "cnn", "irinn", "voa persian", "congress tv", "revolution tv").any { it in value } -> "خبری"
         listOf("ورزش", "sport", "sports", "varzesh", "trt spor", "persiana fight").any { it in value } -> "ورزشی"
