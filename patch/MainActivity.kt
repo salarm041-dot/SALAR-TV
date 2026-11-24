@@ -1255,7 +1255,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
         Triple("رادیو", "ایستگاه‌های رادیویی", Icons.Default.Radio),
         Triple("شبکه‌های خارجی", "کشورهای جهان", Icons.Default.Public),
         Triple("زمان‌بندی‌ها", "ضبط خودکار برنامه", Icons.Default.CalendarMonth),
-        Triple("زیارت آنلاین", "پخش حرم‌های مطهر", Icons.Default.Mosque),
+        Triple("زیارت آنلاین", "پخش حرم‌های مطهر", Icons.Default.AccountBalance),
         Triple("افزودن منابع", "لینک و فهرست M3U", Icons.Default.AddCircle),
         Triple("تنظیمات", "شخصی‌سازی برنامه", Icons.Default.Settings),
         Triple("علاقه‌مندی‌ها", "شبکه‌های منتخب", Icons.Default.Favorite)
@@ -1303,7 +1303,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                 rowItems.forEachIndexed { index, item ->
                     val itemIndex = rowIndex * 2 + index
                     val accent = accents[itemIndex]
-                    Card(Modifier.weight(1f).height(116.dp).clickable { onPage(item.first) },
+                    Card(Modifier.weight(1f).height(116.dp).clickable { onPage(if (item.first == "شبکه‌های خارجی") "تلویزیون" else item.first) },
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF0C1B32)),
                         border = androidx.compose.foundation.BorderStroke(1.4.dp, accent.copy(alpha = .9f))) {
@@ -1385,32 +1385,42 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
 
 @Composable
 fun TvCountryPage(onCountry: (String) -> Unit) {
-    data class CountryCard(val name: String, val flag: String, val color: Color)
+    data class CountryCard(val name: String, val flag: String, val color: Color, val subtitle: String)
     val countries = listOf(
-        CountryCard("ایران", "🇮🇷", Color(0xFF42D6A4)),
-        CountryCard("ترکیه", "🇹🇷", Color(0xFFFF5A68)),
-        CountryCard("آذربایجان", "🇦🇿", Color(0xFF42C8E8)),
-        CountryCard("اسرائیل", "🇮🇱", Color(0xFF65A9FF)),
-        CountryCard("عربی", "🌍", Color(0xFFFFB74D)),
-        CountryCard("سایر", "🌐", Color(0xFFFFD45C))
+        CountryCard("ایران", "🇮🇷", Color(0xFF36D69A), "شبکه‌های سراسری و استانی"),
+        CountryCard("ترکیه", "🇹🇷", Color(0xFFFF6578), "شبکه‌های ملی و خصوصی"),
+        CountryCard("آذربایجان", "🇦🇿", Color(0xFF36C9F1), "شبکه‌های جمهوری آذربایجان"),
+        CountryCard("اسرائیل", "🇮🇱", Color(0xFF78A9FF), "شبکه‌های داخلی و بین‌المللی"),
+        CountryCard("عربی", "🌍", Color(0xFFFFB84A), "شبکه‌های کشورهای عربی"),
+        CountryCard("سایر", "🌐", Color(0xFFB69AFF), "دیگر شبکه‌های جهان")
     )
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Text("شبکه‌های تلویزیونی", color = Color(0xFFE8EDF5), fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
-        Text("کشور موردنظر را انتخاب کنید", color = Color(0xFF9EACC0), fontSize = 12.sp)
-        countries.chunked(3).forEach { rowCountries ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("شبکه‌های تلویزیونی", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+        Text("کشور و منطقهٔ موردنظر را انتخاب کنید", color = Color(0xFFB8C8E0), fontSize = 12.sp)
+        countries.chunked(2).forEach { rowCountries ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
                 rowCountries.forEach { country ->
-                    Card(Modifier.weight(1f).clickable { onCountry(country.name) }, shape = RoundedCornerShape(18.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF172235))) {
-                        Column(Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 6.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(country.flag, fontSize = 38.sp)
-                            Text(country.name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                            Box(Modifier.width(28.dp).height(3.dp).background(country.color, RoundedCornerShape(4.dp)))
+                    Card(Modifier.weight(1f).height(145.dp).clickable { onCountry(country.name) },
+                        shape = RoundedCornerShape(21.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF09182E)),
+                        border = androidx.compose.foundation.BorderStroke(1.5.dp, country.color)) {
+                        Box(Modifier.fillMaxSize().background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(listOf(country.color.copy(alpha = .28f),
+                                Color(0xFF102342), Color(0xFF070F20))))) {
+                            Box(Modifier.align(Alignment.TopEnd).size(72.dp).background(country.color.copy(alpha = .12f),
+                                RoundedCornerShape(bottomStart = 72.dp)))
+                            Column(Modifier.fillMaxSize().padding(11.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceEvenly) {
+                                Box(Modifier.size(59.dp).background(Color(0xFF071326), RoundedCornerShape(30.dp),
+                                    androidx.compose.ui.graphics.Brush.linearGradient(listOf(country.color.copy(alpha = .55f), Color(0xFF071326))),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, country.color)),
+                                    contentAlignment = Alignment.Center) { Text(country.flag, fontSize = 35.sp) }
+                                Text(country.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
+                                Text(country.subtitle, color = country.color, fontSize = 9.sp, maxLines = 1)
+                            }
                         }
                     }
                 }
-                repeat(3 - rowCountries.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
