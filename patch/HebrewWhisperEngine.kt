@@ -108,14 +108,22 @@ internal object HebrewWhisperEngine {
             temporary.delete()
             throw IllegalStateException("اعتبارسنجی SHA-256 مدل عبری ناموفق بود؛ مدل قبلی حفظ شد.")
         }
-        if (destination.exists() && !destination.delete()) {
+        val backup = File(directory, "$MODEL_FILE.previous")
+        if (backup.exists() && !backup.delete()) {
             temporary.delete()
-            throw IllegalStateException("جایگزینی مدل عبری قبلی ناموفق بود.")
+            throw IllegalStateException("پاک‌سازی نسخهٔ پشتیبان قبلی مدل ناموفق بود.")
+        }
+        val hadPrevious = destination.exists()
+        if (hadPrevious && !destination.renameTo(backup)) {
+            temporary.delete()
+            throw IllegalStateException("حفظ مدل عبری قبلی پیش از جایگزینی ناموفق بود.")
         }
         if (!temporary.renameTo(destination)) {
+            if (hadPrevious) backup.renameTo(destination)
             temporary.delete()
-            throw IllegalStateException("ذخیره نهایی مدل عبری ناموفق بود.")
+            throw IllegalStateException("ذخیره نهایی مدل عبری ناموفق بود؛ نسخهٔ قبلی حفظ شد.")
         }
+        backup.delete()
 
         // Only after successful validation, remove the previous Vosk language model.
         File(context.filesDir, "salar-vosk").deleteRecursively()
