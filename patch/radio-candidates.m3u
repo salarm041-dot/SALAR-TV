@@ -21,3 +21,39 @@ http://38.99.146.102:8000/mahoor.mp3
 http://iranonairone.mine.nu:9300/;
 #EXTINF:-1 group-title="رادیو فارسی خارج از ایران / موسیقی سنتی",رادیو درویش
 http://50.22.218.73/stream.mp3?ipport=50.22.218.73_24445
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",رادیو ایران اینترنشنال
+https://stream.radiojar.com/iintl_c
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو نواهنگ
+https://navairan.com/;stream.nsv
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو گو
+https://stream.zeno.fm/v5kxmagseg0uv
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",رادیو البلاد / یعقوبی
+https://streamer.radio.co/sb38bf6e66/listen
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو فاز
+https://free.rcast.net/230792
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",رادیو همراه
+https://stream.zenolive.com/gxdq0awu30duv.aac
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو مژده (موسیقی و گفت‌وگوی مسیحی)
+https://ic2326.c1261.fastserv.com/rm128
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو ZZA (زن، زندگی، آزادی)
+https://listen.radioking.com/radio/526993/stream/585379
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو مجاهد
+https://s2.radio.co/s830691c74/listen
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",رادیو مهر (دری/فارسی)
+https://streams.radio.co/s08eb94fbc/listen
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",ترجمهٔ فارسی قرآن
+https://serverkw.quran-uni.com:8144/;
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",پرشین وایب
+https://radio.aydayazdani.com/stream
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",رادیو شادی
+https://ice9.securenetsystems.net/SHADI
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",امید برای فردا
+https://radio.truth.fm:8000/pipfa
+#EXTINF:-1 group-title="رادیو فارسی خارج از ایران",پرستنده (موسیقی عبادی فارسی)
+https://streamer.radio.co/sa75a4bb19/listen
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو سیمرغ (موسیقی ایرانی)
+https://stream.zeno.fm/9svfnobkrxrvv
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو گچساران
+https://radio.gachsaran.org/gach
+#EXTINF:-1 group-title="رادیو فارسی ایران",رادیو سیمرغ
+https://stream.zeno.fm/jl8n7thgcdftv
