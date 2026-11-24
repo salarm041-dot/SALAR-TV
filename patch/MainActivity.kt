@@ -1350,9 +1350,9 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                         androidx.compose.ui.graphics.Brush.verticalGradient(listOf(accent.copy(alpha = .24f), Color(0xFF0A1428), Color(0xFF050B18))))) {
                         Column(Modifier.fillMaxSize().padding(9.dp), horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceEvenly) {
-                            Box(Modifier.size(53.dp).background(Color(0xFF071326), RoundedCornerShape(27.dp),
-                                androidx.compose.ui.graphics.Brush.linearGradient(listOf(accent.copy(alpha = .6f), Color(0xFF0B1B33))),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, accent.copy(alpha = .8f))),
+                            Box(Modifier.size(53.dp)
+                                .background(Color(0xFF071326), RoundedCornerShape(27.dp))
+                                .border(1.dp, accent.copy(alpha = .8f), RoundedCornerShape(27.dp)),
                                 contentAlignment = Alignment.Center) { Text(flag, fontSize = 31.sp) }
                             Text(name, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
                             Text("مشاهده شبکه‌ها  ›", color = accent, fontSize = 9.sp)
@@ -1413,9 +1413,9 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
                                 RoundedCornerShape(bottomStart = 72.dp)))
                             Column(Modifier.fillMaxSize().padding(11.dp), horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.SpaceEvenly) {
-                                Box(Modifier.size(59.dp).background(Color(0xFF071326), RoundedCornerShape(30.dp),
-                                    androidx.compose.ui.graphics.Brush.linearGradient(listOf(country.color.copy(alpha = .55f), Color(0xFF071326))),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, country.color)),
+                                Box(Modifier.size(59.dp)
+                                    .background(Color(0xFF071326), RoundedCornerShape(30.dp))
+                                    .border(1.dp, country.color, RoundedCornerShape(30.dp)),
                                     contentAlignment = Alignment.Center) { Text(country.flag, fontSize = 35.sp) }
                                 Text(country.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
                                 Text(country.subtitle, color = country.color, fontSize = 9.sp, maxLines = 1)
