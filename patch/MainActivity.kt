@@ -1039,8 +1039,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     } else HomePage(channels, onSelect = { selectChannel(it) }, onAdd = { page = "افزودن منابع" },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onPage = { destination -> page = destination },
-                        dynamicCountries = selectedDynamicCountries.map { it to flagForDynamicCountry(it) }
-                            .filter { pair -> channels.any { it.kind == "تلویزیون" && it.country == pair.first } },
+                        dynamicCountries = (listOf("ایران", "ترکیه", "آذربایجان", "اسرائیل", "عربی", "سایر") + selectedDynamicCountries)
+                            .distinct().map { it to flagForDynamicCountry(it) },
                         onDynamicCountry = { country -> page = "کشور:$country" },
                         onMoreDynamicCountries = { page = "کشورهای منتخب" })
                 }
