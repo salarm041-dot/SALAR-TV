@@ -43,6 +43,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -1304,26 +1305,34 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
             Text("انتخاب کشور", color = Color(0xFFE8EDF5), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text("شبکه‌های تلویزیونی", color = Color(0xFF69DCCF), fontSize = 10.sp)
         }
-        countries.chunked(3).forEach { rowCountries ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                rowCountries.forEach { (name, flag) ->
-                    val tint = when(name) {
-                        "ایران" -> Color(0xFF62D6B0)
-                        "ترکیه" -> Color(0xFFFF788A)
-                        "آذربایجان" -> Color(0xFF6CCDEB)
-                        else -> Color(0xFFB7A0FF)
-                    }
-                    Card(Modifier.weight(1f).clickable { onDynamicCountry(name) }, shape = RoundedCornerShape(18.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF172235))) {
-                        Column(Modifier.fillMaxWidth().padding(vertical = 13.dp, horizontal = 5.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(flag, fontSize = 31.sp)
-                            Text(name, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                            Box(Modifier.width(24.dp).height(3.dp).background(tint, RoundedCornerShape(3.dp)))
+        // Two-row horizontal country shelf: swipe left/right to reveal additional countries.
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            countries.chunked(2).forEach { countryColumn ->
+                Column(Modifier.width(104.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    countryColumn.forEach { (name, flag) ->
+                        val tint = when(name) {
+                            "ایران" -> Color(0xFF62D6B0)
+                            "ترکیه" -> Color(0xFFFF788A)
+                            "آذربایجان" -> Color(0xFF6CCDEB)
+                            else -> Color(0xFFB7A0FF)
+                        }
+                        Card(Modifier.fillMaxWidth().clickable { onDynamicCountry(name) },
+                            shape = RoundedCornerShape(18.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF172235))) {
+                            Column(Modifier.fillMaxWidth().padding(vertical = 13.dp, horizontal = 5.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(flag, fontSize = 31.sp)
+                                Text(name, color = Color.White, fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold, maxLines = 1)
+                                Box(Modifier.width(24.dp).height(3.dp)
+                                    .background(tint, RoundedCornerShape(3.dp)))
+                            }
                         }
                     }
+                    if (countryColumn.size == 1) Spacer(Modifier.height(82.dp))
                 }
-                repeat(3 - rowCountries.size) { Spacer(Modifier.weight(1f)) }
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
