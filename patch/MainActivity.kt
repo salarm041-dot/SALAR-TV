@@ -262,6 +262,18 @@ fun SalarTvApp(isInPip: Boolean = false) {
     var rememberPlayerChoice by remember { mutableStateOf(false) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
     var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "dark") ?: "dark") }
+    var liveDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
+    var keepOriginalAudio by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
+    DisposableEffect(prefs) {
+        val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            when (key) {
+                "live_dubbing_enabled" -> liveDubbingEnabled = prefs.getBoolean("live_dubbing_enabled", false)
+                "live_dubbing_original" -> keepOriginalAudio = prefs.getBoolean("live_dubbing_original", true)
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
     val systemDark = isSystemInDarkTheme()
     val useDarkTheme = when (themeMode) { "light" -> false; "system" -> systemDark; else -> true }
 
@@ -346,6 +358,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
     }
 
     val player = remember { ExoPlayer.Builder(context).build() }
+    LaunchedEffect(player, liveDubbingEnabled, keepOriginalAudio) {
+        // Preserve speech-recognition input while lowering the original track
+        // when the user wants Persian TTS dubbing to stand out.
+        player.volume = if (liveDubbingEnabled && !keepOriginalAudio) 0.25f else 1f
+    }
     DisposableEffect(player) {
         (context as? MainActivity)?.activePlayer = player
         onDispose {
@@ -2090,7 +2107,7 @@ fun LiveDubbingPage() {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("حفظ صدای اصلی شبکه", color = TextMain)
-                Text("برای شنیدن صدای اصلی همراه دوبله", color = MutedText, fontSize = 11.sp)
+                Text("در حالت خاموش، صدای اصلی هنگام دوبله به ۲۵٪ کاهش می‌یابد؛ کاملاً قطع نمی‌شود تا تشخیص گفتار مختل نشود.", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = keepOriginal, onCheckedChange = {
                 keepOriginal = it
