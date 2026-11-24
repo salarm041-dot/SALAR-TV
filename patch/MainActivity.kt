@@ -1629,64 +1629,57 @@ fun OtherCountriesPage(channels: List<Channel>, onCountry: (String) -> Unit) {
 
 @Composable
 fun TvCountryPage(onCountry: (String) -> Unit) {
-    data class CountryCard(val name: String, val flag: String, val symbol: String, val detail: String, val color: Color)
+    data class CountryCard(val name: String, val flag: String, val emblem: androidx.compose.ui.graphics.vector.ImageVector, val color: Color)
     val countries = listOf(
-        CountryCard("ایران", "🇮🇷", "تخت جمشید", "شبکه‌های صدا و سیمای ایران", Color(0xFF42D6A4)),
-        CountryCard("ترکیه", "🇹🇷", "هلال و ستاره", "شبکه‌های تلویزیونی ترکیه", Color(0xFFFF5A68)),
-        CountryCard("آذربایجان", "🇦🇿", "شعله آتش", "شبکه‌های جمهوری آذربایجان", Color(0xFF42C8E8)),
-        CountryCard("اسرائیل", "🇮🇱", "ستاره داوود", "شبکه‌های تلویزیونی اسرائیل؛ خبری، عمومی و فرهنگی", Color(0xFF65A9FF)),
-        CountryCard("عربی", "🌍", "نشان جهان عرب", "فهرست آماده شبکه‌ها به تفکیک ۱۸ کشور", Color(0xFFFFB74D)),
-        CountryCard("سایر", "🌐", "نشان جهان", "شبکه‌های بین‌المللی و سایر کشورها", Color(0xFFFFD45C))
+        CountryCard("ایران", "🇮🇷", Icons.Default.AccountBalance, Color(0xFF42D6A4)),
+        CountryCard("ترکیه", "🇹🇷", Icons.Default.Brightness4, Color(0xFFFF5A68)),
+        CountryCard("آذربایجان", "🇦🇿", Icons.Default.LocalFireDepartment, Color(0xFF42C8E8)),
+        CountryCard("اسرائیل", "🇮🇱", Icons.Default.Star, Color(0xFF65A9FF)),
+        CountryCard("عربی", "🌍", Icons.Default.Public, Color(0xFFFFB74D)),
+        CountryCard("سایر", "🌐", Icons.Default.Language, Color(0xFFFFD45C))
     )
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("شبکه‌های تلویزیونی", color = Color(0xFFFFD45C), fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
         Text("کشور موردنظر را انتخاب کنید", color = SecondaryText, fontSize = 12.sp)
-        countries.forEach { country ->
-            val emblem = when (country.name) {
-                "ایران" -> Icons.Default.AccountBalance
-                "ترکیه" -> Icons.Default.Brightness4
-                "آذربایجان" -> Icons.Default.LocalFireDepartment
-                "اسرائیل" -> Icons.Default.Star
-                "عربی" -> Icons.Default.Public
-                else -> Icons.Default.Language
-            }
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable { onCountry(country.name) },
-                shape = RoundedCornerShape(22.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF101015)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Row(
-                    Modifier.fillMaxWidth().background(
-                        androidx.compose.ui.graphics.Brush.horizontalGradient(
-                            listOf(country.color.copy(alpha = 0.23f), Color(0xFF17171D), Color(0xFF09090C))
-                        )
-                    ).padding(18.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier.size(76.dp)
-                            .background(country.color.copy(alpha = 0.13f), RoundedCornerShape(18.dp)),
-                        contentAlignment = Alignment.Center
+        countries.chunked(3).forEach { rowCountries ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                rowCountries.forEach { country ->
+                    Card(
+                        modifier = Modifier.weight(1f).clickable { onCountry(country.name) },
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF101722)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)
                     ) {
-                        Text(country.flag, fontSize = 39.sp)
-                        Box(
-                            modifier = Modifier.align(Alignment.BottomEnd).size(31.dp)
-                                .background(Color(0xFF09090C), RoundedCornerShape(50)),
-                            contentAlignment = Alignment.Center
+                        Column(
+                            Modifier.fillMaxWidth().background(
+                                androidx.compose.ui.graphics.Brush.verticalGradient(
+                                    listOf(country.color.copy(alpha = 0.22f), Color(0xFF171B26), Color(0xFF090D15))
+                                )
+                            ).padding(vertical = 16.dp, horizontal = 6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(9.dp)
                         ) {
-                            Icon(emblem, contentDescription = country.symbol, tint = country.color,
-                                modifier = Modifier.size(21.dp))
+                            Box(
+                                Modifier.size(66.dp).background(country.color.copy(alpha = 0.12f), RoundedCornerShape(17.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(country.flag, fontSize = 39.sp)
+                                Box(
+                                    Modifier.align(Alignment.BottomEnd).size(25.dp)
+                                        .background(Color(0xFF090D15), RoundedCornerShape(50)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(country.emblem, contentDescription = null, tint = country.color, modifier = Modifier.size(16.dp))
+                                }
+                            }
+                            Text(country.name, color = Color(0xFFFFD978), fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold, maxLines = 1)
+                            Icon(Icons.Default.PlayCircleFilled, contentDescription = null,
+                                tint = country.color, modifier = Modifier.size(23.dp))
                         }
                     }
-                    Spacer(Modifier.width(14.dp))
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(country.name, color = Color(0xFFFFD978), fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                        Text(country.symbol, color = country.color, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        Text(country.detail, color = Color(0xFFBDB8AA), fontSize = 10.sp)
-                    }
-                    Icon(Icons.Default.PlayCircleFilled, null, tint = country.color, modifier = Modifier.size(30.dp))
                 }
+                repeat(3 - rowCountries.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
