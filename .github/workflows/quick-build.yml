@@ -71,8 +71,8 @@ jobs:
           ]
           for permission in required_permissions:
               if permission not in s:
-                  declaration = f'    <uses-permission android:name="{permission}" />\\n'
-                  s, count = re.subn(r'(?m)^\\s*<application\\b', declaration + '    <application', s, count=1)
+                  declaration = f'    <uses-permission android:name="{permission}" />\n'
+                  s, count = re.subn(r'(?m)^\s*<application\b', declaration + '    <application', s, count=1)
                   if count != 1:
                       raise SystemExit(f"Could not add required manifest permission: {permission}")
           if "android.permission.RECORD_AUDIO" not in s:
