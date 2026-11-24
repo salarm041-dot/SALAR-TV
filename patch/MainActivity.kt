@@ -41,6 +41,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -1242,7 +1244,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
     val tvCount = channels.count { it.kind == "تلویزیون" }
     val radioCount = channels.count { it.kind == "رادیو" }
     val countries = dynamicCountries.distinctBy { it.first }
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text("سلام، خوش آمدید", color = Color(0xFF9DAEC5), fontSize = 12.sp)
@@ -1418,8 +1420,10 @@ fun IranTvPage(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite:
         if (section == "سراسری") Text("شبکه‌های ملی صدا و سیما", color = Color(0xFF64D8CA), fontSize = 12.sp, fontWeight = FontWeight.Bold)
         else if (section == "استانی") Text("شبکه‌های استانی به تفکیک استان", color = Color(0xFF64D8CA), fontSize = 12.sp, fontWeight = FontWeight.Bold)
         else if (section == "ماهواره") Text("شبکه‌های فارسی‌زبان و ماهواره‌ای", color = Color(0xFF64D8CA), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        ChannelList(filtered, onSelect = onSelect, onFavorite = onFavorite, onEdit = onEdit, onDelete = onDelete,
-            onRefresh = onRefresh, isRefreshing = isRefreshing, lastRefresh = lastRefresh)
+        Box(Modifier.weight(1f)) {
+            ChannelList(filtered, onSelect = onSelect, onFavorite = onFavorite, onEdit = onEdit, onDelete = onDelete,
+                onRefresh = onRefresh, isRefreshing = isRefreshing, lastRefresh = lastRefresh)
+        }
     }
 }
 @Composable
