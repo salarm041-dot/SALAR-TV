@@ -1224,9 +1224,9 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
         }
         val sections = visibleChannels.groupBy { channel ->
             if (channel.kind == "رادیو") {
-                if (channel.country == "ایران") "صدا و سیما" else "خارج از ایران"
+                "${channel.country.ifBlank { "سایر" }} / رادیو"
             } else {
-                "${channel.country} / ${categoryForChannel(channel)} / ${channel.kind}"
+                "${channel.country.ifBlank { "سایر" }} / ${categoryForChannel(channel)}"
             }
         }.toSortedMap()
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
