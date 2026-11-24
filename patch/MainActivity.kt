@@ -993,18 +993,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     )
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> TvCountryPage(onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" })
-                    "شبکه‌های عربی" -> ArabicCountryPage(onCountry = { country -> page = "عربی:$country" })
-                    "کشور:سایر" -> OtherCountriesPage(channels) { country ->
+                    "شبکه‌های عربی" -> TvCountryPage(onCountry = { country -> page = "عربی:$country" })
+                    "کشور:سایر" -> TvCountryPage(onCountry = { country ->
                         rememberDynamicCountry(country)
                         page = "کشور:$country"
-                    }
-                    "کشورهای منتخب" -> SelectedDynamicCountriesPage(
-                        countries = selectedDynamicCountries.filter { name ->
-                            channels.any { it.kind == "تلویزیون" && it.country == name }
-                        },
-                        channels = channels,
-                        onCountry = { country -> page = "کشور:$country" }
-                    )
+                    })
+                    "کشورهای منتخب" -> TvCountryPage(onCountry = { country -> page = "کشور:$country" })
                     "کشور:ایران" -> IranTvPage(
                         channels = channels,
                         onSelect = { selectChannel(it) },
@@ -1053,7 +1047,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onPage = { destination -> page = destination },
                         dynamicCountries = (listOf("ایران", "ترکیه", "آذربایجان", "اسرائیل", "عربی", "سایر") + selectedDynamicCountries)
-                            .distinct().map { it to flagForDynamicCountry(it) },
+                            .distinct().map { it to "🌐" },
                         onDynamicCountry = { country -> page = "کشور:$country" },
                         onMoreDynamicCountries = { page = "کشورهای منتخب" })
                 }
