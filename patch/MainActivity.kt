@@ -905,7 +905,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         rememberDynamicCountry(country)
                         page = "کشور:$country"
                     }
-                    page.startsWith("کشور:") -> {
+                    page.takeIf { it.startsWith("کشور:") } -> {
                         val country = page.removePrefix("کشور:")
                         val arabicCountries = setOf("عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی", "یمن", "سودان")
                         val filtered = channels.filter { c ->
