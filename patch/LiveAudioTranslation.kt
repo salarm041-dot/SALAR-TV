@@ -64,7 +64,8 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     val models = remember {
         listOf(
             LiveSpeechModel("en", TranslateLanguage.ENGLISH, "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"),
-            LiveSpeechModel("tr", TranslateLanguage.TURKISH, "https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip")
+            LiveSpeechModel("tr", TranslateLanguage.TURKISH, "https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip"),
+            LiveSpeechModel("ar", TranslateLanguage.ARABIC, "https://alphacephei.com/vosk/models/vosk-model-ar-mgb2-0.4.zip")
         )
     }
     var selectedModel by remember { mutableStateOf("en") }
@@ -261,6 +262,9 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             FilterChip(selected = selectedModel == "tr", onClick = {
                 if (!isRunning && !isPreparing) selectedModel = "tr"
             }, label = { Text("ترکی", fontSize = 11.sp) })
+            FilterChip(selected = selectedModel == "ar", onClick = {
+                if (!isRunning && !isPreparing) selectedModel = "ar"
+            }, label = { Text("عربی", fontSize = 11.sp) })
             Button(
                 enabled = !isPreparing,
                 onClick = {
