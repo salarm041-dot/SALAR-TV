@@ -806,7 +806,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onMultiView = { page = "چندنمایی" }
                     )
                     "چندنمایی" -> MultiViewPage(
-                        channels = channels.filter { it.kind == "تلویزیون" }
+                        channels = channels.filter { it.kind == "تلویزیون" && it.url !in lockedChannelUrls }
                     )
                     "زیارت آنلاین" -> PilgrimagePage(
                         savedChannels = channels,
