@@ -172,6 +172,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         // Replace obsolete built-in pilgrimage links without touching user-added locations.
         val obsoletePilgrimageUrls = setOf(
             "https://en.imamali.net/live/",
+            "https://imamhusseintv.com/en/live/6",
             "https://www.youtube.com/embed/kYqGbBqmp8g?autoplay=1&playsinline=1",
             "https://www.youtube.com/embed/9A1S0xAPVIs?autoplay=1&playsinline=1"
         )
@@ -179,7 +180,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         val pilgrimage = listOf(
             Channel("حرم مطهر رضوی — پخش زنده رسمی ۲۴ ساعته", "https://haram.razavi.ir/live", "زیارت آنلاین", "وب", groupTitle = "مشهد مقدس"),
             Channel("حرم امام حسین (ع) — پخش رسمی (۹ تا ۲۱)", "https://imamhussain.gov.iq/english/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
-            Channel("عتبات مقدسه عراق — پخش زنده رسمی ۲۴ ساعته", "https://imamhusseintv.com/en/live/6", "زیارت آنلاین", "وب", groupTitle = "نجف و عتبات عراق"),
+            Channel("پخش زنده رسمی عتبات عراق — نجف، کربلا، کاظمین و سامرا", "https://imamhusseintv.com/en/live/6", "زیارت آنلاین", "وب", groupTitle = "نجف"),
             Channel("مسجدالحرام مکه — پخش زنده قرآن TV رسمی", "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA&autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه")
         )
         val arabic = runCatching {
