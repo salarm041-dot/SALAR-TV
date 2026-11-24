@@ -14,6 +14,8 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Process
+import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -54,6 +56,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Locale
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
@@ -64,6 +67,30 @@ private data class LiveSpeechModel(val id: String, val language: String, val url
 internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
+    val prefs = remember { context.getSharedPreferences("salar_tv", Context.MODE_PRIVATE) }
+    var ttsEngine by remember { mutableStateOf<TextToSpeech?>(null) }
+    var ttsReady by remember { mutableStateOf(false) }
+    DisposableEffect(context) {
+        lateinit var engine: TextToSpeech
+        engine = TextToSpeech(context) { result ->
+            mainHandler.post {
+                if (result == TextToSpeech.SUCCESS) {
+                    val languageResult = engine.setLanguage(Locale("fa", "IR"))
+                    ttsReady = languageResult != TextToSpeech.LANG_MISSING_DATA &&
+                        languageResult != TextToSpeech.LANG_NOT_SUPPORTED
+                } else {
+                    ttsReady = false
+                }
+            }
+        }
+        ttsEngine = engine
+        onDispose {
+            runCatching { engine.stop() }
+            runCatching { engine.shutdown() }
+            ttsEngine = null
+            ttsReady = false
+        }
+    }
     val executor = remember { Executors.newSingleThreadExecutor() }
     val models = remember {
         listOf(
@@ -154,7 +181,28 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                 activeTranslator.translate(source)
                     .addOnSuccessListener { result ->
                         translated = result
-                        status = "ترجمهٔ زنده فعال است"
+                        if (prefs.getBoolean("live_dubbing_enabled", false)) {
+                            val speech = ttsEngine
+                            if (ttsReady && speech != null) {
+                                val voicePreset = prefs.getString("live_dubbing_voice", "زیر")
+                                speech.setPitch(if (voicePreset == "بم" || voicePreset == "مرد") 0.88f else 1.12f)
+                                val volume = prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f)
+                                val parameters = Bundle().apply {
+                                    putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume)
+                                }
+                                speech.speak(
+                                    result,
+                                    TextToSpeech.QUEUE_FLUSH,
+                                    parameters,
+                                    "salar-live-" + System.currentTimeMillis()
+                                )
+                                status = "ترجمه و گفتار فارسی زنده فعال است"
+                            } else {
+                                status = "ترجمه انجام شد؛ موتور گفتار فارسی دستگاه آماده نیست."
+                            }
+                        } else {
+                            status = "ترجمهٔ زنده فعال است"
+                        }
                     }
                     .addOnFailureListener { status = "ترجمه انجام نشد: ${it.localizedMessage ?: "خطا"}" }
             }
@@ -345,7 +393,13 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        Text("ترجمهٔ گفتار زنده به فارسی", color = Color(0xFFFFD27A), fontSize = 12.sp)
+        Text("ترجمه و دوبلهٔ گفتار زنده به فارسی", color = Color(0xFFFFD27A), fontSize = 12.sp)
+        Text(
+            if (ttsReady) "موتور گفتار فارسی آماده است؛ برای شنیدن خروجی، دوبلهٔ هوشمند را روشن کنید."
+            else "برای دوبلهٔ صوتی، وجود صدای فارسی در موتور گفتار گوشی لازم است.",
+            color = Color.White,
+            fontSize = 10.sp
+        )
         Text("زبان‌های بیشتر را هم می‌توانید انتخاب و جداگانه دانلود کنید؛ هیچ زبان اضافه‌ای خودکار دریافت نمی‌شود.", color = Color.White, fontSize = 10.sp)
         Text("انتخاب زبان گفتار", color = Color.White, fontSize = 11.sp)
         models.chunked(4).forEach { languageRow ->
