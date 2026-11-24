@@ -1948,6 +1948,35 @@ fun AboutPage() {
 }
 
 
+private fun provinceForChannel(channel: Channel): String {
+    val name = channel.name.replace('ي', 'ی').replace('ك', 'ک')
+    // Prefer the province explicitly supplied in playlist labels, then use
+    // a maintained mapping for provincial stations whose title omits it.
+    Regex("\\(([^)]+)\\)").find(name)?.groupValues?.getOrNull(1)?.trim()
+        ?.takeIf { it.isNotBlank() }?.let { return it }
+    return when {
+        "آبادان" in name || "خوزستان" in name -> "خوزستان"
+        "البرز" in name -> "البرز"
+        "بوشهر" in name -> "بوشهر"
+        "فارس" in name -> "فارس"
+        "همدان" in name -> "همدان"
+        "ایلام" in name -> "ایلام"
+        "اصفهان" in name -> "اصفهان"
+        "کرمان" in name -> "کرمان"
+        "کیش" in name || "خلیج فارس" in name -> "هرمزگان"
+        "کردستان" in name -> "کردستان"
+        "مهاباد" in name || "آذربایجان غربی" in name -> "آذربایجان غربی"
+        "مکران" in name || "هامون" in name -> "سیستان و بلوچستان"
+        "نور" in name || "تبرستان" in name -> "مازندران"
+        "قزوین" in name -> "قزوین"
+        "سمنان" in name -> "سمنان"
+        "خراسان رضوی" in name || "سبز" in name -> "خراسان رضوی"
+        "آذربایجان شرقی" in name || "سهند" in name -> "آذربایجان شرقی"
+        "شبکه تهران" in name || name == "تهران" -> "تهران"
+        else -> "استان نامشخص"
+    }
+}
+
 private fun categoryForChannel(channel: Channel): String {
     if (channel.kind == "رادیو") return "رادیو"
     val value = (channel.name + " " + channel.country + " " + channel.groupTitle).lowercase()
@@ -1956,7 +1985,7 @@ private fun categoryForChannel(channel: Channel): String {
     // Official IRIB structure takes precedence over genre keywords:
     // national, provincial and international networks must not be mixed
     // into generic news/sports/entertainment sections.
-    if (listOf("شبکه‌های استانی", "شبکه های استانی", "استانی").any { it in group }) return "شبکه‌های استانی"
+    if (listOf("شبکه‌های استانی", "شبکه های استانی", "استانی").any { it in group }) return "استانی / ${provinceForChannel(channel)}"
     if (listOf("شبکه‌های سراسری", "شبکه های سراسری", "سراسری").any { it in group }) return "شبکه‌های سراسری"
     if (listOf("برون‌مرزی", "برون مرزی", "بین‌الملل", "بین الملل").any { it in group }) return "شبکه‌های برون‌مرزی"
     return when {
@@ -1977,7 +2006,7 @@ private fun categoryForChannel(channel: Channel): String {
 
 private fun sectionSortOrder(title: String): Int = when {
     "شبکه‌های سراسری" in title -> 0
-    "شبکه‌های استانی" in title -> 1
+    "استانی /" in title || "شبکه‌های استانی" in title -> 1
     "شبکه‌های برون‌مرزی" in title -> 2
     "سایر شبکه‌های داخلی" in title -> 3
     title.endsWith("/ رادیو") -> 4
