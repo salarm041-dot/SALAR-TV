@@ -320,6 +320,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         }
     }
     var childPinHash by remember { mutableStateOf(prefs.getString("child_lock_pin_hash", "") ?: "") }
+    var adultChannelsEnabled by remember { mutableStateOf(prefs.getBoolean("adult_channels_enabled", false)) }
     var pendingLockedChannel by remember { mutableStateOf<Channel?>(null) }
     var showChildPinDialog by remember { mutableStateOf(false) }
     var childPinEntry by remember { mutableStateOf("") }
@@ -927,9 +928,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onPilgrimage = { page = "زیارت آنلاین" },
                         onMultiView = { page = "چندنمایی" },
                         onAdultChannels = {
-                            if (childPinHash.isBlank()) page = "قفل کودک"
-                            else { adultPinEntry = ""; adultPinError = ""; showAdultPinDialog = true }
-                        }
+                            if (adultChannelsEnabled) {
+                                if (childPinHash.isBlank()) page = "قفل کودک"
+                                else { adultPinEntry = ""; adultPinError = ""; showAdultPinDialog = true }
+                            }
+                        },
+                        adultChannelsEnabled = adultChannelsEnabled
                     )
                     "چندنمایی" -> MultiViewPage(
                         channels = channels.filter { it.kind == "تلویزیون" && !isAdultChannel(it) && it.url !in lockedChannelUrls }
@@ -959,6 +963,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "تنظیمات" -> SettingsPage(
                         themeMode = themeMode,
+                        adultChannelsEnabled = adultChannelsEnabled,
+                        onAdultChannelsEnabledChange = { enabled ->
+                            adultChannelsEnabled = enabled
+                            prefs.edit().putBoolean("adult_channels_enabled", enabled).apply()
+                            if (!enabled) { adultAccessGranted = false; if (page == "شبکه‌های +۱۸") page = "تنظیمات" }
+                        },
                         onThemeModeChange = { mode ->
                             themeMode = mode
                             prefs.edit().putString("theme_mode", mode).apply()
@@ -1989,7 +1999,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
              onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit,
-             onMultiView: () -> Unit, onAdultChannels: () -> Unit) {
+             onMultiView: () -> Unit, onAdultChannels: () -> Unit, adultChannelsEnabled: Boolean) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(16.dp)) {
@@ -2006,7 +2016,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
             }
         }
         MoreButton("چندنمایی هم‌زمان", Icons.Default.GridView, onMultiView)
-        MoreButton("شبکه‌های بزرگسالان +۱۸", Icons.Default.Lock, onAdultChannels)
+        if (adultChannelsEnabled) MoreButton("شبکه‌های بزرگسالان +۱۸", Icons.Default.Lock, onAdultChannels)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
@@ -2482,7 +2492,8 @@ fun ChildLockPage(
 }
 
 @Composable
-fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit) {
+fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit,
+                 adultChannelsEnabled: Boolean, onAdultChannelsEnabledChange: (Boolean) -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var fontScale by remember { mutableFloatStateOf(prefs.getFloat("font_scale", 1f).coerceIn(0.85f, 1.3f)) }
@@ -2517,8 +2528,15 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
                     Spacer(Modifier.width(10.dp))
                     Text("حفاظت و حریم خصوصی", color = TextMain, fontWeight = FontWeight.Bold)
                 }
-                Text("برای محدودکردن پخش شبکه‌های انتخابی با رمز والد، بخش قفل کودک را باز کنید.",
+                Text("برای محدودکردن پخش شبکه‌های انتخابی و حفاظت از بخش +۱۸ با رمز والد، قفل کودک را تنظیم کنید.",
                     color = SecondaryText, fontSize = 12.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("فعال‌سازی بخش شبکه‌های +۱۸", color = TextMain)
+                        Text("این بخش فقط با رمز والد باز می‌شود.", color = MutedText, fontSize = 11.sp)
+                    }
+                    Switch(checked = adultChannelsEnabled, onCheckedChange = onAdultChannelsEnabledChange)
+                }
                 Button(onClick = onChildLock, modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
                     Icon(Icons.Default.Security, contentDescription = null)
