@@ -68,7 +68,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             LiveSpeechModel("ar", TranslateLanguage.ARABIC, "https://alphacephei.com/vosk/models/vosk-model-ar-mgb2-0.4.zip")
         )
     }
-    var selectedModel by remember { mutableStateOf("en") }
+    var selectedModel by remember { mutableStateOf<String?>(null) }
     var status by remember { mutableStateOf("ترجمهٔ گفتار آمادهٔ شروع است.") }
     var translated by remember { mutableStateOf("") }
     var isRunning by remember { mutableStateOf(false) }
@@ -80,13 +80,15 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     var modelInstance by remember { mutableStateOf<Model?>(null) }
     val runningFlag = remember { AtomicBoolean(false) }
     val translator = remember(selectedModel) {
-        val language = models.first { it.id == selectedModel }.language
-        Translation.getClient(
-            TranslatorOptions.Builder()
-                .setSourceLanguage(language)
-                .setTargetLanguage(TranslateLanguage.PERSIAN)
-                .build()
-        )
+        selectedModel?.let { selectedId ->
+            val language = models.first { it.id == selectedId }.language
+            Translation.getClient(
+                TranslatorOptions.Builder()
+                    .setSourceLanguage(language)
+                    .setTargetLanguage(TranslateLanguage.PERSIAN)
+                    .build()
+            )
+        }
     }
 
     fun stopCapture() {
@@ -107,9 +109,13 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
 
     fun translateText(source: String) {
         if (source.isBlank()) return
-        translator.downloadModelIfNeeded(DownloadConditions.Builder().build())
+        val activeTranslator = translator ?: run {
+            status = "ابتدا زبان گفتار را انتخاب کنید."
+            return
+        }
+        activeTranslator.downloadModelIfNeeded(DownloadConditions.Builder().build())
             .addOnSuccessListener {
-                translator.translate(source)
+                activeTranslator.translate(source)
                     .addOnSuccessListener { result ->
                         translated = result
                         status = "ترجمهٔ زنده فعال است"
@@ -212,7 +218,12 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         }
         isPreparing = true
         status = "در حال آماده‌سازی مدل تشخیص گفتار؛ دانلود اولیه ممکن است حدود ۴۰ مگابایت باشد…"
-        val chosen = models.first { it.id == selectedModel }
+        val chosen = models.firstOrNull { it.id == selectedModel }
+        if (chosen == null) {
+            isPreparing = false
+            status = "ابتدا زبان موردنظر را خودتان انتخاب کنید؛ هیچ مدلی خودکار دانلود نمی‌شود."
+            return
+        }
         executor.execute {
             try {
                 val modelDir = ensureSpeechModel(context, chosen)
@@ -244,7 +255,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     DisposableEffect(translator) {
         onDispose {
             stopCapture()
-            translator.close()
+            translator?.close()
         }
     }
 
@@ -255,6 +266,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text("ترجمهٔ گفتار زنده به فارسی", color = Color(0xFFFFD27A), fontSize = 12.sp)
+        Text("زبان را خودتان انتخاب کنید؛ فقط مدل همان زبان هنگام شروع دریافت می‌شود.", color = Color.White, fontSize = 10.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             FilterChip(selected = selectedModel == "en", onClick = {
                 if (!isRunning && !isPreparing) selectedModel = "en"
@@ -266,7 +278,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                 if (!isRunning && !isPreparing) selectedModel = "ar"
             }, label = { Text("عربی", fontSize = 11.sp) })
             Button(
-                enabled = !isPreparing,
+                enabled = !isPreparing && (isRunning || selectedModel != null),
                 onClick = {
                     if (isRunning) {
                         stopCapture()
@@ -287,7 +299,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         }
         Text(status, color = Color(0xFFE0E0E0), fontSize = 10.sp)
         Text(
-            "این قابلیت صدای خروجی SALAR TV را می‌گیرد؛ صدای میکروفون نیست. فقط شبکه‌های مجاز به ضبط صدای پخش قابل تشخیص‌اند.",
+            "مدل زبان‌های انتخاب‌نشده دانلود نمی‌شود. مدل انتخابی فقط در اولین شروع دریافت و برای دفعات بعد نگهداری می‌شود. این قابلیت صدای خروجی SALAR TV را می‌گیرد؛ صدای میکروفون نیست. فقط شبکه‌های مجاز به ضبط صدای پخش قابل تشخیص‌اند.",
             color = Color(0xFFFFCC80), fontSize = 9.sp
         )
     }
