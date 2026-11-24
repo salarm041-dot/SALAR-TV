@@ -115,6 +115,8 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     var selectedModel by remember { mutableStateOf<String?>(null) }
     var status by remember { mutableStateOf("ترجمهٔ گفتار آمادهٔ شروع است.") }
     var translated by remember { mutableStateOf("") }
+    var lastSpokenText by remember { mutableStateOf("") }
+    var lastSpokenAt by remember { mutableStateOf(0L) }
     var isRunning by remember { mutableStateOf(false) }
     var isPreparing by remember { mutableStateOf(false) }
     var projection by remember { mutableStateOf<MediaProjection?>(null) }
@@ -138,6 +140,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
 
     fun stopCapture() {
         runningFlag.set(false)
+        runCatching { ttsEngine?.stop() }
         val threadToJoin = recognitionThread
         val recognizerToClose = recognizer
         val voskToClose = modelInstance
@@ -184,19 +187,33 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                         if (prefs.getBoolean("live_dubbing_enabled", false)) {
                             val speech = ttsEngine
                             if (ttsReady && speech != null) {
-                                val voicePreset = prefs.getString("live_dubbing_voice", "زیر")
-                                speech.setPitch(if (voicePreset == "بم" || voicePreset == "مرد") 0.88f else 1.12f)
-                                val volume = prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f)
-                                val parameters = Bundle().apply {
-                                    putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume)
+                                val speechText = result.trim().replace(Regex("\\s+"), " ")
+                                val now = System.currentTimeMillis()
+                                val isNewSpeech = speechText.isNotBlank() &&
+                                    (speechText != lastSpokenText || now - lastSpokenAt > 5_000L)
+                                if (isNewSpeech) {
+                                    lastSpokenText = speechText
+                                    lastSpokenAt = now
+                                    val voicePreset = prefs.getString("live_dubbing_voice", "زیر")
+                                    speech.setPitch(if (voicePreset == "بم" || voicePreset == "مرد") 0.88f else 1.12f)
+                                    val volume = prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f)
+                                    val parameters = Bundle().apply {
+                                        putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume)
+                                    }
+                                    val speakResult = speech.speak(
+                                        speechText,
+                                        TextToSpeech.QUEUE_ADD,
+                                        parameters,
+                                        "salar-live-" + now
+                                    )
+                                    status = if (speakResult == TextToSpeech.SUCCESS) {
+                                        "ترجمهٔ فارسی به‌ترتیب در صف دوبله قرار گرفت"
+                                    } else {
+                                        "موتور گفتار نتوانست جمله را به صف دوبله اضافه کند."
+                                    }
+                                } else {
+                                    status = "ترجمهٔ تکراری برای دوبله نادیده گرفته شد."
                                 }
-                                speech.speak(
-                                    result,
-                                    TextToSpeech.QUEUE_FLUSH,
-                                    parameters,
-                                    "salar-live-" + System.currentTimeMillis()
-                                )
-                                status = "ترجمه و گفتار فارسی زنده فعال است"
                             } else {
                                 status = "ترجمه انجام شد؛ موتور گفتار فارسی دستگاه آماده نیست."
                             }
