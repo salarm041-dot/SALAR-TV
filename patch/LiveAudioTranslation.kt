@@ -445,7 +445,7 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     val target = File(base, model.id)
     if (File(target, "am/final.mdl").exists() && File(target, "conf").exists()) {
         // Keep only the selected language model on disk.
-        base.listFiles()?.filter { it.isDirectory && it.name != model.id && it.name != "${model.id}-extract" }
+        base.listFiles()?.filter { it.isDirectory && it.name != model.id }
             ?.forEach { it.deleteRecursively() }
         return target.also { File(context.filesDir, "salar-whisper").deleteRecursively() }
     }
@@ -462,6 +462,9 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
         connection.inputStream.use { input ->
             FileOutputStream(archive).use { output -> input.copyTo(output) }
         }
+    } catch (error: Exception) {
+        archive.delete()
+        throw error
     } finally {
         connection.disconnect()
     }
