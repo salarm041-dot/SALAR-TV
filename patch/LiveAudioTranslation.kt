@@ -65,7 +65,19 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         listOf(
             LiveSpeechModel("en", TranslateLanguage.ENGLISH, "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"),
             LiveSpeechModel("tr", TranslateLanguage.TURKISH, "https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip"),
-            LiveSpeechModel("ar", TranslateLanguage.ARABIC, "https://alphacephei.com/vosk/models/vosk-model-ar-mgb2-0.4.zip")
+            LiveSpeechModel("ar", TranslateLanguage.ARABIC, "https://alphacephei.com/vosk/models/vosk-model-ar-mgb2-0.4.zip"),
+            LiveSpeechModel("ru", TranslateLanguage.RUSSIAN, "https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip"),
+            LiveSpeechModel("fr", TranslateLanguage.FRENCH, "https://alphacephei.com/vosk/models/vosk-model-small-fr-0.22.zip"),
+            LiveSpeechModel("de", TranslateLanguage.GERMAN, "https://alphacephei.com/vosk/models/vosk-model-small-de-0.15.zip"),
+            LiveSpeechModel("es", TranslateLanguage.SPANISH, "https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip"),
+            LiveSpeechModel("it", TranslateLanguage.ITALIAN, "https://alphacephei.com/vosk/models/vosk-model-small-it-0.22.zip"),
+            LiveSpeechModel("pt", TranslateLanguage.PORTUGUESE, "https://alphacephei.com/vosk/models/vosk-model-small-pt-0.3.zip"),
+            LiveSpeechModel("nl", TranslateLanguage.DUTCH, "https://alphacephei.com/vosk/models/vosk-model-small-nl-0.22.zip"),
+            LiveSpeechModel("pl", TranslateLanguage.POLISH, "https://alphacephei.com/vosk/models/vosk-model-small-pl-0.22.zip"),
+            LiveSpeechModel("uk", TranslateLanguage.UKRAINIAN, "https://alphacephei.com/vosk/models/vosk-model-small-uk-v3-nano.zip"),
+            LiveSpeechModel("zh", TranslateLanguage.CHINESE, "https://alphacephei.com/vosk/models/vosk-model-small-cn-0.22.zip"),
+            LiveSpeechModel("ja", TranslateLanguage.JAPANESE, "https://alphacephei.com/vosk/models/vosk-model-small-ja-0.22.zip"),
+            LiveSpeechModel("hi", TranslateLanguage.HINDI, "https://alphacephei.com/vosk/models/vosk-model-small-hi-0.22.zip")
         )
     }
     var selectedModel by remember { mutableStateOf<String?>(null) }
@@ -266,17 +278,48 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text("ترجمهٔ گفتار زنده به فارسی", color = Color(0xFFFFD27A), fontSize = 12.sp)
-        Text("زبان را خودتان انتخاب کنید؛ فقط مدل همان زبان هنگام شروع دریافت می‌شود.", color = Color.White, fontSize = 10.sp)
+        Text("زبان‌های بیشتر را هم می‌توانید انتخاب و جداگانه دانلود کنید؛ هیچ زبان اضافه‌ای خودکار دریافت نمی‌شود.", color = Color.White, fontSize = 10.sp)
+        Text("انتخاب زبان گفتار", color = Color.White, fontSize = 11.sp)
+        models.chunked(4).forEach { languageRow ->
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                languageRow.forEach { item ->
+                    val label = when (item.id) {
+                        "en" -> "انگلیسی"; "tr" -> "ترکی"; "ar" -> "عربی"
+                        "ru" -> "روسی"; "fr" -> "فرانسوی"; "de" -> "آلمانی"
+                        "es" -> "اسپانیایی"; "it" -> "ایتالیایی"; "pt" -> "پرتغالی"
+                        "nl" -> "هلندی"; "pl" -> "لهستانی"; "uk" -> "اوکراینی"
+                        "zh" -> "چینی"; "ja" -> "ژاپنی"; "hi" -> "هندی"
+                        else -> item.id
+                    }
+                    FilterChip(selected = selectedModel == item.id, enabled = !isRunning && !isPreparing,
+                        onClick = { selectedModel = item.id },
+                        label = { Text(label, fontSize = 10.sp) })
+                }
+            }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            FilterChip(selected = selectedModel == "en", onClick = {
-                if (!isRunning && !isPreparing) selectedModel = "en"
-            }, label = { Text("انگلیسی", fontSize = 11.sp) })
-            FilterChip(selected = selectedModel == "tr", onClick = {
-                if (!isRunning && !isPreparing) selectedModel = "tr"
-            }, label = { Text("ترکی", fontSize = 11.sp) })
-            FilterChip(selected = selectedModel == "ar", onClick = {
-                if (!isRunning && !isPreparing) selectedModel = "ar"
-            }, label = { Text("عربی", fontSize = 11.sp) })
+            Button(
+                enabled = !isPreparing && !isRunning && selectedModel != null,
+                onClick = {
+                    val chosen = models.first { it.id == selectedModel }
+                    isPreparing = true
+                    status = "در حال دریافت دستی مدل ${chosen.id}؛ فقط همین زبان ذخیره می‌شود…"
+                    executor.execute {
+                        try {
+                            ensureSpeechModel(context, chosen)
+                            mainHandler.post {
+                                isPreparing = false
+                                status = "مدل انتخابی دانلود و آمادهٔ استفاده شد."
+                            }
+                        } catch (e: Exception) {
+                            mainHandler.post {
+                                isPreparing = false
+                                status = "دانلود مدل ناموفق بود: ${e.localizedMessage ?: e.javaClass.simpleName}"
+                            }
+                        }
+                    }
+                }
+            ) { Text("دانلود دستی زبان انتخابی", fontSize = 10.sp) }
             Button(
                 enabled = !isPreparing && (isRunning || selectedModel != null),
                 onClick = {
@@ -299,7 +342,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         }
         Text(status, color = Color(0xFFE0E0E0), fontSize = 10.sp)
         Text(
-            "مدل زبان‌های انتخاب‌نشده دانلود نمی‌شود. مدل انتخابی فقط در اولین شروع دریافت و برای دفعات بعد نگهداری می‌شود. این قابلیت صدای خروجی SALAR TV را می‌گیرد؛ صدای میکروفون نیست. فقط شبکه‌های مجاز به ضبط صدای پخش قابل تشخیص‌اند.",
+            "فقط یک مدل تشخیص گفتار روی گوشی نگهداری می‌شود؛ با دانلود زبان دیگر، مدل قبلی پس از موفقیت دانلود پاک می‌شود. این قابلیت صدای خروجی SALAR TV را می‌گیرد؛ صدای میکروفون نیست. فقط شبکه‌های مجاز به ضبط صدای پخش قابل تشخیص‌اند.",
             color = Color(0xFFFFCC80), fontSize = 9.sp
         )
     }
