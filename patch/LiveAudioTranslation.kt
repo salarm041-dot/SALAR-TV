@@ -300,6 +300,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                 } else {
                     val modelDir = ensureSpeechModel(context, chosen)
                     val loadedModel = Model(modelDir.absolutePath)
+                    val base = File(context.filesDir, "salar-vosk")
+                    base.listFiles()?.filter { it.isDirectory && it.name != chosen.id }
+                        ?.forEach { it.deleteRecursively() }
+                    File(context.filesDir, "salar-whisper").deleteRecursively()
                     mainHandler.post {
                         modelInstance = loadedModel
                         isPreparing = false
@@ -367,7 +371,17 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                     status = if (chosen.id == "he") "در حال دریافت دستی مدل چندزبانهٔ عبری (حدود ۷۵ مگابایت)…" else "در حال دریافت دستی مدل ${chosen.id}؛ فقط همین زبان ذخیره می‌شود…"
                     executor.execute {
                         try {
-                            if (chosen.id == "he") HebrewWhisperEngine.downloadModel(context) else ensureSpeechModel(context, chosen)
+                            if (chosen.id == "he") {
+                                HebrewWhisperEngine.downloadModel(context)
+                            } else {
+                                val modelDir = ensureSpeechModel(context, chosen)
+                                val validation = Model(modelDir.absolutePath)
+                                validation.close()
+                                val base = File(context.filesDir, "salar-vosk")
+                                base.listFiles()?.filter { it.isDirectory && it.name != chosen.id }
+                                    ?.forEach { it.deleteRecursively() }
+                                File(context.filesDir, "salar-whisper").deleteRecursively()
+                            }
                             mainHandler.post {
                                 isPreparing = false
                                 status = "مدل انتخابی دانلود و آمادهٔ استفاده شد."
@@ -444,10 +458,11 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     if (!base.exists() && !base.mkdirs()) throw IllegalStateException("ساخت پوشهٔ مدل ممکن نشد.")
     val target = File(base, model.id)
     if (File(target, "am/final.mdl").exists() && File(target, "conf").exists()) {
-        // Keep only the selected language model on disk.
-        base.listFiles()?.filter { it.isDirectory && it.name != model.id }
-            ?.forEach { it.deleteRecursively() }
-        return target.also { File(context.filesDir, "salar-whisper").deleteRecursively() }
+        // Validate the existing model before treating it as the selected model.
+        // Do not delete another working model until native loading succeeds.
+        val validation = Model(target.absolutePath)
+        validation.close()
+        return target
     }
 
     val archive = File(context.cacheDir, "vosk-${model.id}.zip")
@@ -493,9 +508,12 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
                 entry = zip.nextEntry
             }
         }
-        if (!File(staging, "am/final.mdl").exists()) {
+        if (!File(staging, "am/final.mdl").exists() || !File(staging, "conf").exists()) {
             throw IllegalStateException("ساختار مدل گفتار معتبر نیست.")
         }
+        // Native-load the extracted model before replacing any previous model.
+        val validation = Model(staging.absolutePath)
+        validation.close()
     } catch (error: Exception) {
         archive.delete()
         staging.deleteRecursively()
@@ -515,9 +533,7 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
         throw IllegalStateException("انتقال مدل به پوشهٔ نهایی ناموفق بود؛ مدل قبلی حفظ شد.")
     }
     backup.deleteRecursively()
-    // Retain just one downloaded language model to limit app storage usage.
-    base.listFiles()?.filter { it.isDirectory && it.name != model.id }
-        ?.forEach { it.deleteRecursively() }
-    File(context.filesDir, "salar-whisper").deleteRecursively()
+    // Previous language models are deliberately retained here. The caller removes
+    // them only after the selected model has loaded successfully.
     return target
 }
