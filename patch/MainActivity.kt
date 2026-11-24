@@ -271,7 +271,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     saveChannels()
                     val refreshedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))
                     lastChannelRefresh = refreshedAt
-                    prefs.edit().putString("last_channel_refresh", refreshedAt).apply()
+                    prefs.edit()
+                        .putString("last_channel_refresh", refreshedAt)
+                        .putLong("last_auto_refresh_${requestedKind}", System.currentTimeMillis())
+                        .apply()
                     android.widget.Toast.makeText(context,
                         if (fresh.isEmpty()) "فهرست بررسی شد؛ شبکه جدیدی برای افزودن وجود نداشت." else "${fresh.size} شبکه جدید اضافه شد.",
                         android.widget.Toast.LENGTH_LONG).show()
@@ -280,6 +283,21 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         android.widget.Toast.LENGTH_LONG).show()
                 }
                 isRefreshingChannels = false
+            }
+        }
+    }
+
+    LaunchedEffect(page) {
+        val requestedKind = when {
+            page == "رادیو" -> "رادیو"
+            page == "تلویزیون" || page.startsWith("کشور:") -> "تلویزیون"
+            else -> null
+        }
+        if (requestedKind != null) {
+            val lastAutoRefresh = prefs.getLong("last_auto_refresh_${requestedKind}", 0L)
+            val refreshInterval = 24L * 60L * 60L * 1000L
+            if (System.currentTimeMillis() - lastAutoRefresh >= refreshInterval) {
+                refreshChannels(requestedKind)
             }
         }
     }
