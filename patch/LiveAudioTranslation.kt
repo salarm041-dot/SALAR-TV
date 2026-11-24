@@ -309,7 +309,12 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     val base = File(context.filesDir, "salar-vosk")
     if (!base.exists() && !base.mkdirs()) throw IllegalStateException("ساخت پوشهٔ مدل ممکن نشد.")
     val target = File(base, model.id)
-    if (File(target, "am/final.mdl").exists() && File(target, "conf").exists()) return target
+    if (File(target, "am/final.mdl").exists() && File(target, "conf").exists()) {
+        // Keep only the selected language model on disk.
+        base.listFiles()?.filter { it.isDirectory && it.name != model.id && it.name != "${model.id}-extract" }
+            ?.forEach { it.deleteRecursively() }
+        return target
+    }
 
     val archive = File(context.cacheDir, "vosk-${model.id}.zip")
     val connection = (URL(model.url).openConnection() as HttpURLConnection).apply {
@@ -357,5 +362,8 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     }
     if (target.exists()) target.deleteRecursively()
     if (!staging.renameTo(target)) throw IllegalStateException("انتقال مدل به پوشهٔ نهایی ناموفق بود.")
+    // Retain just one downloaded language model to limit app storage usage.
+    base.listFiles()?.filter { it.isDirectory && it.name != model.id }
+        ?.forEach { it.deleteRecursively() }
     return target
 }
