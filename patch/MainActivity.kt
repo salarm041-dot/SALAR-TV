@@ -1013,7 +1013,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("نام شبکه یا برنامه")
                     OutlinedTextField(title, { title = it }, placeholder = { Text("مثلاً خبر") })
-                    OutlinedTextField(streamUrl, { streamUrl = it }, label = { Text("لینک مستقیم HLS / M3U8") },
+                    OutlinedTextField(streamUrl, { streamUrl = it }, label = { Text("لینک پخش مستقیم یا HLS / M3U8") },
                         placeholder = { Text("https://server/live/index.m3u8") }, singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                     Text("زمان شروع (نمونه: 2026-12-01 20:30)")
@@ -1022,7 +1022,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         label = { Text("مدت ضبط به دقیقه (۱ تا ۳۶۰)") }, singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                     if (scheduleError.isNotBlank()) Text(scheduleError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
-                    Text("برای ضبط خودکار، لینک HLS قابل دسترس و اتصال اینترنت پایدار لازم است.",
+                    Text("ضبط شبکه‌های HLS و رادیوهای دارای جریان مستقیم HTTP/HTTPS پشتیبانی می‌شود؛ اتصال اینترنت پایدار لازم است.",
                         color = MutedText, fontSize = 11.sp)
                 }
             },
@@ -1033,7 +1033,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         val startMillis = start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                         val minutes = duration.toIntOrNull()?.coerceIn(1, 360) ?: error("مدت ضبط را بین ۱ تا ۳۶۰ دقیقه وارد کنید.")
                         require(title.isNotBlank()) { "نام برنامه را وارد کنید." }
-                        require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
+                        require(streamUrl.trim().startsWith("https://") || streamUrl.trim().startsWith("http://")) { "لینک معتبر HTTP یا HTTPS وارد کنید." }
                         require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
                         val requestCode = (title + streamUrl + startMillis).hashCode()
                         val newItem = ScheduledRecording(title.trim(), streamUrl.trim(), startMillis, minutes)
