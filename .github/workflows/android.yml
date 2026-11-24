@@ -493,6 +493,18 @@ jobs:
           path: SALAR-TV-debug.apk
           if-no-files-found: error
 
+      - name: Enable KVM access for Android emulator
+        run: |
+          if [ -e /dev/kvm ]; then
+            sudo chmod 666 /dev/kvm || true
+          fi
+          if [ -r /dev/kvm ] && [ -w /dev/kvm ]; then
+            echo "KVM is available to the runner"
+          else
+            echo "KVM is unavailable; enabling the emulator's supported TCG fallback"
+            echo "ANDROID_I_WANT_MY_TCG=yes" >> "$GITHUB_ENV"
+          fi
+
       - name: Android 11 emulator smoke test
         timeout-minutes: 15
         uses: reactivecircus/android-emulator-runner@v2
@@ -504,7 +516,7 @@ jobs:
           arch: x86_64
           profile: pixel_2
           emulator-boot-timeout: 360
-          disable-linux-hw-accel: false
+          disable-linux-hw-accel: auto
           disable-animations: true
           script: |
             set -euo pipefail
