@@ -494,6 +494,7 @@ jobs:
           if-no-files-found: error
 
       - name: Android 11 emulator smoke test
+        timeout-minutes: 15
         uses: reactivecircus/android-emulator-runner@v2
         env:
           ANDROID_I_WANT_MY_TCG: "yes"
@@ -504,5 +505,19 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="${{ github.workspace }}/SALAR-TV-emulator.apk"; test -f "$APK" && adb install -r "$APK" && adb shell am start -n com.salar.tv/.MainActivity && sleep 20 && adb shell dumpsys activity activities | grep -q "com.salar.tv" && (adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv" && { echo "App crashed during startup smoke test"; exit 1; } || echo "Android 11 emulator launch smoke test passed")
+            set -euo pipefail
+            APK="${{ github.workspace }}/SALAR-TV-emulator.apk"
+            test -f "$APK"
+            adb install -r "$APK"
+            adb logcat -c
+            adb shell am force-stop com.salar.tv || true
+            adb shell am start -W -n com.salar.tv/.MainActivity
+            sleep 15
+            adb shell pidof com.salar.tv
+            adb logcat -d -t 5000 > startup-log.txt
+            if grep -E "FATAL EXCEPTION|Process: com.salar.tv" startup-log.txt; then
+              echo "App crashed during startup smoke test"
+              exit 1
+            fi
+            echo "Android 11 emulator launch smoke test passed"
 
