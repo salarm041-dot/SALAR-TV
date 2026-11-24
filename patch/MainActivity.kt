@@ -171,6 +171,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
         }.getOrDefault(emptyList())
         // Replace obsolete built-in pilgrimage links without touching user-added locations.
         val obsoletePilgrimageUrls = setOf(
+            "https://haram.razavi.ir/live",
+            "https://imamhussain.gov.iq/english/live",
             "https://en.imamali.net/live/",
             "https://imamhusseintv.com/en/live/6",
             "https://www.youtube.com/embed/kYqGbBqmp8g?autoplay=1&playsinline=1",
