@@ -48,6 +48,7 @@ jobs:
         run: |
           install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
           install -D patch/LiveAudioTranslation.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/LiveAudioTranslation.kt"
+          install -D patch/HebrewWhisperEngine.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HebrewWhisperEngine.kt"
           install -D patch/HlsRecorderService.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HlsRecorderService.kt"
           install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
           install -D patch/RecordingBootReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingBootReceiver.kt"
@@ -108,6 +109,7 @@ jobs:
               '    implementation("com.google.mlkit:language-id:17.0.6")',
               '    implementation("net.java.dev.jna:jna:5.18.1@aar")',
               '    implementation("com.alphacephei:vosk-android:0.3.75@aar")',
+              '    implementation("dev.ffmpegkit-maintained:whisper-android:1.0.0")',
           ]
           insert_at = dep_block.end()
           for dep in additions:
