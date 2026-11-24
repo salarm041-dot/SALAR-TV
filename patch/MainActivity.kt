@@ -186,9 +186,11 @@ private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_salar_tv),
-                    contentDescription = "SALAR TV",
+                    contentDescription = "لوگوی کامل SALAR TV",
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(148.dp)
+                        .padding(9.dp)
                         .graphicsLayer {
                             scaleX = pulse.value
                             scaleY = pulse.value
