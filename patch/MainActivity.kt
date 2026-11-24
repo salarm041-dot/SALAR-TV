@@ -1949,6 +1949,14 @@ fun AboutPage() {
 private fun categoryForChannel(channel: Channel): String {
     if (channel.kind == "رادیو") return "رادیو"
     val value = (channel.name + " " + channel.country + " " + channel.groupTitle).lowercase()
+    val group = channel.groupTitle.lowercase()
+        .replace('ي', 'ی').replace('ك', 'ک')
+    // Official IRIB structure takes precedence over genre keywords:
+    // national, provincial and international networks must not be mixed
+    // into generic news/sports/entertainment sections.
+    if (listOf("شبکه‌های استانی", "شبکه های استانی", "استانی").any { it in group }) return "شبکه‌های استانی"
+    if (listOf("شبکه‌های سراسری", "شبکه های سراسری", "سراسری").any { it in group }) return "شبکه‌های سراسری"
+    if (listOf("برون‌مرزی", "برون مرزی", "بین‌الملل", "بین الملل").any { it in group }) return "شبکه‌های برون‌مرزی"
     return when {
         listOf("خبر", "news", "haber", "bbc", "cnn", "irinn", "voa persian", "congress tv", "revolution tv").any { it in value } -> "خبری"
         listOf("ورزش", "sport", "sports", "varzesh", "trt spor", "persiana fight").any { it in value } -> "ورزشی"
@@ -1960,7 +1968,7 @@ private fun categoryForChannel(channel: Channel): String {
         listOf("سلامت", "health", "saglik", "sağlık", "persiana medical").any { it in value } -> "سلامت"
         listOf("قرآن", "معارف", "quran", "religion").any { it in value } -> "دینی و فرهنگی"
         "persiana comedy" in value -> "سرگرمی"
-        channel.groupTitle.contains("شبکه‌های استانی", ignoreCase = true) || (channel.country == "ایران" && listOf("استان", "شبکه آذربایجان غربی", "شبکه سهند", "شبکه سبلان").any { it in value }) -> "استانی"
+        channel.country == "ایران" -> "سایر شبکه‌های داخلی"
         else -> "عمومی"
     }
 }
@@ -1993,7 +2001,11 @@ private fun parseM3u(text: String): List<Channel> {
                 "خارج از ایران" in meta -> "خارج از ایران"
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
-                "iran" in meta || "ایران" in meta || "ir/" in meta || "شبکه‌های استانی" in meta -> "ایران"
+                "صداوسیما" in meta || "صدا و سیما" in meta ||
+                    "شبکه‌های استانی" in meta || "شبکه های استانی" in meta ||
+                    "شبکه‌های سراسری" in meta || "شبکه های سراسری" in meta ||
+                    "شبکه‌های برون‌مرزی" in meta || "شبکه های برون مرزی" in meta ||
+                    "irib" in meta || "iran" in meta || "ایران" in meta || "ir/" in meta -> "ایران"
                 "saudi" in meta || "عربستان" in meta || "sa/" in meta -> "عربستان"
                 "uae" in meta || "emirates" in meta || "امارات" in meta || "ae/" in meta -> "امارات"
                 "qatar" in meta || "قطر" in meta || "qa/" in meta -> "قطر"
