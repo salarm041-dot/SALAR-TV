@@ -28,9 +28,23 @@ internal object HebrewWhisperEngine {
     private fun modelFile(context: Context): File =
         File(File(context.filesDir, "salar-whisper"), MODEL_FILE)
 
+    private fun sha256(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        FileInputStream(file).use { input ->
+            val buffer = ByteArray(128 * 1024)
+            while (true) {
+                val count = input.read(buffer)
+                if (count < 0) break
+                digest.update(buffer, 0, count)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
+    }
+
     fun isModelDownloaded(context: Context): Boolean {
         val file = modelFile(context)
-        return file.isFile && file.length() == MODEL_BYTES
+        return file.isFile && file.length() == MODEL_BYTES &&
+            runCatching { sha256(file).equals(MODEL_SHA256, ignoreCase = true) }.getOrDefault(false)
     }
 
     /**
@@ -89,16 +103,7 @@ internal object HebrewWhisperEngine {
             temporary.delete()
             throw IllegalStateException("حجم فایل مدل عبری با نسخهٔ رسمی مطابقت ندارد.")
         }
-        val digest = MessageDigest.getInstance("SHA-256")
-        FileInputStream(temporary).use { input ->
-            val buffer = ByteArray(128 * 1024)
-            while (true) {
-                val count = input.read(buffer)
-                if (count < 0) break
-                digest.update(buffer, 0, count)
-            }
-        }
-        val actualSha256 = digest.digest().joinToString("") { "%02x".format(it) }
+        val actualSha256 = sha256(temporary)
         if (!actualSha256.equals(MODEL_SHA256, ignoreCase = true)) {
             temporary.delete()
             throw IllegalStateException("اعتبارسنجی SHA-256 مدل عبری ناموفق بود؛ مدل قبلی حفظ شد.")
