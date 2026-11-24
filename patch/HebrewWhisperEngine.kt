@@ -1,0 +1,122 @@
+package com.salar.tv
+
+import android.content.Context
+import dev.ffmpegkit.whisper.Whisper
+import dev.ffmpegkit.whisper.WhisperConfig
+import dev.ffmpegkit.whisper.WhisperModel
+import dev.ffmpegkit.whisper.WhisperResult
+import java.io.File
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+
+/**
+ * Hebrew speech-to-text engine for SALAR TV.
+ *
+ * The multilingual Whisper tiny model is downloaded only when the user explicitly
+ * requests it. Audio passed to transcribe() must be a 16 kHz, mono, PCM WAV file.
+ */
+internal object HebrewWhisperEngine {
+    private const val MODEL_URL =
+        "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin"
+    private const val MODEL_FILE = "ggml-tiny.bin"
+    private const val MIN_MODEL_BYTES = 50L * 1024L * 1024L
+
+    private fun modelFile(context: Context): File =
+        File(File(context.filesDir, "salar-whisper"), MODEL_FILE)
+
+    fun isModelDownloaded(context: Context): Boolean {
+        val file = modelFile(context)
+        return file.isFile && file.length() >= MIN_MODEL_BYTES
+    }
+
+    /**
+     * Call only from the explicit "download Hebrew" user action.
+     * Existing speech models are retained until the new model is fully downloaded
+     * and validated; a failed download never removes the working model.
+     */
+    fun downloadModel(context: Context, onProgress: (Long, Long) -> Unit = { _, _ -> }): File {
+        val destination = modelFile(context)
+        if (isModelDownloaded(context)) return destination
+
+        val directory = destination.parentFile
+            ?: throw IllegalStateException("مسیر ذخیره مدل عبری نامعتبر است.")
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw IllegalStateException("ساخت پوشه مدل عبری ناموفق بود.")
+        }
+
+        val temporary = File(directory, "$MODEL_FILE.part")
+        temporary.delete()
+        val connection = (URL(MODEL_URL).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 20000
+            readTimeout = 120000
+            instanceFollowRedirects = true
+        }
+        try {
+            connection.connect()
+            if (connection.responseCode !in 200..299) {
+                throw IllegalStateException("دانلود مدل عبری با کد ${connection.responseCode} ناموفق بود.")
+            }
+            val total = connection.contentLengthLong
+            connection.inputStream.use { input ->
+                FileOutputStream(temporary).use { output ->
+                    val buffer = ByteArray(64 * 1024)
+                    var downloaded = 0L
+                    while (true) {
+                        val count = input.read(buffer)
+                        if (count < 0) break
+                        output.write(buffer, 0, count)
+                        downloaded += count
+                        onProgress(downloaded, total)
+                    }
+                    output.fd.sync()
+                }
+            }
+        } catch (error: Exception) {
+            temporary.delete()
+            throw error
+        } finally {
+            connection.disconnect()
+        }
+
+        if (!temporary.isFile || temporary.length() < MIN_MODEL_BYTES) {
+            temporary.delete()
+            throw IllegalStateException("فایل مدل عبری ناقص یا نامعتبر است.")
+        }
+        if (destination.exists() && !destination.delete()) {
+            temporary.delete()
+            throw IllegalStateException("جایگزینی مدل عبری قبلی ناموفق بود.")
+        }
+        if (!temporary.renameTo(destination)) {
+            temporary.delete()
+            throw IllegalStateException("ذخیره نهایی مدل عبری ناموفق بود.")
+        }
+
+        // Only after successful validation, remove the previous Vosk language model.
+        File(context.filesDir, "salar-vosk").deleteRecursively()
+        return destination
+    }
+
+    suspend fun loadModel(context: Context): WhisperModel {
+        val file = modelFile(context)
+        if (!isModelDownloaded(context)) {
+            throw IllegalStateException("ابتدا مدل عبری را به‌صورت دستی دانلود کنید.")
+        }
+        return Whisper.loadModel(context, file.absolutePath)
+    }
+
+    suspend fun transcribeHebrew(model: WhisperModel, wavFile: File): WhisperResult {
+        if (!wavFile.isFile || wavFile.length() < 44L) {
+            throw IllegalArgumentException("فایل صوتی WAV معتبر نیست.")
+        }
+        return Whisper.transcribe(
+            model,
+            wavFile.absolutePath,
+            WhisperConfig(language = "he", translate = false, threads = 2)
+        )
+    }
+
+    fun releaseModel(model: WhisperModel) {
+        Whisper.releaseModel(model)
+    }
+}
