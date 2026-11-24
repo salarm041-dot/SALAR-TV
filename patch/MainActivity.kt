@@ -933,7 +933,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 else { adultPinEntry = ""; adultPinError = ""; showAdultPinDialog = true }
                             }
                         },
-                        adultChannelsEnabled = adultChannelsEnabled
+                        adultChannelsEnabled = adultChannelsEnabled,
+                        hasAdultChannels = channels.any { isAdultChannel(it) }
                     )
                     "چندنمایی" -> MultiViewPage(
                         channels = channels.filter { it.kind == "تلویزیون" && !isAdultChannel(it) && it.url !in lockedChannelUrls }
@@ -1151,6 +1152,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         var url by remember(original.url) { mutableStateOf(original.url) }
         var country by remember(original.url) { mutableStateOf(original.country) }
         var kind by remember(original.url) { mutableStateOf(original.kind) }
+        var markAdult by remember(original.url) { mutableStateOf(isAdultChannel(original)) }
         AlertDialog(
             onDismissRequest = { editingChannel = null },
             title = { Text("ویرایش شبکه", color = Gold) },
@@ -1163,6 +1165,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             FilterChip(selected = country == it, onClick = { country = it }, label = { Text(it) })
                         }
                     }
+                    if (kind == "تلویزیون") Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = markAdult, onCheckedChange = { markAdult = it })
+                        Text("قرار دادن در فهرست پنهان +۱۸", color = TextMain)
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         listOf("تلویزیون", "رادیو").forEach {
                             FilterChip(selected = kind == it, onClick = { kind = it }, label = { Text(it) })
@@ -1174,7 +1180,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 TextButton(onClick = {
                     if (name.isNotBlank() && (url.startsWith("http://") || url.startsWith("https://"))) {
                         val index = channels.indexOfFirst { it.url == original.url }
-                        if (index >= 0) channels[index] = original.copy(name = name.trim(), url = url.trim(), country = country, kind = kind)
+                        if (index >= 0) channels[index] = original.copy(
+                            name = name.trim(), url = url.trim(), country = country, kind = kind,
+                            groupTitle = if (markAdult) "Adult +18" else original.groupTitle.takeUnless { isAdultChannel(original) }.orEmpty()
+                        )
                         saveChannels()
                         editingChannel = null
                     }
@@ -1895,6 +1904,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
     var password by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("ایران") }
     var kind by remember { mutableStateOf("تلویزیون") }
+    var markAdult by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -1909,6 +1919,13 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
             "url" -> {
                 OutlinedTextField(name, { name = it }, label = { Text("نام شبکه / ایستگاه") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                 OutlinedTextField(url, { url = it }, label = { Text("آدرس مستقیم پخش") }, placeholder = { Text("https://example.com/live.m3u8") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
+                if (kind == "تلویزیون") Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = markAdult, onCheckedChange = { markAdult = it })
+                    Column {
+                        Text("افزودن به فهرست پنهان بزرگسالان", color = TextMain)
+                        Text("این شبکه در فهرست عادی کشورها نمایش داده نمی‌شود.", color = MutedText, fontSize = 11.sp)
+                    }
+                }
                 Button(enabled = !busy, onClick = {
                     val clean = url.trim()
                     if (!(clean.startsWith("https://") || clean.startsWith("http://"))) status = "آدرس معتبر http/https را وارد کنید."
@@ -1927,7 +1944,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
                             busy = false
                         }
                     } else if (name.isNotBlank()) {
-                        onAdd(Channel(name.trim(), clean, country, kind)); name = ""; url = ""; status = "لینک شبکه ذخیره شد."
+                        onAdd(Channel(name.trim(), clean, country, kind, groupTitle = if (markAdult) "Adult +18" else "")); name = ""; url = ""; markAdult = false; status = "لینک شبکه ذخیره شد."
                     } else status = "برای لینک پخش مستقیم، نام شبکه را وارد کنید."
                 }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) { Text(if (busy) "در حال دریافت…" else "ذخیره لینک / دریافت فهرست", color = Color.Black) }
             }
@@ -1999,7 +2016,8 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
              onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit,
-             onMultiView: () -> Unit, onAdultChannels: () -> Unit, adultChannelsEnabled: Boolean) {
+             onMultiView: () -> Unit, onAdultChannels: () -> Unit, adultChannelsEnabled: Boolean,
+             hasAdultChannels: Boolean) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(16.dp)) {
@@ -2016,7 +2034,7 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
             }
         }
         MoreButton("چندنمایی هم‌زمان", Icons.Default.GridView, onMultiView)
-        if (adultChannelsEnabled) MoreButton("شبکه‌های بزرگسالان +۱۸", Icons.Default.Lock, onAdultChannels)
+        if (adultChannelsEnabled && hasAdultChannels) MoreButton("شبکه‌های بزرگسالان +۱۸", Icons.Default.Lock, onAdultChannels)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
