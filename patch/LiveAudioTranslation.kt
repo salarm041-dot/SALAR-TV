@@ -469,31 +469,36 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     val staging = File(base, "${model.id}-extract")
     if (staging.exists()) staging.deleteRecursively()
     if (!staging.mkdirs()) throw IllegalStateException("ساخت پوشهٔ موقت مدل ناموفق بود.")
-    ZipInputStream(BufferedInputStream(archive.inputStream())).use { zip ->
-        var entry = zip.nextEntry
-        while (entry != null) {
-            val normalized = entry.name.replace(92.toChar(), '/')
-            val relative = normalized.substringAfter('/', normalized).trimStart('/')
-            if (relative.isNotBlank()) {
-                val output = File(staging, relative)
-                if (!output.canonicalPath.startsWith(staging.canonicalPath + File.separator)) {
-                    throw IllegalStateException("مسیر نامعتبر در فایل مدل.")
+    try {
+        ZipInputStream(BufferedInputStream(archive.inputStream())).use { zip ->
+            var entry = zip.nextEntry
+            while (entry != null) {
+                val normalized = entry.name.replace(92.toChar(), '/')
+                val relative = normalized.substringAfter('/', normalized).trimStart('/')
+                if (relative.isNotBlank()) {
+                    val output = File(staging, relative)
+                    if (!output.canonicalPath.startsWith(staging.canonicalPath + File.separator)) {
+                        throw IllegalStateException("مسیر نامعتبر در فایل مدل.")
+                    }
+                    if (entry.isDirectory) output.mkdirs()
+                    else {
+                        output.parentFile?.mkdirs()
+                        FileOutputStream(output).use { out -> zip.copyTo(out) }
+                    }
                 }
-                if (entry.isDirectory) output.mkdirs()
-                else {
-                    output.parentFile?.mkdirs()
-                    FileOutputStream(output).use { out -> zip.copyTo(out) }
-                }
+                zip.closeEntry()
+                entry = zip.nextEntry
             }
-            zip.closeEntry()
-            entry = zip.nextEntry
         }
+        if (!File(staging, "am/final.mdl").exists()) {
+            throw IllegalStateException("ساختار مدل گفتار معتبر نیست.")
+        }
+    } catch (error: Exception) {
+        archive.delete()
+        staging.deleteRecursively()
+        throw error
     }
     archive.delete()
-    if (!File(staging, "am/final.mdl").exists()) {
-        staging.deleteRecursively()
-        throw IllegalStateException("ساختار مدل گفتار معتبر نیست.")
-    }
     val backup = File(base, "${model.id}-previous")
     if (backup.exists()) backup.deleteRecursively()
     val hadPrevious = target.exists()
