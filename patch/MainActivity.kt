@@ -1306,7 +1306,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("انتخاب کشور", color = Color(0xFFE8EDF5), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("شبکه‌های تلویزیونی", color = Color(0xFF69DCCF), fontSize = 10.sp)
+            Text("برای دیدن بقیه، افقی بکشید  ↔", color = Color(0xFF69DCCF), fontSize = 10.sp)
         }
         // Two-row horizontal country shelf: swipe left/right to reveal additional countries.
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
