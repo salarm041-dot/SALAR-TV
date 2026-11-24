@@ -190,10 +190,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
         )
         channels.removeAll { it.country == "زیارت آنلاین" && it.url in obsoletePilgrimageUrls }
         val pilgrimage = listOf(
-            Channel("حرم مطهر رضوی — پخش زنده رسمی ۲۴ ساعته", "https://haram.razavi.ir/live", "زیارت آنلاین", "وب", groupTitle = "مشهد مقدس"),
-            Channel("حرم امام حسین (ع) — پخش رسمی (۹ تا ۲۱)", "https://imamhussain.gov.iq/english/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
-            Channel("پخش زنده رسمی عتبات عراق — نجف، کربلا، کاظمین و سامرا", "https://imamhusseintv.com/en/live/6", "زیارت آنلاین", "وب", groupTitle = "نجف"),
-            Channel("مسجدالحرام مکه — پخش زنده قرآن TV رسمی", "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA&autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه")
+            Channel("حرم مطهر رضوی — پخش زنده رسمی", "https://haram.razavi.ir/live", "زیارت آنلاین", "وب", groupTitle = "مشهد مقدس"),
+            Channel("حرم مطهر امام حسین (ع) — پخش زنده رسمی (۹ تا ۲۱ به وقت کربلا)", "https://imamhussain.org/english/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
+            Channel("حرم مطهر امام علی (ع) — پخش زنده رسمی", "https://en.imamali.net/live/", "زیارت آنلاین", "وب", groupTitle = "نجف اشرف"),
+            Channel("مسجدالحرام مکه — پخش زنده رسمی قرآن TV", "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA&autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه"),
+            Channel("مسجدالنبی مدینه — کانال رسمی السنة النبوية", "https://www.youtube.com/@SaudiSunnahTv/live", "زیارت آنلاین", "وب", groupTitle = "مدینه منوره")
         )
         val arabic = runCatching {
             context.assets.open("arabic-channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
