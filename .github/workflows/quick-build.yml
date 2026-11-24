@@ -44,6 +44,7 @@ jobs:
         run: |
           install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
           install -D patch/LiveAudioTranslation.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/LiveAudioTranslation.kt"
+          install -D patch/HebrewWhisperEngine.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HebrewWhisperEngine.kt"
           install -D patch/HlsRecorderService.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/HlsRecorderService.kt"
           install -D patch/RecordingAlarmReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingAlarmReceiver.kt"
           install -D patch/RecordingBootReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingBootReceiver.kt"
@@ -58,7 +59,7 @@ jobs:
           manifest = Path(sys.argv[1])
           s = manifest.read_text()
           s = s.replace('<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />',
-              '<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
+              '<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
           s = s.replace('android:icon="@drawable/ic_salar_tv"', 'android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"')
           s = s.replace('<application', '<application android:allowAudioPlaybackCapture="true"', 1)
           s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\n        <receiver android:name=".RecordingBootReceiver" android:enabled="true" android:exported="false"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter></receiver>\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\n    </application>')
@@ -96,6 +97,7 @@ jobs:
               '    implementation("com.google.mlkit:language-id:17.0.6")',
               '    implementation("net.java.dev.jna:jna:5.18.1@aar")',
               '    implementation("com.alphacephei:vosk-android:0.3.75@aar")',
+              '    implementation("dev.ffmpegkit-maintained:whisper-android:1.0.0")',
           ]
           insert_at = dep_block.end()
           for dep in additions:
