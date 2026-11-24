@@ -166,9 +166,9 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     ) { result ->
         val data = result.data
         if (result.resultCode != Activity.RESULT_OK || data == null) {
+            stopCapture()
+            isPreparing = false
             status = "دسترسی ضبط صدای پخش‌کننده تأیید نشد."
-            runCatching { modelInstance?.close() }
-            modelInstance = null
         } else {
             try {
                 val manager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -243,7 +243,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                         }
                     } catch (e: Exception) {
                         mainHandler.post {
-                            if (runningFlag.get()) status = "خطای دریافت صدای پخش: ${e.localizedMessage ?: e.javaClass.simpleName}"
+                            if (runningFlag.get()) {
+                                stopCapture()
+                                status = "خطای دریافت صدای پخش: ${e.localizedMessage ?: e.javaClass.simpleName}"
+                            }
                         }
                     }
                 }.apply { name = "SalarTvPlaybackSpeech"; start() }
