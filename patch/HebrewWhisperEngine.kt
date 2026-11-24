@@ -37,7 +37,10 @@ internal object HebrewWhisperEngine {
      */
     fun downloadModel(context: Context, onProgress: (Long, Long) -> Unit = { _, _ -> }): File {
         val destination = modelFile(context)
-        if (isModelDownloaded(context)) return destination
+        if (isModelDownloaded(context)) {
+            File(context.filesDir, "salar-vosk").deleteRecursively()
+            return destination
+        }
 
         val directory = destination.parentFile
             ?: throw IllegalStateException("مسیر ذخیره مدل عبری نامعتبر است.")
@@ -102,7 +105,9 @@ internal object HebrewWhisperEngine {
         if (!isModelDownloaded(context)) {
             throw IllegalStateException("ابتدا مدل عبری را به‌صورت دستی دانلود کنید.")
         }
-        return Whisper.loadModel(context, file.absolutePath)
+        val model = Whisper.loadModel(context, file.absolutePath)
+        File(context.filesDir, "salar-vosk").deleteRecursively()
+        return model
     }
 
     suspend fun transcribeHebrew(model: WhisperModel, wavFile: File): WhisperResult {
