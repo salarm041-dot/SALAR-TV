@@ -549,7 +549,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
                         var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
-                        var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", false)) }
+                        var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
                         var menuDubbingVoice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
                         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
                             AndroidView(
@@ -1433,6 +1433,28 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
         var requestId = 0
 
         val listener = object : Player.Listener {
+            private fun selectFirstAvailableSubtitleTrack() {
+                val textGroups = player.currentTracks.groups
+                    .filter { it.type == androidx.media3.common.C.TRACK_TYPE_TEXT }
+                if (textGroups.any { group -> (0 until group.length).any { group.isTrackSelected(it) } }) return
+                for (group in textGroups) {
+                    val firstSupported = (0 until group.length).firstOrNull { group.isTrackSupported(it) }
+                    if (firstSupported != null) {
+                        player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                            .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_TEXT, false)
+                            .setOverrideForType(androidx.media3.common.TrackSelectionOverride(
+                                group.mediaTrackGroup, listOf(firstSupported)
+                            ))
+                            .build()
+                        return
+                    }
+                }
+            }
+
+            override fun onTracksChanged(tracks: androidx.media3.common.Tracks) {
+                selectFirstAvailableSubtitleTrack()
+            }
+
             override fun onCues(cueGroup: CueGroup) {
                 val sourceText = cueGroup.cues
                     .mapNotNull { it.text?.toString()?.trim()?.takeIf { text -> text.isNotBlank() } }
@@ -1521,6 +1543,8 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
             }
         }
         player.addListener(listener)
+        // When Persian translation is enabled, choose a supported subtitle track automatically.
+        listener.run { onTracksChanged(player.currentTracks) }
         onDispose {
             player.removeListener(listener)
             activeTranslator?.close()
@@ -1788,7 +1812,7 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
 fun LiveDubbingPage() {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
-    var subtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", false)) }
+    var subtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
     var enabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
     var keepOriginal by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
     var voice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
@@ -1798,16 +1822,16 @@ fun LiveDubbingPage() {
         Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("وضعیت موتور هوش مصنوعی", color = Gold, fontWeight = FontWeight.Bold)
-                Text("موتور ترجمه زیرنویس به فارسی با ML Kit متصل شده است؛ ترجمه هنگام پخش و پس از انتخاب زیرنویس متنی شبکه انجام می‌شود.",
+                Text("ترجمهٔ زیرنویس به فارسی فعال است. هنگام پخش، برنامه اولین زیرنویس متنیِ قابل‌استفادهٔ شبکه را خودکار انتخاب و ترجمه می‌کند.",
                     color = Color(0xFFFFCC80), fontSize = 12.sp)
-                Text("مدل زبان در اولین استفاده دانلود می‌شود. دوبله صوتی زنده هنوز به موتور تشخیص گفتار و تولید صدا نیاز دارد و در این نسخه فعال نیست.",
+                Text("در اولین استفاده، مدل زبان با اینترنت دانلود می‌شود. اگر شبکه زیرنویس متنی نداشته باشد، ترجمهٔ زیرنویس ممکن نیست؛ دوبلهٔ صوتیِ مستقل هنوز فعال نشده است.",
                     color = SecondaryText, fontSize = 12.sp)
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("زیرنویس هوشمند فارسی", color = TextMain)
-                Text("ترجمه زیرنویس متنی شبکه به فارسی؛ مستقل از صدای دوبله", color = MutedText, fontSize = 11.sp)
+                Text("پیش‌فرض روشن؛ انتخاب خودکار زیرنویس متنی و ترجمه به فارسی", color = MutedText, fontSize = 11.sp)
             }
             Switch(checked = subtitleEnabled, onCheckedChange = {
                 subtitleEnabled = it
