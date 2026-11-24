@@ -320,15 +320,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
         }
     }
     var childPinHash by remember { mutableStateOf(prefs.getString("child_lock_pin_hash", "") ?: "") }
-    var adultChannelsEnabled by remember { mutableStateOf(prefs.getBoolean("adult_channels_enabled", false)) }
     var pendingLockedChannel by remember { mutableStateOf<Channel?>(null) }
     var showChildPinDialog by remember { mutableStateOf(false) }
     var childPinEntry by remember { mutableStateOf("") }
     var childPinError by remember { mutableStateOf("") }
-    var showAdultPinDialog by remember { mutableStateOf(false) }
-    var adultPinEntry by remember { mutableStateOf("") }
-    var adultPinError by remember { mutableStateOf("") }
-    var adultAccessGranted by remember { mutableStateOf(false) }
     fun saveLockedChannels() {
         prefs.edit().putString("child_locked_urls", JSONArray(lockedChannelUrls).toString()).apply()
     }
@@ -927,35 +922,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) },
                         onPilgrimage = { page = "زیارت آنلاین" },
                         onMultiView = { page = "چندنمایی" },
-                        onAdultChannels = {
-                            if (adultChannelsEnabled) {
-                                if (childPinHash.isBlank()) page = "قفل کودک"
-                                else { adultPinEntry = ""; adultPinError = ""; showAdultPinDialog = true }
-                            }
-                        },
-                        adultChannelsEnabled = adultChannelsEnabled,
-                        hasAdultChannels = channels.any { isAdultChannel(it) }
                     )
                     "چندنمایی" -> MultiViewPage(
-                        channels = channels.filter { it.kind == "تلویزیون" && !isAdultChannel(it) && it.url !in lockedChannelUrls }
+                        channels = channels.filter { it.kind == "تلویزیون" && it.url !in lockedChannelUrls }
                     )
-                    "شبکه‌های +۱۸" -> if (adultAccessGranted) {
-                        ChannelList(
-                            channels = channels.filter { it.kind == "تلویزیون" && isAdultChannel(it) },
-                            onSelect = { selectChannel(it) },
-                            onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
-                            onEdit = { editingChannel = it },
-                            onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() }
-                        )
-                    } else {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("دسترسی محدود", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                            Text("برای مشاهده این بخش، ابتدا رمز والد را از تنظیمات قفل کودک تعریف کنید و سپس رمز را وارد کنید.", color = SecondaryText)
-                            Button(onClick = { page = "قفل کودک" }, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
-                                Text("تنظیم رمز والد", color = Color.Black)
-                            }
-                        }
-                    }
                     "زیارت آنلاین" -> PilgrimagePage(
                         savedChannels = channels,
                         onPlay = { selectChannel(it) },
@@ -964,12 +934,6 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "تنظیمات" -> SettingsPage(
                         themeMode = themeMode,
-                        adultChannelsEnabled = adultChannelsEnabled,
-                        onAdultChannelsEnabledChange = { enabled ->
-                            adultChannelsEnabled = enabled
-                            prefs.edit().putBoolean("adult_channels_enabled", enabled).apply()
-                            if (!enabled) { adultAccessGranted = false; if (page == "شبکه‌های +۱۸") page = "تنظیمات" }
-                        },
                         onThemeModeChange = { mode ->
                             themeMode = mode
                             prefs.edit().putString("theme_mode", mode).apply()
@@ -1042,7 +1006,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         val country = page.removePrefix("کشور:")
                         val arabicCountries = setOf("عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی", "یمن", "سودان")
                         val filtered = channels.filter { c ->
-                            c.kind == "تلویزیون" && !isAdultChannel(c) && when (country) {
+                            c.kind == "تلویزیون" && when (country) {
                                 "ایران" -> c.country == "ایران"
                                 "ترکیه" -> c.country == "ترکیه"
                                 "آذربایجان" -> c.country == "آذربایجان" || c.country == "جمهوری آذربایجان"
@@ -1062,7 +1026,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onRefresh = { refreshChannels("رادیو") }, isRefreshing = isRefreshingChannels, lastRefresh = lastChannelRefresh)
-                    "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite && !isAdultChannel(it) }, onSelect = { selectChannel(it) },
+                    "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selectChannel(it) },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                     else -> if (page.startsWith("عربی:")) {
@@ -1072,7 +1036,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                             onEdit = { editingChannel = it },
                             onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
-                    } else HomePage(channels.filterNot { isAdultChannel(it) }, onSelect = { selectChannel(it) }, onAdd = { page = "افزودن منابع" },
+                    } else HomePage(channels, onSelect = { selectChannel(it) }, onAdd = { page = "افزودن منابع" },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onPage = { destination -> page = destination },
                         dynamicCountries = selectedDynamicCountries.map { it to flagForDynamicCountry(it) }
@@ -1082,38 +1046,6 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 }
             }
         }
-    }
-
-    if (showAdultPinDialog) {
-        AlertDialog(
-            onDismissRequest = { showAdultPinDialog = false; adultPinEntry = ""; adultPinError = "" },
-            title = { Text("ورود به شبکه‌های +۱۸", color = Gold) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("این بخش فقط برای افراد بزرگسال است. برای ادامه، رمز والد را وارد کنید.")
-                    OutlinedTextField(
-                        value = adultPinEntry,
-                        onValueChange = { adultPinEntry = it.filter(Char::isDigit).take(8); adultPinError = "" },
-                        label = { Text("رمز والد") }, singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
-                    )
-                    if (adultPinError.isNotBlank()) Text(adultPinError, color = MaterialTheme.colorScheme.error)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (adultPinEntry.isNotBlank() && hashChildPin(adultPinEntry) == childPinHash) {
-                        adultAccessGranted = true
-                        showAdultPinDialog = false
-                        adultPinEntry = ""
-                        page = "شبکه‌های +۱۸"
-                    } else adultPinError = "رمز والد صحیح نیست."
-                }) { Text("تأیید و ورود", color = Gold) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAdultPinDialog = false; adultPinEntry = ""; adultPinError = "" }) { Text("انصراف") }
-            }
-        )
     }
 
     if (showChildPinDialog) {
@@ -1152,7 +1084,6 @@ fun SalarTvApp(isInPip: Boolean = false) {
         var url by remember(original.url) { mutableStateOf(original.url) }
         var country by remember(original.url) { mutableStateOf(original.country) }
         var kind by remember(original.url) { mutableStateOf(original.kind) }
-        var markAdult by remember(original.url) { mutableStateOf(isAdultChannel(original)) }
         AlertDialog(
             onDismissRequest = { editingChannel = null },
             title = { Text("ویرایش شبکه", color = Gold) },
@@ -1164,10 +1095,6 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         listOf("ایران", "ترکیه", "آذربایجان", "سایر").forEach {
                             FilterChip(selected = country == it, onClick = { country = it }, label = { Text(it) })
                         }
-                    }
-                    if (kind == "تلویزیون") Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(checked = markAdult, onCheckedChange = { markAdult = it })
-                        Text("قرار دادن در فهرست پنهان +۱۸", color = TextMain)
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         listOf("تلویزیون", "رادیو").forEach {
@@ -1181,8 +1108,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     if (name.isNotBlank() && (url.startsWith("http://") || url.startsWith("https://"))) {
                         val index = channels.indexOfFirst { it.url == original.url }
                         if (index >= 0) channels[index] = original.copy(
-                            name = name.trim(), url = url.trim(), country = country, kind = kind,
-                            groupTitle = if (markAdult) "Adult +18" else original.groupTitle.takeUnless { isAdultChannel(original) }.orEmpty()
+                            name = name.trim(), url = url.trim(), country = country, kind = kind
                         )
                         saveChannels()
                         editingChannel = null
@@ -1904,7 +1830,6 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
     var password by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("ایران") }
     var kind by remember { mutableStateOf("تلویزیون") }
-    var markAdult by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -1919,13 +1844,6 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
             "url" -> {
                 OutlinedTextField(name, { name = it }, label = { Text("نام شبکه / ایستگاه") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                 OutlinedTextField(url, { url = it }, label = { Text("آدرس مستقیم پخش") }, placeholder = { Text("https://example.com/live.m3u8") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
-                if (kind == "تلویزیون") Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = markAdult, onCheckedChange = { markAdult = it })
-                    Column {
-                        Text("افزودن به فهرست پنهان بزرگسالان", color = TextMain)
-                        Text("این شبکه در فهرست عادی کشورها نمایش داده نمی‌شود.", color = MutedText, fontSize = 11.sp)
-                    }
-                }
                 Button(enabled = !busy, onClick = {
                     val clean = url.trim()
                     if (!(clean.startsWith("https://") || clean.startsWith("http://"))) status = "آدرس معتبر http/https را وارد کنید."
@@ -1944,7 +1862,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
                             busy = false
                         }
                     } else if (name.isNotBlank()) {
-                        onAdd(Channel(name.trim(), clean, country, kind, groupTitle = if (markAdult) "Adult +18" else "")); name = ""; url = ""; markAdult = false; status = "لینک شبکه ذخیره شد."
+                        onAdd(Channel(name.trim(), clean, country, kind)); name = ""; url = ""; status = "لینک شبکه ذخیره شد."
                     } else status = "برای لینک پخش مستقیم، نام شبکه را وارد کنید."
                 }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) { Text(if (busy) "در حال دریافت…" else "ذخیره لینک / دریافت فهرست", color = Color.Black) }
             }
@@ -2016,8 +1934,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
              onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
              onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit,
-             onMultiView: () -> Unit, onAdultChannels: () -> Unit, adultChannelsEnabled: Boolean,
-             hasAdultChannels: Boolean) {
+             onMultiView: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(16.dp)) {
@@ -2034,7 +1951,6 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
             }
         }
         MoreButton("چندنمایی هم‌زمان", Icons.Default.GridView, onMultiView)
-        if (adultChannelsEnabled && hasAdultChannels) MoreButton("شبکه‌های بزرگسالان +۱۸", Icons.Default.Lock, onAdultChannels)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
@@ -2510,8 +2426,7 @@ fun ChildLockPage(
 }
 
 @Composable
-fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit,
-                 adultChannelsEnabled: Boolean, onAdultChannelsEnabledChange: (Boolean) -> Unit) {
+fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var fontScale by remember { mutableFloatStateOf(prefs.getFloat("font_scale", 1f).coerceIn(0.85f, 1.3f)) }
@@ -2546,15 +2461,8 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
                     Spacer(Modifier.width(10.dp))
                     Text("حفاظت و حریم خصوصی", color = TextMain, fontWeight = FontWeight.Bold)
                 }
-                Text("برای محدودکردن پخش شبکه‌های انتخابی و حفاظت از بخش +۱۸ با رمز والد، قفل کودک را تنظیم کنید.",
+                Text("برای محدودکردن پخش شبکه‌های انتخابی، قفل کودک را تنظیم کنید.",
                     color = SecondaryText, fontSize = 12.sp)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text("فعال‌سازی بخش شبکه‌های +۱۸", color = TextMain)
-                        Text("این بخش فقط با رمز والد باز می‌شود.", color = MutedText, fontSize = 11.sp)
-                    }
-                    Switch(checked = adultChannelsEnabled, onCheckedChange = onAdultChannelsEnabledChange)
-                }
                 Button(onClick = onChildLock, modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
                     Icon(Icons.Default.Security, contentDescription = null)
@@ -2730,13 +2638,6 @@ private fun provinceForChannel(channel: Channel): String {
         "شبکه تهران" in name || name == "تهران" -> "تهران"
         else -> "استان نامشخص"
     }
-}
-
-private fun isAdultChannel(channel: Channel): Boolean {
-    val metadata = (channel.name + " " + channel.groupTitle).lowercase()
-        .replace('ي', 'ی').replace('ك', 'ک')
-    val markers = listOf("+18", "18+", "adult", "adults", "xxx", "بزرگسال", "مخصوص بزرگسالان")
-    return markers.any { it in metadata }
 }
 
 private fun categoryForChannel(channel: Channel): String {
