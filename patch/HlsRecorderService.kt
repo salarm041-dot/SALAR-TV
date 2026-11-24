@@ -124,6 +124,7 @@ class HlsRecorderService : Service() {
         connection.readTimeout = 20000
         connection.instanceFollowRedirects = true
         connection.setRequestProperty("User-Agent", "SALAR-TV/1.2")
+        connection.setRequestProperty("Icy-MetaData", "0")
         connection.connect()
         if (connection.responseCode !in 200..299) {
             val code = connection.responseCode

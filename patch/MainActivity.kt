@@ -879,7 +879,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     )
                     "ضبط‌ها" -> RecordingsPage(
                         files = (context.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES)
-                            ?: context.filesDir).listFiles()?.filter { it.isFile && it.extension.lowercase() in setOf("ts", "mp4", "m4v", "mkv") }
+                            ?: context.filesDir).listFiles()?.filter { it.isFile && it.extension.lowercase() in setOf("ts", "mp4", "m4v", "mkv", "mp3", "aac", "ogg", "wav", "m4a", "audio") }
                             ?.sortedByDescending { it.lastModified() } ?: emptyList(),
                         onPlay = { file ->
                             useExternalPlayer = false
