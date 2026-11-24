@@ -828,12 +828,18 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "شبکه‌های عربی" -> ArabicCountryPage(onCountry = { country -> page = "عربی:$country" })
                     "کشور:ایران", "کشور:ترکیه", "کشور:آذربایجان", "کشور:سایر" -> {
                         val country = page.removePrefix("کشور:")
-                        val filtered = channels.filter { c -> c.kind == "تلویزیون" && when (country) {
-                            "ایران" -> c.country.contains("ایران")
-                            "ترکیه" -> c.country.contains("ترکیه")
-                            "آذربایجان" -> c.country.contains("آذربایجان")
-                            else -> c.country !in setOf("ایران", "ترکیه", "آذربایجان", "جمهوری آذربایجان")
-                        } }
+                        val arabicCountries = setOf("عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی", "یمن", "سودان")
+                        val filtered = channels.filter { c ->
+                            c.kind == "تلویزیون" && when (country) {
+                                "ایران" -> c.country == "ایران"
+                                "ترکیه" -> c.country == "ترکیه"
+                                "آذربایجان" -> c.country == "آذربایجان" || c.country == "جمهوری آذربایجان"
+                                "سایر" -> c.country == "سایر" || c.country == "خارج از ایران" ||
+                                    c.country == "فارسی‌زبان خارج از ایران" ||
+                                    (c.country !in setOf("ایران", "ترکیه", "آذربایجان", "جمهوری آذربایجان") && c.country !in arabicCountries)
+                                else -> false
+                            }
+                        }
                         ChannelList(filtered, onSelect = { selected = it },
                             onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                             onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
