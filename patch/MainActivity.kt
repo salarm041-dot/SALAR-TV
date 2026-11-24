@@ -207,7 +207,7 @@ private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "نسخه ۱٫۰",
+                    text = "نسخه ۱٫۱",
                     color = Color(0xFFB9A477),
                     fontSize = 12.sp
                 )
