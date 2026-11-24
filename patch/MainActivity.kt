@@ -823,7 +823,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onChildLock = { page = "قفل کودک" }
                     )
                     "قفل کودک" -> ChildLockPage(
-                        channels = channels.filter { it.kind == "تلویزیون" || it.kind == "رادیو" },
+                        channels = channels.distinctBy { it.url },
                         lockedUrls = lockedChannelUrls.toSet(),
                         currentPinHash = childPinHash,
                         onBack = { page = "تنظیمات" },
