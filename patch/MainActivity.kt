@@ -1019,6 +1019,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         require(streamUrl.startsWith("https://") || streamUrl.startsWith("http://")) { "لینک معتبر HLS وارد کنید." }
                         require(startMillis > System.currentTimeMillis()) { "زمان شروع باید در آینده باشد." }
                         val requestCode = (title + streamUrl + startMillis).hashCode()
+                        val newItem = ScheduledRecording(title.trim(), streamUrl.trim(), startMillis, minutes)
+                        require(scheduledRecordings.none { it.requestCode == newItem.requestCode }) {
+                            "این ضبط قبلاً زمان‌بندی شده است."
+                        }
                         val alarmIntent = Intent(context, RecordingAlarmReceiver::class.java).apply {
                             putExtra("name", title.trim())
                             putExtra("url", streamUrl.trim())
@@ -1036,10 +1040,6 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             return@TextButton
                         }
                         alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pending)
-                        val newItem = ScheduledRecording(title.trim(), streamUrl.trim(), startMillis, minutes)
-                        require(scheduledRecordings.none { it.requestCode == newItem.requestCode }) {
-                            "این ضبط قبلاً زمان‌بندی شده است."
-                        }
                         scheduledRecordings.add(newItem)
                         saveScheduledRecordings()
                         schedules = (schedules + "\n$title | $dateTime | $minutes دقیقه").trim()
