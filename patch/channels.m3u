@@ -209,7 +209,7 @@ https://gcinemahls.wns.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="MaahTV.my" tvg-name="Maah TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MaahTV.my.png" group-title="Satellite · Film & Series | ماهواره‌ای · فیلم و سریال" tvg-language="fas" tvg-quality="SD",Maah TV | ماه
 https://hls.maahtv.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="IsraelParsTV.il" tvg-name="Israel Pars TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IsraelParsTV.il.png" group-title="Satellite · News & Current Affairs | ماهواره‌ای · خبر و امور جاری" tvg-language="heb" tvg-quality="SD",Israel Pars TV | اسرائیل پارس
+#EXTINF:-1 tvg-id="IsraelParsTV.il" tvg-name="Israel Pars TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IsraelParsTV.il.png" group-title="اسرائیل / فارسی‌زبان" tvg-language="heb" tvg-quality="SD",Israel Pars TV | اسرائیل پارس
 https://live.pars-israel.com/tmp_hls/iptv/index.m3u8
 
 #EXTINF:-1 tvg-id="MihanTV.ir" tvg-name="Mihan TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MihanTV.ir.png" group-title="Satellite · News & Current Affairs | ماهواره‌ای · خبر و امور جاری" tvg-language="fas" tvg-quality="FHD",Mihan TV | میهن
