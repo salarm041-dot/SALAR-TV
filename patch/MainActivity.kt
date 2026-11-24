@@ -1047,7 +1047,16 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onPage = { destination -> page = destination },
                         dynamicCountries = (listOf("ایران", "ترکیه", "آذربایجان", "اسرائیل", "عربی", "سایر") + selectedDynamicCountries)
-                            .distinct().map { it to "🌐" },
+                            .distinct().map { name ->
+                                name to when (name) {
+                                    "ایران" -> "🇮🇷"
+                                    "ترکیه" -> "🇹🇷"
+                                    "آذربایجان", "جمهوری آذربایجان" -> "🇦🇿"
+                                    "اسرائیل" -> "🇮🇱"
+                                    "عربی" -> "🌍"
+                                    else -> "🌐"
+                                }
+                            },
                         onDynamicCountry = { country -> page = "کشور:$country" },
                         onMoreDynamicCountries = { page = "کشورهای منتخب" })
                 }
