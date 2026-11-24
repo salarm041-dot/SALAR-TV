@@ -514,7 +514,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                                                 android.view.ViewGroup.LayoutParams.MATCH_PARENT
                                             ))
-                                            hostActivity.window.decorView.systemUiVisibility =
+                                            hostActivity?.window?.decorView?.systemUiVisibility =
                                                 (android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
                                                     or android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                                                     or android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
