@@ -1228,7 +1228,7 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
             } else {
                 "${channel.country.ifBlank { "سایر" }} / ${categoryForChannel(channel)}"
             }
-        }.toSortedMap()
+        }.toSortedMap(compareBy<String> { sectionSortOrder(it) }.thenBy { it })
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (onRefresh != null) item(key = "refresh_channels") {
                 Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -1270,7 +1270,9 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                     }
                     Divider(color = Gold.copy(alpha = 0.28f))
                 }
-                items(sectionChannels, key = { it.url }) { c ->
+                items(sectionChannels.sortedWith(
+                    compareBy<Channel> { channelSortOrder(it) }.thenBy { it.name.lowercase(Locale.ROOT) }
+                ), key = { it.url }) { c ->
                     Card(
                         modifier = Modifier.fillMaxWidth().clickable { onSelect(c) },
                         colors = CardDefaults.cardColors(containerColor = Panel),
@@ -1971,6 +1973,30 @@ private fun categoryForChannel(channel: Channel): String {
         channel.country == "ایران" -> "سایر شبکه‌های داخلی"
         else -> "عمومی"
     }
+}
+
+private fun sectionSortOrder(title: String): Int = when {
+    "شبکه‌های سراسری" in title -> 0
+    "شبکه‌های استانی" in title -> 1
+    "شبکه‌های برون‌مرزی" in title -> 2
+    "سایر شبکه‌های داخلی" in title -> 3
+    title.endsWith("/ رادیو") -> 4
+    else -> 10
+}
+
+private fun channelSortOrder(channel: Channel): Int {
+    if (categoryForChannel(channel) == "شبکه‌های سراسری") {
+        val name = channel.name.replace('ي', 'ی').replace('ك', 'ک')
+        val nationalOrder = listOf(
+            "شبکه یک", "شبکه دو", "شبکه سه", "شبکه چهار", "شبکه پنج",
+            "شبکه آموزش", "شبکه قرآن", "شبکه خبر", "شبکه ورزش", "شبکه مستند",
+            "شبکه سلامت", "شبکه افق", "شبکه نسیم", "شبکه تماشا", "شبکه نمایش",
+            "شبکه امید", "شبکه کودک", "شبکه پویا", "شبکه نهال"
+        )
+        val index = nationalOrder.indexOfFirst { name.contains(it, ignoreCase = true) }
+        return if (index >= 0) index else 100
+    }
+    return 1000
 }
 
 private fun toggleFavorite(list: MutableList<Channel>, channel: Channel, save: () -> Unit) {
