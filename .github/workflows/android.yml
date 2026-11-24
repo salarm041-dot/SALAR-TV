@@ -67,8 +67,21 @@ jobs:
           from pathlib import Path
           p = Path(sys.argv[1])
           s = p.read_text()
-          s = s.replace('<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />',
-              '<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />')
+          required_permissions = [
+              "android.permission.RECORD_AUDIO",
+              "android.permission.SCHEDULE_EXACT_ALARM",
+              "android.permission.RECEIVE_BOOT_COMPLETED",
+              "android.permission.FOREGROUND_SERVICE",
+              "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+          ]
+          for permission in required_permissions:
+              if permission not in s:
+                  declaration = f'    <uses-permission android:name="{permission}" />\\n'
+                  s, count = re.subn(r'(?m)^\\s*<application\\b', declaration + '    <application', s, count=1)
+                  if count != 1:
+                      raise SystemExit(f"Could not add required manifest permission: {permission}")
+          if "android.permission.RECORD_AUDIO" not in s:
+              raise SystemExit("RECORD_AUDIO permission missing after manifest update")
           s = s.replace('android:icon="@drawable/ic_salar_tv"', 'android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"')
           s = s.replace('<application', '<application android:allowAudioPlaybackCapture="true"', 1)
           s = s.replace('    </application>', '        <receiver android:name=".RecordingAlarmReceiver" android:exported="false" />\n        <receiver android:name=".RecordingBootReceiver" android:enabled="true" android:exported="false">\n            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>\n        </receiver>\n        <service android:name=".HlsRecorderService" android:exported="false" android:foregroundServiceType="dataSync" />\n    </application>')
