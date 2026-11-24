@@ -298,7 +298,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                         requestCapture()
                     }
                 } else {
-                    val modelDir = ensureSpeechModel(context, chosen)
+                    val modelDir = File(File(context.filesDir, "salar-vosk"), chosen.id)
+                    if (!File(modelDir, "am/final.mdl").isFile || !File(modelDir, "conf").isDirectory) {
+                        throw IllegalStateException("مدل این زبان هنوز دانلود نشده است؛ ابتدا دکمهٔ «دانلود دستی زبان انتخابی» را بزنید.")
+                    }
                     val loadedModel = Model(modelDir.absolutePath)
                     val base = File(context.filesDir, "salar-vosk")
                     base.listFiles()?.filter { it.isDirectory && it.name != chosen.id }
