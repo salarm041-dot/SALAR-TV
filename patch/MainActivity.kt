@@ -164,6 +164,16 @@ fun SalarTvApp(isInPip: Boolean = false) {
         prefs.edit().putString("channels", arr.toString()).apply()
     }
 
+    // Enable Persian subtitle translation once for existing installs as well as new installs.
+    LaunchedEffect(Unit) {
+        if (!prefs.getBoolean("persian_subtitle_default_migrated", false)) {
+            prefs.edit()
+                .putBoolean("live_subtitle_enabled", true)
+                .putBoolean("persian_subtitle_default_migrated", true)
+                .apply()
+        }
+    }
+
     // Seed the bundled public playlist once. Existing user channels are preserved.
     LaunchedEffect(Unit) {
         val bundled = runCatching {
