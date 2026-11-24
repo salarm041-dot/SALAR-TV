@@ -1205,17 +1205,50 @@ fun ArabicCountryPage(onCountry: (String) -> Unit) {
         "مراکش" to "🇲🇦", "الجزایر" to "🇩🇿", "تونس" to "🇹🇳", "لیبی" to "🇱🇾",
         "یمن" to "🇾🇪", "سودان" to "🇸🇩"
     )
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("شبکه‌های عربی بر اساس کشور", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("شبکه‌های عربی بر اساس کشور", color = Color(0xFFFFD45C), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text("کشور را انتخاب کنید؛ فهرست شبکه‌ها از قبل داخل برنامه قرار دارد.", color = SecondaryText, fontSize = 12.sp)
-        countries.forEach { (name, flag) ->
-            Card(Modifier.fillMaxWidth().clickable { onCountry(name) },
-                colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(14.dp)) {
-                Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(flag, fontSize = 30.sp)
-                    Spacer(Modifier.width(12.dp))
-                    Text(name, color = TextMain, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                    Icon(Icons.Default.ChevronRight, null, tint = Gold)
+        countries.forEachIndexed { index, (name, flag) ->
+            val accent = when (index % 3) {
+                0 -> Color(0xFFD6AD62)
+                1 -> Color(0xFF42C8E8)
+                else -> Color(0xFF42D6A4)
+            }
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable { onCountry(name) },
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF101015)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Row(
+                    Modifier.fillMaxWidth().background(
+                        androidx.compose.ui.graphics.Brush.horizontalGradient(
+                            listOf(accent.copy(alpha = 0.22f), Color(0xFF17171D), Color(0xFF09090C))
+                        )
+                    ).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier.size(68.dp)
+                            .background(accent.copy(alpha = 0.13f), RoundedCornerShape(18.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(flag, fontSize = 36.sp)
+                        Box(
+                            modifier = Modifier.align(Alignment.BottomEnd).size(29.dp)
+                                .background(Color(0xFF09090C), RoundedCornerShape(50)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.Public, contentDescription = "نماد کشور $name",
+                                tint = accent, modifier = Modifier.size(19.dp))
+                        }
+                    }
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(name, color = Color(0xFFFFD978), fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                        Text("شبکه‌های تلویزیونی $name", color = Color(0xFFBDB8AA), fontSize = 11.sp)
+                    }
+                    Icon(Icons.Default.PlayCircleFilled, null, tint = accent, modifier = Modifier.size(29.dp))
                 }
             }
         }
