@@ -45,6 +45,10 @@ import com.google.mlkit.nl.translate.TranslatorOptions
 import org.json.JSONObject
 import org.vosk.Model
 import org.vosk.Recognizer
+import dev.ffmpegkit.whisper.WhisperConfig
+import dev.ffmpegkit.whisper.WhisperModel
+import kotlinx.coroutines.runBlocking
+import java.io.ByteArrayOutputStream
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -66,6 +70,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             LiveSpeechModel("en", TranslateLanguage.ENGLISH, "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"),
             LiveSpeechModel("tr", TranslateLanguage.TURKISH, "https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip"),
             LiveSpeechModel("ar", TranslateLanguage.ARABIC, "https://alphacephei.com/vosk/models/vosk-model-ar-mgb2-0.4.zip"),
+            LiveSpeechModel("he", TranslateLanguage.HEBREW, ""),
             LiveSpeechModel("ru", TranslateLanguage.RUSSIAN, "https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip"),
             LiveSpeechModel("fr", TranslateLanguage.FRENCH, "https://alphacephei.com/vosk/models/vosk-model-small-fr-0.22.zip"),
             LiveSpeechModel("de", TranslateLanguage.GERMAN, "https://alphacephei.com/vosk/models/vosk-model-small-de-0.15.zip"),
@@ -90,6 +95,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     var recognitionThread by remember { mutableStateOf<Thread?>(null) }
     var recognizer by remember { mutableStateOf<Recognizer?>(null) }
     var modelInstance by remember { mutableStateOf<Model?>(null) }
+    var whisperModelInstance by remember { mutableStateOf<WhisperModel?>(null) }
     val runningFlag = remember { AtomicBoolean(false) }
     val translator = remember(selectedModel) {
         selectedModel?.let { selectedId ->
@@ -116,6 +122,8 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         recognizer = null
         runCatching { modelInstance?.close() }
         modelInstance = null
+        runCatching { whisperModelInstance?.let { HebrewWhisperEngine.releaseModel(it) } }
+        whisperModelInstance = null
         isRunning = false
     }
 
@@ -171,8 +179,9 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                     audioRecord.release()
                     throw IllegalStateException("سیستم ضبط صدای خروجی را راه‌اندازی نکرد.")
                 }
-                val activeModel = modelInstance ?: throw IllegalStateException("مدل گفتار بارگذاری نشده است.")
-                val activeRecognizer = Recognizer(activeModel, 16000.0f)
+                val hebrewMode = selectedModel == "he"
+                val activeWhisper = if (hebrewMode) whisperModelInstance ?: throw IllegalStateException("مدل عبری بارگذاری نشده است.") else null
+                val activeRecognizer = if (hebrewMode) null else Recognizer(modelInstance ?: throw IllegalStateException("مدل گفتار بارگذاری نشده است."), 16000.0f)
                 recorder = audioRecord
                 recognizer = activeRecognizer
                 runningFlag.set(true)
@@ -180,16 +189,39 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                 status = "در حال شنیدن صدای خودِ پخش‌کننده…"
                 val thread = Thread {
                     val buffer = ByteArray(8192)
+                    val hebrewChunk = ByteArrayOutputStream()
+                    val chunkTargetBytes = 16000 * 2 * 8
+                    var chunkNumber = 0
                     try {
                         audioRecord.startRecording()
                         while (runningFlag.get() && !Thread.currentThread().isInterrupted) {
                             val count = audioRecord.read(buffer, 0, buffer.size)
-                            if (count > 0 && activeRecognizer.acceptWaveForm(buffer, count)) {
-                                val recognized = runCatching {
-                                    JSONObject(activeRecognizer.result).optString("text", "")
-                                }.getOrDefault("")
-                                if (recognized.isNotBlank()) {
-                                    mainHandler.post { translateText(recognized) }
+                            if (count > 0) {
+                                if (hebrewMode) {
+                                    hebrewChunk.write(buffer, 0, count)
+                                    if (hebrewChunk.size() >= chunkTargetBytes) {
+                                        val wav = File(context.cacheDir, "hebrew-live-$chunkNumber.wav")
+                                        chunkNumber++
+                                        writePcmWav(wav, hebrewChunk.toByteArray(), 16000, 1)
+                                        hebrewChunk.reset()
+                                        try {
+                                            val recognized = runBlocking {
+                                                dev.ffmpegkit.whisper.Whisper.transcribe(
+                                                    activeWhisper!!,
+                                                    wav.absolutePath,
+                                                    WhisperConfig(language = "he", translate = false, threads = 2)
+                                                ).text
+                                            }.trim()
+                                            if (recognized.isNotBlank()) mainHandler.post { translateText(recognized) }
+                                        } finally {
+                                            wav.delete()
+                                        }
+                                    }
+                                } else if (activeRecognizer!!.acceptWaveForm(buffer, count)) {
+                                    val recognized = runCatching {
+                                        JSONObject(activeRecognizer.result).optString("text", "")
+                                    }.getOrDefault("")
+                                    if (recognized.isNotBlank()) mainHandler.post { translateText(recognized) }
                                 }
                             }
                         }
@@ -238,13 +270,23 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         }
         executor.execute {
             try {
-                val modelDir = ensureSpeechModel(context, chosen)
-                val loadedModel = Model(modelDir.absolutePath)
-                mainHandler.post {
-                    modelInstance = loadedModel
-                    isPreparing = false
-                    status = "مدل آماده شد؛ مجوز ضبط صدای داخلی را تأیید کنید."
-                    requestCapture()
+                if (chosen.id == "he") {
+                    val loadedWhisper = runBlocking { HebrewWhisperEngine.loadModel(context) }
+                    mainHandler.post {
+                        whisperModelInstance = loadedWhisper
+                        isPreparing = false
+                        status = "مدل چندزبانهٔ عبری آماده شد؛ مجوز ضبط صدای داخلی را تأیید کنید."
+                        requestCapture()
+                    }
+                } else {
+                    val modelDir = ensureSpeechModel(context, chosen)
+                    val loadedModel = Model(modelDir.absolutePath)
+                    mainHandler.post {
+                        modelInstance = loadedModel
+                        isPreparing = false
+                        status = "مدل آماده شد؛ مجوز ضبط صدای داخلی را تأیید کنید."
+                        requestCapture()
+                    }
                 }
             } catch (e: Exception) {
                 mainHandler.post {
@@ -284,7 +326,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 languageRow.forEach { item ->
                     val label = when (item.id) {
-                        "en" -> "انگلیسی"; "tr" -> "ترکی"; "ar" -> "عربی"
+                        "en" -> "انگلیسی"; "tr" -> "ترکی"; "ar" -> "عربی"; "he" -> "عبری"
                         "ru" -> "روسی"; "fr" -> "فرانسوی"; "de" -> "آلمانی"
                         "es" -> "اسپانیایی"; "it" -> "ایتالیایی"; "pt" -> "پرتغالی"
                         "nl" -> "هلندی"; "pl" -> "لهستانی"; "uk" -> "اوکراینی"
@@ -303,10 +345,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
                 onClick = {
                     val chosen = models.first { it.id == selectedModel }
                     isPreparing = true
-                    status = "در حال دریافت دستی مدل ${chosen.id}؛ فقط همین زبان ذخیره می‌شود…"
+                    status = if (chosen.id == "he") "در حال دریافت دستی مدل چندزبانهٔ عبری (حدود ۷۵ مگابایت)…" else "در حال دریافت دستی مدل ${chosen.id}؛ فقط همین زبان ذخیره می‌شود…"
                     executor.execute {
                         try {
-                            ensureSpeechModel(context, chosen)
+                            if (chosen.id == "he") HebrewWhisperEngine.downloadModel(context) else ensureSpeechModel(context, chosen)
                             mainHandler.post {
                                 isPreparing = false
                                 status = "مدل انتخابی دانلود و آمادهٔ استفاده شد."
@@ -348,6 +390,36 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
     }
 }
 
+private fun writePcmWav(file: File, pcm: ByteArray, sampleRate: Int, channels: Int) {
+    val byteRate = sampleRate * channels * 2
+    FileOutputStream(file).use { out ->
+        fun writeInt(value: Int) {
+            out.write(value and 0xff)
+            out.write((value shr 8) and 0xff)
+            out.write((value shr 16) and 0xff)
+            out.write((value shr 24) and 0xff)
+        }
+        fun writeShort(value: Int) {
+            out.write(value and 0xff)
+            out.write((value shr 8) and 0xff)
+        }
+        out.write("RIFF".toByteArray(Charsets.US_ASCII))
+        writeInt(36 + pcm.size)
+        out.write("WAVE".toByteArray(Charsets.US_ASCII))
+        out.write("fmt ".toByteArray(Charsets.US_ASCII))
+        writeInt(16)
+        writeShort(1)
+        writeShort(channels)
+        writeInt(sampleRate)
+        writeInt(byteRate)
+        writeShort(channels * 2)
+        writeShort(16)
+        out.write("data".toByteArray(Charsets.US_ASCII))
+        writeInt(pcm.size)
+        out.write(pcm)
+    }
+}
+
 private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     val base = File(context.filesDir, "salar-vosk")
     if (!base.exists() && !base.mkdirs()) throw IllegalStateException("ساخت پوشهٔ مدل ممکن نشد.")
@@ -356,7 +428,7 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
         // Keep only the selected language model on disk.
         base.listFiles()?.filter { it.isDirectory && it.name != model.id && it.name != "${model.id}-extract" }
             ?.forEach { it.deleteRecursively() }
-        return target
+        return target.also { File(context.filesDir, "salar-whisper").deleteRecursively() }
     }
 
     val archive = File(context.cacheDir, "vosk-${model.id}.zip")
@@ -408,5 +480,6 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     // Retain just one downloaded language model to limit app storage usage.
     base.listFiles()?.filter { it.isDirectory && it.name != model.id }
         ?.forEach { it.deleteRecursively() }
+    File(context.filesDir, "salar-whisper").deleteRecursively()
     return target
 }
