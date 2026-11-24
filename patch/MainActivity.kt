@@ -1248,107 +1248,136 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
     val tvCount = channels.count { it.kind == "تلویزیون" }
     val radioCount = channels.count { it.kind == "رادیو" }
     val countries = dynamicCountries.distinctBy { it.first }
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text("سلام، خوش آمدید", color = Color(0xFF9DAEC5), fontSize = 12.sp)
-                Text("دنیای تصویر، انتخاب شماست", color = Color(0xFFF4F6FB), fontSize = 22.sp, fontWeight = FontWeight.Black)
+    val gold = Color(0xFFFFC94A)
+    val neonBlue = Color(0xFF168CFF)
+    val quick = listOf(
+        Triple("تلویزیون", "پخش زنده شبکه‌ها", Icons.Default.LiveTv),
+        Triple("رادیو", "ایستگاه‌های رادیویی", Icons.Default.Radio),
+        Triple("شبکه‌های خارجی", "کشورهای جهان", Icons.Default.Public),
+        Triple("زمان‌بندی‌ها", "ضبط خودکار برنامه", Icons.Default.CalendarMonth),
+        Triple("زیارت آنلاین", "پخش حرم‌های مطهر", Icons.Default.Mosque),
+        Triple("افزودن منابع", "لینک و فهرست M3U", Icons.Default.AddCircle),
+        Triple("تنظیمات", "شخصی‌سازی برنامه", Icons.Default.Settings),
+        Triple("علاقه‌مندی‌ها", "شبکه‌های منتخب", Icons.Default.Favorite)
+    )
+    val accents = listOf(Color(0xFF18A7FF), Color(0xFFFFC247), Color(0xFF5D8CFF), Color(0xFFFF9C3D),
+        Color(0xFFFFC247), Color(0xFF28C9E8), Color(0xFF9BA9C5), Color(0xFFFF6E9A))
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(17.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(54.dp).background(
+                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFFFD66B), Color(0xFF8C5B12))),
+                RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.LiveTv, null, tint = Color(0xFF071326), modifier = Modifier.size(35.dp))
             }
-            Surface(shape = RoundedCornerShape(15.dp), color = Color(0xFF182438)) {
-                IconButton(onClick = onAdd) { Icon(Icons.Default.AddLink, "افزودن منبع", tint = Color(0xFF65D9D0)) }
-            }
-        }
-        Card(shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF172A43))) {
-            Box(Modifier.fillMaxWidth().background(
-                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF254B68), Color(0xFF192B45), Color(0xFF171C31)))
-            ).padding(20.dp)) {
-                Column(verticalArrangement = Arrangement.spacedBy(13.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("SALAR  /  LIVE", color = Color(0xFF68E0D1), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-                            Text("همین حالا تماشا کن", color = Color.White, fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
-                            Text("شبکه‌های زنده از ایران و سراسر جهان", color = Color(0xFFBDCADB), fontSize = 11.sp)
-                        }
-                        Box(Modifier.size(68.dp).background(Color(0xFF315878), RoundedCornerShape(22.dp)), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.LiveTv, null, tint = Color(0xFF77E6D9), modifier = Modifier.size(40.dp))
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Button(onClick = { onPage("تلویزیون") },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF70DED0), contentColor = Color(0xFF102334)),
-                            shape = RoundedCornerShape(14.dp)) {
-                            Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(4.dp)); Text("ورود به تلویزیون", fontWeight = FontWeight.Bold)
-                        }
-                        Surface(color = Color(0x332D4059), shape = RoundedCornerShape(13.dp)) {
-                            Text("$tvCount شبکه  •  $radioCount رادیو", color = Color.White, fontSize = 10.sp,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 11.dp))
-                        }
-                    }
+            Spacer(Modifier.width(11.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("SALAR ", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                    Text("TV", color = gold, fontSize = 24.sp, fontWeight = FontWeight.Black)
                 }
+                Text("تلویزیون، رادیو و سرگرمی آنلاین", color = Color(0xFFB8C8E0), fontSize = 11.sp)
+            }
+            Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFF101F36),
+                border = androidx.compose.foundation.BorderStroke(1.dp, gold.copy(alpha = 0.65f))) {
+                IconButton(onClick = onAdd) { Icon(Icons.Default.AddLink, "افزودن منبع", tint = gold) }
             }
         }
-        Text("دسترسی سریع", color = Color(0xFFE8EDF5), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            listOf(Triple("تلویزیون", "شبکه‌های جهان", Icons.Default.Tv),
-                Triple("رادیو", "صداهای زنده", Icons.Default.Radio),
-                Triple("زیارت آنلاین", "پخش اماکن مقدس", Icons.Default.AccountBalance)).forEachIndexed { index, item ->
-                val tint = listOf(Color(0xFF69DCCF), Color(0xFFB7A0FF), Color(0xFFFFC978))[index]
-                Card(Modifier.weight(1f).clickable { onPage(item.first) }, shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF151F30))) {
-                    Column(Modifier.fillMaxWidth().padding(vertical = 15.dp, horizontal = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                        Icon(item.third, null, tint = tint, modifier = Modifier.size(27.dp))
-                        Text(item.first, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        Text(item.second, color = Color(0xFF9EACC0), fontSize = 9.sp, maxLines = 1)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("$tvCount شبکه تلویزیونی" to Icons.Default.Tv, "$radioCount ایستگاه رادیویی" to Icons.Default.Radio).forEach { item ->
+                Surface(Modifier.weight(1f), color = Color(0xFF101E34), shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF176DC0).copy(alpha = .65f))) {
+                    Row(Modifier.padding(horizontal = 10.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(item.second, null, tint = gold, modifier = Modifier.size(19.dp))
+                        Spacer(Modifier.width(7.dp))
+                        Text(item.first, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("انتخاب کشور", color = Color(0xFFE8EDF5), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("برای دیدن بقیه، افقی بکشید  ↔", color = Color(0xFF69DCCF), fontSize = 10.sp)
+            Text("دسترسی سریع", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+            Text("۸ بخش اصلی", color = gold, fontSize = 10.sp)
         }
-        // Two-row horizontal country shelf: swipe left/right to reveal additional countries.
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            countries.chunked(2).forEach { countryColumn ->
-                Column(Modifier.width(104.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    countryColumn.forEach { (name, flag) ->
-                        val tint = when(name) {
-                            "ایران" -> Color(0xFF62D6B0)
-                            "ترکیه" -> Color(0xFFFF788A)
-                            "آذربایجان" -> Color(0xFF6CCDEB)
-                            else -> Color(0xFFB7A0FF)
-                        }
-                        Card(Modifier.fillMaxWidth().clickable { onDynamicCountry(name) },
-                            shape = RoundedCornerShape(18.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF172235))) {
-                            Column(Modifier.fillMaxWidth().padding(vertical = 13.dp, horizontal = 5.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text(flag, fontSize = 31.sp)
-                                Text(name, color = Color.White, fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold, maxLines = 1)
-                                Box(Modifier.width(24.dp).height(3.dp)
-                                    .background(tint, RoundedCornerShape(3.dp)))
+        quick.chunked(2).forEachIndexed { rowIndex, rowItems ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
+                rowItems.forEachIndexed { index, item ->
+                    val itemIndex = rowIndex * 2 + index
+                    val accent = accents[itemIndex]
+                    Card(Modifier.weight(1f).height(116.dp).clickable { onPage(item.first) },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0C1B32)),
+                        border = androidx.compose.foundation.BorderStroke(1.4.dp, accent.copy(alpha = .9f))) {
+                        Box(Modifier.fillMaxSize().background(
+                            androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF123D70), Color(0xFF0B1830), Color(0xFF080F20))))) {
+                            Box(Modifier.align(Alignment.TopEnd).size(74.dp).background(accent.copy(alpha = .10f), RoundedCornerShape(bottomStart = 70.dp)))
+                            Column(Modifier.fillMaxSize().padding(11.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceBetween) {
+                                Box(Modifier.size(52.dp).background(
+                                    androidx.compose.ui.graphics.Brush.radialGradient(listOf(accent.copy(alpha = .42f), Color(0xFF10223D))),
+                                    RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                                    Icon(item.third, null, tint = accent, modifier = Modifier.size(34.dp))
+                                }
+                                Text(item.first, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                                Text(item.second, color = Color(0xFFB8C8E0), fontSize = 9.sp, maxLines = 1)
                             }
                         }
                     }
-                    if (countryColumn.size == 1) Spacer(Modifier.height(82.dp))
+                }
+                if (rowItems.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text("انتخاب کشور", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+            Text("برای دیدن همه، افقی بکشید  ↔", color = gold, fontSize = 10.sp)
+        }
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
+            countries.forEachIndexed { index, pair ->
+                val (name, flag) = pair
+                val accent = when(name) {
+                    "ایران" -> Color(0xFF31D69A)
+                    "ترکیه" -> Color(0xFFFF6375)
+                    "آذربایجان", "جمهوری آذربایجان" -> Color(0xFF35C9F4)
+                    "اسرائیل" -> Color(0xFF77A9FF)
+                    else -> accents[index % accents.size]
+                }
+                Card(Modifier.width(116.dp).height(124.dp).clickable { onDynamicCountry(name) },
+                    shape = RoundedCornerShape(19.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0B1B33)),
+                    border = androidx.compose.foundation.BorderStroke(1.5.dp, accent)) {
+                    Box(Modifier.fillMaxSize().background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(listOf(accent.copy(alpha = .24f), Color(0xFF0A1428), Color(0xFF050B18))))) {
+                        Column(Modifier.fillMaxSize().padding(9.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceEvenly) {
+                            Box(Modifier.size(53.dp).background(Color(0xFF071326), RoundedCornerShape(27.dp),
+                                androidx.compose.ui.graphics.Brush.linearGradient(listOf(accent.copy(alpha = .6f), Color(0xFF0B1B33))),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, accent.copy(alpha = .8f))),
+                                contentAlignment = Alignment.Center) { Text(flag, fontSize = 31.sp) }
+                            Text(name, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                            Text("مشاهده شبکه‌ها  ›", color = accent, fontSize = 9.sp)
+                        }
+                    }
                 }
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("بیشتر کشورها", color = Color(0xFF69DCCF), fontSize = 12.sp,
-                modifier = Modifier.clickable { onMoreDynamicCountries() }.padding(4.dp))
-            Text("منابع و شبکه‌های تازه", color = Color(0xFF8E9CB0), fontSize = 10.sp)
+            Text("شبکه‌های منتخب", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("مشاهده تلویزیون  ←", color = gold, fontSize = 10.sp, modifier = Modifier.clickable { onPage("تلویزیون") })
         }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = { onPage("بیشتر") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) {
-                Icon(Icons.Default.Explore, null); Spacer(Modifier.width(5.dp)); Text("امکانات بیشتر")
-            }
-            OutlinedButton(onClick = onAdd, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) {
-                Icon(Icons.Default.Add, null); Spacer(Modifier.width(5.dp)); Text("افزودن شبکه")
+        val featured = channels.filter { it.kind == "تلویزیون" && it.logoUrl.isNotBlank() }.take(8)
+        if (featured.isNotEmpty()) {
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                featured.forEach { channel ->
+                    Card(Modifier.width(94.dp).clickable { onSelect(channel) }, shape = RoundedCornerShape(15.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF101D32)),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1C75C9))) {
+                        Column(Modifier.fillMaxWidth().padding(9.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                            ChannelLogo(channel.logoUrl, channel.kind)
+                            Text(channel.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 2,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                        }
+                    }
+                }
             }
         }
     }
