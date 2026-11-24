@@ -210,6 +210,30 @@ fun SalarTvApp(isInPip: Boolean = false) {
     var lastChannelRefresh by remember { mutableStateOf(prefs.getString("last_channel_refresh", "") ?: "") }
     val refreshScope = rememberCoroutineScope()
     var selected by remember { mutableStateOf<Channel?>(null) }
+    val lockedChannelUrls = remember {
+        mutableStateListOf<String>().apply {
+            runCatching {
+                val saved = JSONArray(prefs.getString("child_locked_urls", "[]") ?: "[]")
+                for (i in 0 until saved.length()) add(saved.optString(i))
+            }
+        }
+    }
+    var childPinHash by remember { mutableStateOf(prefs.getString("child_lock_pin_hash", "") ?: "") }
+    var pendingLockedChannel by remember { mutableStateOf<Channel?>(null) }
+    var showChildPinDialog by remember { mutableStateOf(false) }
+    var childPinEntry by remember { mutableStateOf("") }
+    var childPinError by remember { mutableStateOf("") }
+    fun saveLockedChannels() {
+        prefs.edit().putString("child_locked_urls", JSONArray(lockedChannelUrls).toString()).apply()
+    }
+    fun selectChannel(channel: Channel) {
+        if (channel.url in lockedChannelUrls) {
+            pendingLockedChannel = channel
+            childPinEntry = ""
+            childPinError = ""
+            showChildPinDialog = true
+        } else selected = channel
+    }
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
     var editingChannel by remember { mutableStateOf<Channel?>(null) }
@@ -786,7 +810,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     )
                     "زیارت آنلاین" -> PilgrimagePage(
                         savedChannels = channels,
-                        onPlay = { selected = it },
+                        onPlay = { selectChannel(it) },
                         onAdd = { channel -> channels.add(channel); saveChannels() }
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
@@ -795,6 +819,26 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onThemeModeChange = { mode ->
                             themeMode = mode
                             prefs.edit().putString("theme_mode", mode).apply()
+                        },
+                        onChildLock = { page = "قفل کودک" }
+                    )
+                    "قفل کودک" -> ChildLockPage(
+                        channels = channels.filter { it.kind == "تلویزیون" || it.kind == "رادیو" },
+                        lockedUrls = lockedChannelUrls.toSet(),
+                        currentPinHash = childPinHash,
+                        onBack = { page = "تنظیمات" },
+                        onToggle = { channel, locked ->
+                            if (locked && channel.url !in lockedChannelUrls) lockedChannelUrls.add(channel.url)
+                            else if (!locked) lockedChannelUrls.remove(channel.url)
+                            saveLockedChannels()
+                        },
+                        onSavePin = { oldPin, newPin ->
+                            val oldMatches = childPinHash.isBlank() || hashChildPin(oldPin) == childPinHash
+                            if (oldMatches && newPin.length in 4..8 && newPin.all(Char::isDigit)) {
+                                childPinHash = hashChildPin(newPin)
+                                prefs.edit().putString("child_lock_pin_hash", childPinHash).apply()
+                                true
+                            } else false
                         }
                     )
                     "زمان‌بندی‌ها" -> ScheduledRecordingsPage(
@@ -840,31 +884,61 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 else -> false
                             }
                         }
-                        ChannelList(filtered, onSelect = { selected = it },
+                        ChannelList(filtered, onSelect = { selectChannel(it) },
                             onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                             onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                             onRefresh = { refreshChannels("تلویزیون") }, isRefreshing = isRefreshingChannels, lastRefresh = lastChannelRefresh)
                     }
-                    "رادیو" -> ChannelList(channels.filter { it.kind == "رادیو" }, onSelect = { selected = it },
+                    "رادیو" -> ChannelList(channels.filter { it.kind == "رادیو" }, onSelect = { selectChannel(it) },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onRefresh = { refreshChannels("رادیو") }, isRefreshing = isRefreshingChannels, lastRefresh = lastChannelRefresh)
-                    "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selected = it },
+                    "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selectChannel(it) },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
                     else -> if (page.startsWith("عربی:")) {
                         val arabicCountry = page.removePrefix("عربی:")
                         ChannelList(channels.filter { it.kind == "تلویزیون" && it.country == arabicCountry },
-                            onSelect = { selected = it },
+                            onSelect = { selectChannel(it) },
                             onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                             onEdit = { editingChannel = it },
                             onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
-                    } else HomePage(channels, onSelect = { selected = it }, onAdd = { page = "افزودن منابع" },
+                    } else HomePage(channels, onSelect = { selectChannel(it) }, onAdd = { page = "افزودن منابع" },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onPage = { destination -> page = destination })
                 }
             }
         }
+    }
+
+    if (showChildPinDialog) {
+        AlertDialog(
+            onDismissRequest = { showChildPinDialog = false; pendingLockedChannel = null },
+            title = { Text("قفل کودک", color = Gold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("برای پخش «${pendingLockedChannel?.name ?: "این شبکه"}» رمز والد را وارد کنید.")
+                    OutlinedTextField(
+                        value = childPinEntry,
+                        onValueChange = { childPinEntry = it.filter(Char::isDigit).take(8); childPinError = "" },
+                        label = { Text("رمز والد") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
+                    )
+                    if (childPinError.isNotBlank()) Text(childPinError, color = MaterialTheme.colorScheme.error)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (hashChildPin(childPinEntry) == childPinHash && childPinEntry.isNotBlank()) {
+                        selected = pendingLockedChannel
+                        showChildPinDialog = false
+                        pendingLockedChannel = null
+                        childPinEntry = ""
+                    } else childPinError = "رمز واردشده صحیح نیست."
+                }) { Text("تأیید و پخش", color = Gold) }
+            },
+            dismissButton = { TextButton(onClick = { showChildPinDialog = false; pendingLockedChannel = null }) { Text("انصراف") } }
+        )
     }
 
     if (editingChannel != null) {
@@ -1779,8 +1853,102 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
     }
 }
 
+private fun hashChildPin(pin: String): String =
+    java.security.MessageDigest.getInstance("SHA-256")
+        .digest(pin.toByteArray(Charsets.UTF_8))
+        .joinToString("") { "%02x".format(it) }
+
 @Composable
-fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
+fun ChildLockPage(
+    channels: List<Channel>,
+    lockedUrls: Set<String>,
+    currentPinHash: String,
+    onBack: () -> Unit,
+    onToggle: (Channel, Boolean) -> Unit,
+    onSavePin: (String, String) -> Boolean
+) {
+    var showPinEditor by remember { mutableStateOf(false) }
+    var oldPin by remember { mutableStateOf("") }
+    var newPin by remember { mutableStateOf("") }
+    var confirmPin by remember { mutableStateOf("") }
+    var pinError by remember { mutableStateOf("") }
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        TextButton(onClick = onBack) {
+            Icon(Icons.Default.ArrowBack, contentDescription = null)
+            Text("بازگشت به تنظیمات")
+        }
+        Text("قفل کودک", color = Gold, fontSize = 21.sp, fontWeight = FontWeight.Bold)
+        Text("شبکه‌های قفل‌شده فقط پس از واردکردن رمز والد پخش می‌شوند. رمز برای تغییر این فهرست نیز لازم است.",
+            color = SecondaryText, fontSize = 12.sp)
+        Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
+            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(if (currentPinHash.isBlank()) "رمز والد هنوز تنظیم نشده است." else "رمز والد تنظیم شده است.",
+                    color = if (currentPinHash.isBlank()) Color(0xFFFFCC80) else Gold, fontWeight = FontWeight.SemiBold)
+                Button(onClick = { showPinEditor = true; oldPin = ""; newPin = ""; confirmPin = ""; pinError = "" },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
+                    Text(if (currentPinHash.isBlank()) "تنظیم رمز والد" else "تغییر رمز والد")
+                }
+            }
+        }
+        Text("شبکه‌ها و ایستگاه‌های قفل‌شده (${lockedUrls.size})", color = Gold, fontWeight = FontWeight.Bold)
+        if (currentPinHash.isBlank()) {
+            Text("ابتدا رمز والد را تنظیم کنید تا امکان قفل‌کردن شبکه‌ها فعال شود.", color = MutedText, fontSize = 12.sp)
+        }
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            items(channels.distinctBy { it.url }, key = { it.url }) { channel ->
+                Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(channel.name, color = TextMain, fontWeight = FontWeight.Medium)
+                            Text("${channel.country} • ${channel.kind}", color = MutedText, fontSize = 10.sp)
+                        }
+                        Switch(
+                            checked = channel.url in lockedUrls,
+                            enabled = currentPinHash.isNotBlank(),
+                            onCheckedChange = { onToggle(channel, it) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+    if (showPinEditor) {
+        AlertDialog(
+            onDismissRequest = { showPinEditor = false },
+            title = { Text(if (currentPinHash.isBlank()) "تنظیم رمز والد" else "تغییر رمز والد", color = Gold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (currentPinHash.isNotBlank()) OutlinedTextField(oldPin, { oldPin = it.filter(Char::isDigit).take(8) },
+                        label = { Text("رمز فعلی") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+                    OutlinedTextField(newPin, { newPin = it.filter(Char::isDigit).take(8) },
+                        label = { Text("رمز جدید (۴ تا ۸ رقم)") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+                    OutlinedTextField(confirmPin, { confirmPin = it.filter(Char::isDigit).take(8) },
+                        label = { Text("تکرار رمز جدید") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+                    if (pinError.isNotBlank()) Text(pinError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    when {
+                        newPin.length !in 4..8 -> pinError = "رمز باید بین ۴ تا ۸ رقم باشد."
+                        newPin != confirmPin -> pinError = "تکرار رمز با رمز جدید یکسان نیست."
+                        !onSavePin(oldPin, newPin) -> pinError = "رمز فعلی صحیح نیست."
+                        else -> showPinEditor = false
+                    }
+                }) { Text("ذخیره رمز", color = Gold) }
+            },
+            dismissButton = { TextButton(onClick = { showPinEditor = false }) { Text("انصراف") } }
+        )
+    }
+}
+
+@Composable
+fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var fontScale by remember { mutableFloatStateOf(prefs.getFloat("font_scale", 1f).coerceIn(0.85f, 1.3f)) }
@@ -1815,8 +1983,14 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit) {
                     Spacer(Modifier.width(10.dp))
                     Text("حفاظت و حریم خصوصی", color = TextMain, fontWeight = FontWeight.Bold)
                 }
-                Text("ورود با حساب آنلاین و قفل PIN در این نسخه هنوز پیاده‌سازی نشده‌اند؛ این بخش برای تکمیل امنیت ورود در نظر گرفته شده است.",
+                Text("برای محدودکردن پخش شبکه‌های انتخابی با رمز والد، بخش قفل کودک را باز کنید.",
                     color = SecondaryText, fontSize = 12.sp)
+                Button(onClick = onChildLock, modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
+                    Icon(Icons.Default.ChildCare, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("مدیریت قفل کودک")
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("تأیید پیش از حذف شبکه", color = TextMain, modifier = Modifier.weight(1f))
                     Switch(checked = confirmDelete, onCheckedChange = {
