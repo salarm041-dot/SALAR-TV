@@ -73,6 +73,9 @@ private var TextMain by mutableStateOf(Color(0xFFF5F1E8))
 private var SecondaryText by mutableStateOf(Color.LightGray)
 private var MutedText by mutableStateOf(Color.Gray)
 
+private const val REMOTE_TV_PLAYLIST = "https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/channels.m3u"
+private const val REMOTE_RADIO_PLAYLIST = "https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/radio-candidates.m3u"
+
 data class Channel(
     val name: String,
     val url: String,
@@ -183,6 +186,9 @@ fun SalarTvApp(isInPip: Boolean = false) {
     }
 
     var page by remember { mutableStateOf("خانه") }
+    var isRefreshingChannels by remember { mutableStateOf(false) }
+    var lastChannelRefresh by remember { mutableStateOf(prefs.getString("last_channel_refresh", "") ?: "") }
+    val refreshScope = rememberCoroutineScope()
     var selected by remember { mutableStateOf<Channel?>(null) }
     var showAdd by remember { mutableStateOf(false) }
     var showSchedule by remember { mutableStateOf(false) }
@@ -228,6 +234,53 @@ fun SalarTvApp(isInPip: Boolean = false) {
         if (TextMain != nextText) TextMain = nextText
         if (SecondaryText != nextSecondary) SecondaryText = nextSecondary
         if (MutedText != nextMuted) MutedText = nextMuted
+    }
+
+    val refreshChannels: (String) -> Unit = { requestedKind ->
+        if (!isRefreshingChannels) {
+            isRefreshingChannels = true
+            refreshScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    runCatching {
+                        val sourceUrl = if (requestedKind == "رادیو") REMOTE_RADIO_PLAYLIST else REMOTE_TV_PLAYLIST
+                        val connection = (URL(sourceUrl).openConnection() as HttpURLConnection)
+                        connection.connectTimeout = 15000
+                        connection.readTimeout = 30000
+                        connection.requestMethod = "GET"
+                        connection.setRequestProperty("User-Agent", "SALAR-TV-Android/1.3")
+                        connection.setRequestProperty("Cache-Control", "no-cache")
+                        try {
+                            val code = connection.responseCode
+                            if (code !in 200..299) error("دریافت فهرست ناموفق بود؛ HTTP $code")
+                            val body = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                            require(body.trimStart().startsWith("#EXTM3U", ignoreCase = true)) { "پاسخ سرور، فهرست معتبر M3U نیست." }
+                            val parsed = parseM3u(body).filter { it.kind == requestedKind && it.url.startsWith("https://") }
+                            require(parsed.isNotEmpty()) { "هیچ شبکه معتبری در فهرست دریافتی پیدا نشد." }
+                            parsed
+                        } finally { connection.disconnect() }
+                    }
+                }
+                result.onSuccess { remote ->
+                    val knownUrls = channels.map { it.url.trim().lowercase(Locale.ROOT) }.toMutableSet()
+                    val fresh = remote.filter { channel ->
+                        val normalized = channel.url.trim().lowercase(Locale.ROOT)
+                        normalized.isNotBlank() && knownUrls.add(normalized)
+                    }
+                    channels.addAll(fresh)
+                    saveChannels()
+                    val refreshedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))
+                    lastChannelRefresh = refreshedAt
+                    prefs.edit().putString("last_channel_refresh", refreshedAt).apply()
+                    android.widget.Toast.makeText(context,
+                        if (fresh.isEmpty()) "فهرست بررسی شد؛ شبکه جدیدی برای افزودن وجود نداشت." else "${fresh.size} شبکه جدید اضافه شد.",
+                        android.widget.Toast.LENGTH_LONG).show()
+                }.onFailure { error ->
+                    android.widget.Toast.makeText(context, "بروزرسانی انجام نشد؛ فهرست قبلی حفظ شد. ${error.message ?: "خطای اتصال"}",
+                        android.widget.Toast.LENGTH_LONG).show()
+                }
+                isRefreshingChannels = false
+            }
+        }
     }
 
     val player = remember { ExoPlayer.Builder(context).build() }
@@ -697,11 +750,13 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         } }
                         ChannelList(filtered, onSelect = { selected = it },
                             onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
-                            onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                            onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
+                            onRefresh = { refreshChannels("تلویزیون") }, isRefreshing = isRefreshingChannels, lastRefresh = lastChannelRefresh)
                     }
                     "رادیو" -> ChannelList(channels.filter { it.kind == "رادیو" }, onSelect = { selected = it },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
-                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
+                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
+                        onRefresh = { refreshChannels("رادیو") }, isRefreshing = isRefreshingChannels, lastRefresh = lastChannelRefresh)
                     "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selected = it },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
@@ -1054,11 +1109,20 @@ private fun ChannelLogo(logoUrl: String, kind: String) {
 
 @Composable
 fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
-                onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {}) {
+                onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {},
+                onRefresh: (() -> Unit)? = null, isRefreshing: Boolean = false, lastRefresh: String = "") {
     var searchQuery by remember { mutableStateOf("") }
     if (channels.isEmpty()) {
-        Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+        Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("موردی برای نمایش وجود ندارد.", color = SecondaryText)
+            if (onRefresh != null) Button(onClick = onRefresh, enabled = !isRefreshing,
+                colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
+                if (isRefreshing) CircularProgressIndicator(Modifier.size(18.dp), color = Color.Black, strokeWidth = 2.dp)
+                else Icon(Icons.Default.Sync, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (isRefreshing) "در حال دریافت فهرست..." else "بروزرسانی شبکه‌ها")
+            }
         }
     } else {
         val visibleChannels = channels.filter {
@@ -1074,6 +1138,18 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
             }
         }.toSortedMap()
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (onRefresh != null) item(key = "refresh_channels") {
+                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Button(onClick = onRefresh, enabled = !isRefreshing, modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
+                        if (isRefreshing) CircularProgressIndicator(Modifier.size(18.dp), color = Color.Black, strokeWidth = 2.dp)
+                        else Icon(Icons.Default.Sync, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(if (isRefreshing) "در حال دریافت فهرست تازه..." else "بروزرسانی شبکه‌ها")
+                    }
+                    if (lastRefresh.isNotBlank()) Text("آخرین بروزرسانی موفق: $lastRefresh", color = MutedText, fontSize = 10.sp)
+                }
+            }
             item(key = "channel_search") {
                 OutlinedTextField(
                     value = searchQuery,
