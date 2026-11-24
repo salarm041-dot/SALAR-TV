@@ -503,6 +503,8 @@ jobs:
           target: default
           arch: x86_64
           profile: pixel_2
+          emulator-boot-timeout: 360
+          disable-linux-hw-accel: false
           disable-animations: true
           script: |
             set -euo pipefail
