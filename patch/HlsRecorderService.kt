@@ -74,9 +74,7 @@ class HlsRecorderService : Service() {
                     val extension = recordingExtension(contentType, streamUrl)
                     val target = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + "." + extension)
                     output = target
-                    probe.connectTimeout = 15000
-                    probe.readTimeout = 20000
-                    probe.setRequestProperty("User-Agent", "SALAR-TV/1.2")
+                    // openConnection() has already connected and applied headers/timeouts.
                     val response = probe.responseCode
                     if (response !in 200..299) error("HTTP $response")
                     probe.inputStream.use { input ->
