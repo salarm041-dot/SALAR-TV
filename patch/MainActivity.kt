@@ -890,7 +890,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> TvCountryPage(onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" })
                     "شبکه‌های عربی" -> ArabicCountryPage(onCountry = { country -> page = "عربی:$country" })
-                    "کشور:ایران", "کشور:ترکیه", "کشور:آذربایجان", "کشور:سایر" -> {
+                    "کشور:ایران", "کشور:ترکیه", "کشور:آذربایجان", "کشور:اسرائیل", "کشور:سایر" -> {
                         val country = page.removePrefix("کشور:")
                         val arabicCountries = setOf("عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی", "یمن", "سودان")
                         val filtered = channels.filter { c ->
@@ -898,9 +898,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 "ایران" -> c.country == "ایران"
                                 "ترکیه" -> c.country == "ترکیه"
                                 "آذربایجان" -> c.country == "آذربایجان" || c.country == "جمهوری آذربایجان"
+                                "اسرائیل" -> c.country == "اسرائیل"
                                 "سایر" -> c.country == "سایر" || c.country == "خارج از ایران" ||
                                     c.country == "فارسی‌زبان خارج از ایران" ||
-                                    (c.country !in setOf("ایران", "ترکیه", "آذربایجان", "جمهوری آذربایجان") && c.country !in arabicCountries)
+                                    (c.country !in setOf("ایران", "ترکیه", "آذربایجان", "جمهوری آذربایجان", "اسرائیل") && c.country !in arabicCountries)
                                 else -> false
                             }
                         }
@@ -1262,6 +1263,7 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
         CountryCard("ایران", "🇮🇷", "تخت جمشید", "شبکه‌های صدا و سیمای ایران", Color(0xFF42D6A4)),
         CountryCard("ترکیه", "🇹🇷", "هلال و ستاره", "شبکه‌های تلویزیونی ترکیه", Color(0xFFFF5A68)),
         CountryCard("آذربایجان", "🇦🇿", "شعله آتش", "شبکه‌های جمهوری آذربایجان", Color(0xFF42C8E8)),
+        CountryCard("اسرائیل", "🇮🇱", "ستاره داوود", "شبکه‌های تلویزیونی اسرائیل؛ خبری، عمومی و فرهنگی", Color(0xFF65A9FF)),
         CountryCard("عربی", "🌍", "نشان جهان عرب", "فهرست آماده شبکه‌ها به تفکیک ۱۸ کشور", Color(0xFFFFB74D)),
         CountryCard("سایر", "🌐", "نشان جهان", "شبکه‌های بین‌المللی و سایر کشورها", Color(0xFFFFD45C))
     )
@@ -1273,6 +1275,7 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
                 "ایران" -> Icons.Default.AccountBalance
                 "ترکیه" -> Icons.Default.Brightness4
                 "آذربایجان" -> Icons.Default.LocalFireDepartment
+                "اسرائیل" -> Icons.Default.Star
                 "عربی" -> Icons.Default.Public
                 else -> Icons.Default.Language
             }
