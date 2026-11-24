@@ -519,17 +519,10 @@ jobs:
           disable-linux-hw-accel: auto
           disable-animations: true
           script: |
-            set -euo pipefail
-            echo "Smoke-test working directory: $(pwd)"
-            echo "GitHub workspace: $GITHUB_WORKSPACE"
-            ls -lah "$GITHUB_WORKSPACE"
-            APK="$(find "$GITHUB_WORKSPACE" -maxdepth 4 -type f -name 'SALAR-TV-emulator.apk' -print -quit)"
-            if [ -z "$APK" ]; then
-              echo "Emulator APK not found; diagnostic APK files:"
-              find "$GITHUB_WORKSPACE" -maxdepth 8 -type f -name '*.apk' -print
-              exit 1
-            fi
+            set -eu
+            APK="$SALAR_TV_EMULATOR_APK_PATH"
             echo "Installing emulator APK: $APK"
+            test -f "$APK"
             adb install -r "$APK"
             adb logcat -c
             adb shell am force-stop com.salar.tv || true
