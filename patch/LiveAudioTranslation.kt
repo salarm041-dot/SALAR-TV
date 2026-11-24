@@ -111,20 +111,36 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
 
     fun stopCapture() {
         runningFlag.set(false)
+        val threadToJoin = recognitionThread
+        val recognizerToClose = recognizer
+        val voskToClose = modelInstance
+        val whisperToClose = whisperModelInstance
         runCatching { recorder?.stop() }
         runCatching { recorder?.release() }
         recorder = null
         runCatching { projection?.stop() }
         projection = null
-        recognitionThread?.interrupt()
+        threadToJoin?.interrupt()
         recognitionThread = null
-        runCatching { recognizer?.close() }
         recognizer = null
-        runCatching { modelInstance?.close() }
         modelInstance = null
-        runCatching { whisperModelInstance?.let { HebrewWhisperEngine.releaseModel(it) } }
         whisperModelInstance = null
         isRunning = false
+
+        // Whisper uses native inference. Never free its native model while a chunk
+        // is still being transcribed on the capture thread.
+        if (threadToJoin != null) {
+            Thread({
+                runCatching { threadToJoin.join() }
+                runCatching { recognizerToClose?.close() }
+                runCatching { voskToClose?.close() }
+                runCatching { whisperToClose?.let { HebrewWhisperEngine.releaseModel(it) } }
+            }, "SalarTvSpeechCleanup").apply { isDaemon = true; start() }
+        } else {
+            runCatching { recognizerToClose?.close() }
+            runCatching { voskToClose?.close() }
+            runCatching { whisperToClose?.let { HebrewWhisperEngine.releaseModel(it) } }
+        }
     }
 
     fun translateText(source: String) {
