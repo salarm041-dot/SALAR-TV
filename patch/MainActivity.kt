@@ -585,7 +585,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
                         var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
                         var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
-                        var menuDubbingVoice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
+                        var menuDubbingVoice by remember { mutableStateOf(if (prefs.getString("live_dubbing_voice", "زیر") == "بم" || prefs.getString("live_dubbing_voice", "") == "مرد") "بم" else "زیر") }
                         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
                             AndroidView(
                                 factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
@@ -703,9 +703,9 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                                 prefs.edit().putBoolean("live_subtitle_enabled", it).apply()
                                             })
                                         }
-                                        Text("صدای دوبله")
+                                        Text("زیر و بمی صدای دوبله")
                                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            listOf("زن", "مرد").forEach { voiceOption ->
+                                            listOf("زیر", "بم").forEach { voiceOption ->
                                                 FilterChip(selected = menuDubbingVoice == voiceOption, onClick = {
                                                     menuDubbingVoice = voiceOption
                                                     prefs.edit().putString("live_dubbing_voice", voiceOption).apply()
@@ -2044,7 +2044,7 @@ fun LiveDubbingPage() {
     var subtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
     var enabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
     var keepOriginal by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
-    var voice by remember { mutableStateOf(prefs.getString("live_dubbing_voice", "زن") ?: "زن") }
+    var voice by remember { mutableStateOf(if (prefs.getString("live_dubbing_voice", "زیر") == "بم" || prefs.getString("live_dubbing_voice", "") == "مرد") "بم" else "زیر") }
     var volume by remember { mutableFloatStateOf(prefs.getFloat("live_dubbing_volume", 1f)) }
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("مترجم و دوبلور هوشمند زنده", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -2053,7 +2053,7 @@ fun LiveDubbingPage() {
                 Text("وضعیت موتور هوش مصنوعی", color = Gold, fontWeight = FontWeight.Bold)
                 Text("ترجمهٔ زیرنویس به فارسی فعال است. هنگام پخش، برنامه اولین زیرنویس متنیِ قابل‌استفادهٔ شبکه را خودکار انتخاب و ترجمه می‌کند.",
                     color = Color(0xFFFFCC80), fontSize = 12.sp)
-                Text("در اولین استفاده، مدل زبان با اینترنت دانلود می‌شود. اگر شبکه زیرنویس متنی نداشته باشد، ترجمهٔ زیرنویس ممکن نیست؛ دوبلهٔ صوتیِ مستقل هنوز فعال نشده است.",
+                Text("برای دوبلهٔ صوتی، دوبلهٔ هوشمند را روشن کنید. خروجی از موتور گفتار فارسی نصب‌شده در گوشی ساخته می‌شود؛ گزینه‌های زیر و بم فقط زیر و بمی صدا را تغییر می‌دهند و جنسیت صدا به موتور دستگاه بستگی دارد.",
                     color = SecondaryText, fontSize = 12.sp)
             }
         }
@@ -2078,9 +2078,9 @@ fun LiveDubbingPage() {
                 prefs.edit().putBoolean("live_dubbing_enabled", it).apply()
             })
         }
-        Text("صدای دوبله", color = Gold, fontWeight = FontWeight.Bold)
+        Text("زیر و بمی صدای دوبله", color = Gold, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("زن", "مرد").forEach { option ->
+            listOf("زیر", "بم").forEach { option ->
                 FilterChip(selected = voice == option, onClick = {
                     voice = option
                     prefs.edit().putString("live_dubbing_voice", option).apply()
