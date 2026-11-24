@@ -494,8 +494,19 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
         staging.deleteRecursively()
         throw IllegalStateException("ساختار مدل گفتار معتبر نیست.")
     }
-    if (target.exists()) target.deleteRecursively()
-    if (!staging.renameTo(target)) throw IllegalStateException("انتقال مدل به پوشهٔ نهایی ناموفق بود.")
+    val backup = File(base, "${model.id}-previous")
+    if (backup.exists()) backup.deleteRecursively()
+    val hadPrevious = target.exists()
+    if (hadPrevious && !target.renameTo(backup)) {
+        staging.deleteRecursively()
+        throw IllegalStateException("حفظ مدل قبلی پیش از جایگزینی ناموفق بود.")
+    }
+    if (!staging.renameTo(target)) {
+        if (hadPrevious) backup.renameTo(target)
+        staging.deleteRecursively()
+        throw IllegalStateException("انتقال مدل به پوشهٔ نهایی ناموفق بود؛ مدل قبلی حفظ شد.")
+    }
+    backup.deleteRecursively()
     // Retain just one downloaded language model to limit app storage usage.
     base.listFiles()?.filter { it.isDirectory && it.name != model.id }
         ?.forEach { it.deleteRecursively() }
