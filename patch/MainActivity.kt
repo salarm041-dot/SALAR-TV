@@ -169,13 +169,18 @@ fun SalarTvApp(isInPip: Boolean = false) {
         val bundled = runCatching {
             context.assets.open("channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
         }.getOrDefault(emptyList())
+        // Replace obsolete built-in pilgrimage links without touching user-added locations.
+        val obsoletePilgrimageUrls = setOf(
+            "https://en.imamali.net/live/",
+            "https://www.youtube.com/embed/kYqGbBqmp8g?autoplay=1&playsinline=1",
+            "https://www.youtube.com/embed/9A1S0xAPVIs?autoplay=1&playsinline=1"
+        )
+        channels.removeAll { it.country == "زیارت آنلاین" && it.url in obsoletePilgrimageUrls }
         val pilgrimage = listOf(
-            Channel("حرم مطهر رضوی — پخش زنده رسمی", "https://haram.razavi.ir/live", "زیارت آنلاین", "وب", groupTitle = "مشهد مقدس"),
-            Channel("حرم امام حسین (ع) — پخش زنده رسمی", "https://imamhussain.gov.iq/english/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
-            Channel("حرم امام علی (ع) — پخش زنده رسمی", "https://en.imamali.net/live/", "زیارت آنلاین", "وب", groupTitle = "نجف"),
-            Channel("مسجدالحرام — پخش زنده رسمی قرآن TV", "https://www.youtube.com/embed/kYqGbBqmp8g?autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه"),
-            Channel("مسجدالنبی — پخش زنده رسمی سنت TV", "https://www.youtube.com/embed/9A1S0xAPVIs?autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مدینه منوره"),
-            Channel("پخش زنده ۲۴ ساعته عتبات مقدسه", "https://imamhusseintv.com/en/live/6", "زیارت آنلاین", "وب", groupTitle = "سایر اماکن مذهبی")
+            Channel("حرم مطهر رضوی — پخش زنده رسمی ۲۴ ساعته", "https://haram.razavi.ir/live", "زیارت آنلاین", "وب", groupTitle = "مشهد مقدس"),
+            Channel("حرم امام حسین (ع) — پخش رسمی (۹ تا ۲۱)", "https://imamhussain.gov.iq/english/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
+            Channel("عتبات مقدسه عراق — پخش زنده رسمی ۲۴ ساعته", "https://imamhusseintv.com/en/live/6", "زیارت آنلاین", "وب", groupTitle = "نجف و عتبات عراق"),
+            Channel("مسجدالحرام مکه — پخش زنده قرآن TV رسمی", "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA&autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه")
         )
         val arabic = runCatching {
             context.assets.open("arabic-channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
@@ -479,8 +484,53 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                     settings.javaScriptEnabled = true
                                     settings.domStorageEnabled = true
                                     settings.mediaPlaybackRequiresUserGesture = false
-                                    webViewClient = android.webkit.WebViewClient()
-                                    webChromeClient = android.webkit.WebChromeClient()
+                                    settings.loadsImagesAutomatically = true
+                                    settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                                    webViewClient = object : android.webkit.WebViewClient() {
+                                        override fun onReceivedError(
+                                            view: android.webkit.WebView,
+                                            request: android.webkit.WebResourceRequest,
+                                            error: android.webkit.WebResourceError
+                                        ) {
+                                            if (request.isForMainFrame) {
+                                                android.widget.Toast.makeText(ctx, "بارگذاری صفحه پخش ناموفق بود؛ اتصال اینترنت یا دسترسی منطقه‌ای را بررسی کن.", android.widget.Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                    val hostActivity = ctx as? android.app.Activity
+                                    val originalUiFlags = hostActivity?.window?.decorView?.systemUiVisibility ?: 0
+                                    webChromeClient = object : android.webkit.WebChromeClient() {
+                                        private var fullscreenView: android.view.View? = null
+                                        private var fullscreenCallback: android.webkit.WebChromeClient.CustomViewCallback? = null
+                                        override fun onShowCustomView(view: android.view.View, callback: android.webkit.WebChromeClient.CustomViewCallback) {
+                                            val decor = hostActivity?.window?.decorView as? android.widget.FrameLayout
+                                            if (decor == null || fullscreenView != null) {
+                                                callback.onCustomViewHidden()
+                                                return
+                                            }
+                                            fullscreenView = view
+                                            fullscreenCallback = callback
+                                            decor.addView(view, android.widget.FrameLayout.LayoutParams(
+                                                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                                                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                                            ))
+                                            hostActivity.window.decorView.systemUiVisibility =
+                                                (android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
+                                                    or android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                                    or android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                                    or android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                                    or android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                                    or android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+                                        }
+                                        override fun onHideCustomView() {
+                                            val decor = hostActivity?.window?.decorView as? android.widget.FrameLayout
+                                            fullscreenView?.let { decor?.removeView(it) }
+                                            fullscreenView = null
+                                            hostActivity?.window?.decorView?.systemUiVisibility = originalUiFlags
+                                            fullscreenCallback?.onCustomViewHidden()
+                                            fullscreenCallback = null
+                                        }
+                                    }
                                     android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
                                     loadUrl(webUrl)
                                 }
@@ -488,7 +538,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             update = { view -> if (view.url != webUrl) view.loadUrl(webUrl) },
                             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f)
                         )
-                        Text("پخش از درگاه رسمی؛ در صورت محدودیت منطقه‌ای یا توقف پخش، ممکن است صفحه باز شود ولی ویدئو اجرا نشود.",
+                        Text("صفحهٔ پخش رسمی درون برنامه باز می‌شود؛ دکمهٔ تمام‌صفحهٔ ویدئو نیز پشتیبانی می‌شود. دسترسی نهایی به وضعیت پخش منبع و اینترنت بستگی دارد.",
                             color = SecondaryText, fontSize = 11.sp)
                     } else if (!useExternalPlayer) {
                         var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
@@ -1641,8 +1691,16 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
             Card(colors = CardDefaults.cardColors(containerColor = Panel)) {
                 Column(Modifier.fillMaxWidth().padding(14.dp)) {
                     Icon(Icons.Default.Place, null, tint = Gold, modifier = Modifier.size(30.dp))
-                    Text("هنوز لینک پخش زنده‌ای برای $place ثبت نشده است.", color = TextMain, fontWeight = FontWeight.SemiBold)
-                    Text("نشانی پخش رسمی یا مجاز را در کادر زیر وارد کن.", color = SecondaryText, fontSize = 12.sp)
+                    Text(
+                        if (place == "مدینه منوره") "فعلاً پخش زندهٔ ۲۴ ساعتهٔ قابل‌تأیید برای مسجدالنبی در دسترس نیست."
+                        else "هنوز لینک پخش زنده‌ای برای $place ثبت نشده است.",
+                        color = TextMain, fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        if (place == "مدینه منوره") "در آخرین بررسی، پخش ۲۴ ساعتهٔ سنت TV آفلاین گزارش شده بود؛ برای جلوگیری از نمایش پخش خراب، لینک غیرفعال اضافه نشده است."
+                        else "نشانی پخش رسمی یا مجاز را در کادر زیر وارد کن.",
+                        color = SecondaryText, fontSize = 12.sp
+                    )
                 }
             }
         } else {
@@ -1658,7 +1716,8 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
         Button(onClick = {
             val cleanUrl = streamUrl.trim()
             if (title.isNotBlank() && (cleanUrl.startsWith("https://") || cleanUrl.startsWith("http://"))) {
-                onAdd(Channel(title.trim(), cleanUrl, "زیارت آنلاین", "تلویزیون", groupTitle = place))
+                val directMedia = Regex("(?i)\\.(m3u8|mpd|mp4|ts)(?:\\?.*)?$").containsMatchIn(cleanUrl)
+                onAdd(Channel(title.trim(), cleanUrl, "زیارت آنلاین", if (directMedia) "تلویزیون" else "وب", groupTitle = place))
                 title = ""
                 streamUrl = ""
             }
