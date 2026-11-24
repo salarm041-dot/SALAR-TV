@@ -381,3 +381,61 @@ https://navairan.com/;stream.nsv
 https://stream.zeno.fm/9svfnobkrxrvv
 #EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو فاز
 https://free.rcast.net/230792
+
+# Turkey and Azerbaijan channel expansion (publicly listed HLS; availability may vary)
+#EXTINF:-1 group-title="ترکیه / عمومی",Kanal D
+https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web&ce=3
+#EXTINF:-1 group-title="ترکیه / عمومی",Star TV
+https://dogus.daioncdn.net/startv/startv_720p.m3u8?app=a20ac41e-bdc3-4aa1-934d-26b484480ac9&ce=3&sid=8l4w3lst4co5
+#EXTINF:-1 group-title="ترکیه / عمومی",ATV
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/atv/atv_1080p.m3u8
+#EXTINF:-1 group-title="ترکیه / خبری",A Haber
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/ahaber/ahaber.m3u8
+#EXTINF:-1 group-title="ترکیه / ورزشی",A Spor
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/aspor/aspor.m3u8
+#EXTINF:-1 group-title="ترکیه / خبری",NTV
+https://dogus.daioncdn.net/ntv/ntv.m3u8?app=ntv_web
+#EXTINF:-1 group-title="ترکیه / خبری",Habertürk
+https://tv.ensonhaber.com/haberturk/haberturk.m3u8
+#EXTINF:-1 group-title="ترکیه / عمومی",NOW TV
+https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv.m3u8
+#EXTINF:-1 group-title="ترکیه / عمومی",Kanal 7
+https://kanal7.blutv.com/blutv_kanal7_live/live.m3u8
+#EXTINF:-1 group-title="ترکیه / خبری",Halk TV
+https://halktv-live.daioncdn.net/halktv/halktv.m3u8
+#EXTINF:-1 group-title="ترکیه / ورزشی",HT Spor
+https://ciner.daioncdn.net/ht-spor/ht-spor.m3u8?app=web
+#EXTINF:-1 group-title="ترکیه / اقتصادی",Ekotürk
+https://cdn.ekoturk.net/hls/master.m3u8
+#EXTINF:-1 group-title="ترکیه / اقتصادی",CNBC-e
+https://hnpsechtsc.turknet.ercdn.net/xpnvudnlsv/cnbc-e/cnbc-e.m3u8
+#EXTINF:-1 group-title="ترکیه / دینی و فرهنگی",Diyanet TV
+https://eustr73.mediatriple.net/videoonlylive/mtikoimxnztxlive/broadcast_5e3bf95a47e07.smil/playlist.m3u8
+#EXTINF:-1 group-title="ترکیه / عمومی",360 TV
+https://turkmedya-live.ercdn.net/tv360/tv360.m3u8
+#EXTINF:-1 group-title="ترکیه / خبری",Flash Haber TV
+https://b01c02nl.mediatriple.net/videoonlylive/mtyycglqauzjhlive/broadcast_67c053c48829f.smil/playlist.m3u8
+#EXTINF:-1 group-title="آذربایجان / عمومی",AzTV
+https://az.tvstream.az/hls/stream9/index.m3u8
+#EXTINF:-1 group-title="آذربایجان / خبری",Baku TV
+https://rtmp.baku.tv/hls/bakutv.m3u8
+#EXTINF:-1 group-title="آذربایجان / خبری",ARB 24
+https://operativmm.az/tvs/arb24/stream/index.m3u8
+#EXTINF:-1 group-title="آذربایجان / عمومی",Space TV
+https://operativmm.az/tvs/space/stream8/index.m3u8
+#EXTINF:-1 group-title="آذربایجان / عمومی",FTV
+https://stream.ftv.az/live/ftv.m3u8
+#EXTINF:-1 group-title="آذربایجان / عمومی",GunAz TV
+https://tv.gunaz.tv/hls/live.m3u8
+#EXTINF:-1 group-title="آذربایجان / عمومی",Kanal S
+https://lives.atv.az:5443/KANAL-S/streams/kanals.m3u8
+#EXTINF:-1 group-title="آذربایجان / موسیقی",Music Azerbaijan
+https://cdn-sinematv.yayin.com.tr/sinematv/sinematv/playlist.m3u8
+#EXTINF:-1 group-title="آذربایجان / عمومی",Vilayət TV
+https://nl.livekadeh.com/hls2/vilayet.m3u8
+#EXTINF:-1 group-title="آذربایجان / خبری",Xəzər TV
+https://xezer.tvstream.az/hls/stream/main_stream.m3u8
+#EXTINF:-1 group-title="آذربایجان / موسیقی",KN Music TV
+https://cdn4.yayin.com.tr/kntv/video.m3u8
+#EXTINF:-1 group-title="آذربایجان / کودک",Balacan TV
+https://v2.catcast.tv/content/50634/seg-25745099-v1-a1/index.m3u8
