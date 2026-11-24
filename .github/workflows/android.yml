@@ -142,6 +142,32 @@ jobs:
           print("ML Kit translation and language identification dependencies configured")
           PY
 
+      - name: Configure ARM64 and emulator ABI APK outputs
+        run: |
+          python3 - "$PROJECT_DIR/app/build.gradle.kts" <<'PY'
+          import re, sys
+          from pathlib import Path
+          p = Path(sys.argv[1])
+          source = p.read_text()
+          if "splits {" not in source:
+              match = re.search(r'(?m)^android\s*\{', source)
+              if not match:
+                  raise SystemExit("android block not found; cannot configure ABI splits")
+              block = """
+              splits {
+                  abi {
+                      isEnable = true
+                      reset()
+                      include("arm64-v8a", "x86_64")
+                      isUniversalApk = false
+                  }
+              }
+          """
+              source = source[:match.end()] + block + source[match.end():]
+          p.write_text(source)
+          print("Configured separate ARM64 phone and x86_64 emulator APKs")
+          PY
+
       - name: Inspect project source
         run: |
           echo "=== PROJECT FILES ==="
@@ -411,34 +437,54 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
-          import re
+          import re, os
+
           apks = list(Path("project").glob("**/app/build/outputs/apk/debug/*.apk"))
-          if len(apks) != 1:
-              raise SystemExit(f"Expected exactly one debug APK, found {len(apks)}")
-          with ZipFile(apks[0]) as apk:
-              names = set(apk.namelist())
-              required = {"AndroidManifest.xml", "classes.dex", "assets/channels.m3u"}
-              missing = required - names
-              if missing:
-                  raise SystemExit(f"APK missing required files: {sorted(missing)}")
-              playlist = apk.read("assets/channels.m3u").decode("utf-8-sig")
-              entries = re.findall(r"(?m)^#EXTINF", playlist)
-              if len(entries) != 285:
-                  raise SystemExit(f"APK bundled playlist mismatch: expected 285 entries, found {len(entries)}")
-              if not any("شبکه‌های استانی" in line for line in playlist.splitlines()):
-                  raise SystemExit("Provincial channels metadata missing from APK")
-          apk_path = apks[0].resolve()
-          with open(__import__("os").environ["GITHUB_ENV"], "a") as env:
-              env.write(f"SALAR_TV_APK_PATH={apk_path}\n")
-          print(f"APK package OK: {apk_path}, {apks[0].stat().st_size} bytes, 156 playlist entries")
+          def find_abi_apk(abi):
+              matches = []
+              for candidate in apks:
+                  try:
+                      with ZipFile(candidate) as z:
+                          if any(name.startswith(f"lib/{abi}/") and name.endswith(".so") for name in z.namelist()):
+                              matches.append(candidate)
+                  except Exception:
+                      pass
+              if len(matches) != 1:
+                  raise SystemExit(f"Expected exactly one {abi} APK with native libraries, found {len(matches)}")
+              return matches[0]
+
+          phone_apk = find_abi_apk("arm64-v8a")
+          emulator_apk = find_abi_apk("x86_64")
+          for apk_path, abi in ((phone_apk, "arm64-v8a"), (emulator_apk, "x86_64")):
+              with ZipFile(apk_path) as apk:
+                  names = set(apk.namelist())
+                  required = {"AndroidManifest.xml", "classes.dex", "assets/channels.m3u"}
+                  missing = required - names
+                  if missing:
+                      raise SystemExit(f"{abi} APK missing required files: {sorted(missing)}")
+                  if not any(n.startswith(f"lib/{abi}/") and n.endswith(".so") for n in names):
+                      raise SystemExit(f"{abi} APK has no native libraries for its target architecture")
+                  playlist = apk.read("assets/channels.m3u").decode("utf-8-sig")
+                  entries = re.findall(r"(?m)^#EXTINF", playlist)
+                  if len(entries) != 285:
+                      raise SystemExit(f"{abi} APK playlist mismatch: expected 285 entries, found {len(entries)}")
+                  if not any("شبکه‌های استانی" in line for line in playlist.splitlines()):
+                      raise SystemExit(f"{abi} APK provincial channels metadata missing")
+
+          with open(os.environ["GITHUB_ENV"], "a") as env:
+              env.write(f"SALAR_TV_APK_PATH={phone_apk.resolve()}\n")
+              env.write(f"SALAR_TV_EMULATOR_APK_PATH={emulator_apk.resolve()}\n")
+          print(f"ARM64 phone APK OK: {phone_apk} ({phone_apk.stat().st_size} bytes)")
+          print(f"x86_64 emulator APK OK: {emulator_apk} ({emulator_apk.stat().st_size} bytes)")
           PY
 
-      - name: Stage APK for emulator container
+      - name: Stage APKs
         run: |
-          APK=$(find "$PROJECT_DIR" -path "*/app/build/outputs/apk/debug/*.apk" -print -quit)
-          test -n "$APK"
-          cp "$APK" "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
-          ls -lh "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+          test -f "$SALAR_TV_APK_PATH"
+          test -f "$SALAR_TV_EMULATOR_APK_PATH"
+          cp "$SALAR_TV_APK_PATH" "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+          cp "$SALAR_TV_EMULATOR_APK_PATH" "$GITHUB_WORKSPACE/SALAR-TV-emulator.apk"
+          ls -lh "$GITHUB_WORKSPACE/SALAR-TV-debug.apk" "$GITHUB_WORKSPACE/SALAR-TV-emulator.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -458,5 +504,5 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="${{ github.workspace }}/SALAR-TV-debug.apk"; test -f "$APK" && adb install -r "$APK" && adb shell am start -n com.salar.tv/.MainActivity && sleep 20 && adb shell dumpsys activity activities | grep -q "com.salar.tv" && (adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv" && { echo "App crashed during startup smoke test"; exit 1; } || echo "Android 11 emulator launch smoke test passed")
+            APK="${{ github.workspace }}/SALAR-TV-emulator.apk"; test -f "$APK" && adb install -r "$APK" && adb shell am start -n com.salar.tv/.MainActivity && sleep 20 && adb shell dumpsys activity activities | grep -q "com.salar.tv" && (adb logcat -d -t 5000 | grep -E "FATAL EXCEPTION|Process: com.salar.tv" && { echo "App crashed during startup smoke test"; exit 1; } || echo "Android 11 emulator launch smoke test passed")
 
