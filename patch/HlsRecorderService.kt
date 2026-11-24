@@ -38,7 +38,8 @@ class HlsRecorderService : Service() {
                     contentType.contains("mpegurl") || contentType.contains("vnd.apple")
                 if (isHls) {
                     probe.disconnect()
-                    output = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + ".ts")
+                    val target = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + ".ts")
+                    output = target
                     val seen = HashSet<String>()
                     while (running && System.currentTimeMillis() < deadline) {
                         val playlistText = downloadText(streamUrl)
@@ -61,7 +62,7 @@ class HlsRecorderService : Service() {
                             if (!running || System.currentTimeMillis() >= deadline) break
                             if (seen.add(segment)) {
                                 val bytes = downloadBytes(segment)
-                                output.appendBytes(bytes)
+                                target.appendBytes(bytes)
                                 saved += bytes.size
                                 updateNotification("در حال ضبط: $name • " + (saved / 1_048_576) + " مگابایت")
                             }
@@ -71,14 +72,15 @@ class HlsRecorderService : Service() {
                     }
                 } else {
                     val extension = recordingExtension(contentType, streamUrl)
-                    output = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + "." + extension)
+                    val target = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + "." + extension)
+                    output = target
                     probe.connectTimeout = 15000
                     probe.readTimeout = 20000
                     probe.setRequestProperty("User-Agent", "SALAR-TV/1.2")
                     val response = probe.responseCode
                     if (response !in 200..299) error("HTTP $response")
                     probe.inputStream.use { input ->
-                        output.outputStream().use { out ->
+                        target.outputStream().use { out ->
                             val buffer = ByteArray(64 * 1024)
                             var lastNotice = 0L
                             while (running && System.currentTimeMillis() < deadline) {
