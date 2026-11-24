@@ -152,8 +152,8 @@ jobs:
           urls = [url for _, url in entries]
           provincial = [meta for meta, _ in entries if "شبکه‌های استانی" in meta]
           logos = [meta for meta, _ in entries if "tvg-logo=" in meta]
-          if len(entries) != 160:
-              raise SystemExit(f"Unexpected playlist size: expected 160 entries, found {len(entries)}")
+          if len(entries) != 188:
+              raise SystemExit(f"Unexpected playlist size: expected 188 entries, found {len(entries)}")
           if len(urls) != len(set(urls)):
               raise SystemExit("Duplicate stream URLs found in bundled playlist")
           if len(provincial) != 34:
