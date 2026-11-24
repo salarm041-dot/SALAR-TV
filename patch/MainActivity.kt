@@ -289,13 +289,21 @@ fun SalarTvApp(isInPip: Boolean = false) {
 
     val selectedDynamicCountries = remember {
         mutableStateListOf<String>().apply {
-            addAll(prefs.getStringSet("home_dynamic_countries", emptySet())?.toList().orEmpty())
+            val ordered = runCatching {
+                val json = JSONArray(prefs.getString("home_dynamic_countries_order", "[]") ?: "[]")
+                List(json.length()) { json.optString(it) }.filter { it.isNotBlank() }
+            }.getOrDefault(emptyList())
+            val legacy = prefs.getStringSet("home_dynamic_countries", emptySet())?.toList().orEmpty()
+            addAll((ordered + legacy).distinct())
         }
     }
     fun rememberDynamicCountry(country: String) {
         if (country !in selectedDynamicCountries) {
             selectedDynamicCountries.add(country)
-            prefs.edit().putStringSet("home_dynamic_countries", selectedDynamicCountries.toSet()).apply()
+            prefs.edit()
+                .putString("home_dynamic_countries_order", JSONArray(selectedDynamicCountries).toString())
+                .putStringSet("home_dynamic_countries", selectedDynamicCountries.toSet())
+                .apply()
         }
     }
     var page by remember { mutableStateOf("خانه") }
@@ -987,6 +995,13 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         rememberDynamicCountry(country)
                         page = "کشور:$country"
                     }
+                    "کشورهای منتخب" -> SelectedDynamicCountriesPage(
+                        countries = selectedDynamicCountries.filter { name ->
+                            channels.any { it.kind == "تلویزیون" && it.country == name }
+                        },
+                        channels = channels,
+                        onCountry = { country -> page = "کشور:$country" }
+                    )
                     page.takeIf { it.startsWith("کشور:") } -> {
                         val country = page.removePrefix("کشور:")
                         val arabicCountries = setOf("عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن", "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی", "یمن", "سودان")
@@ -1026,7 +1041,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onPage = { destination -> page = destination },
                         dynamicCountries = selectedDynamicCountries.map { it to flagForDynamicCountry(it) }
                             .filter { pair -> channels.any { it.kind == "تلویزیون" && it.country == pair.first } },
-                        onDynamicCountry = { country -> page = "کشور:$country" })
+                        onDynamicCountry = { country -> page = "کشور:$country" },
+                        onMoreDynamicCountries = { page = "کشورهای منتخب" })
                 }
             }
         }
@@ -1209,7 +1225,8 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
              onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {},
              onPage: (String) -> Unit = {},
              dynamicCountries: List<Pair<String, String>> = emptyList(),
-             onDynamicCountry: (String) -> Unit = {}) {
+             onDynamicCountry: (String) -> Unit = {},
+             onMoreDynamicCountries: () -> Unit = {}) {
     val tvCount = channels.count { it.kind == "تلویزیون" }
     val radioCount = channels.count { it.kind == "رادیو" }
     @Composable
@@ -1284,35 +1301,57 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                 Modifier.weight(1f)) { onPage("تنظیمات") }
         }
         if (dynamicCountries.isNotEmpty()) {
+            val homeCountries = dynamicCountries.take(6)
+            val overflowCountries = dynamicCountries.drop(6)
             Text("کشورهای انتخاب‌شده", color = Color(0xFFFFD45C), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            dynamicCountries.chunked(2).forEach { pair ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    pair.forEach { (countryName, flag) ->
+            homeCountries.chunked(3).forEach { rowCountries ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                    rowCountries.forEach { (countryName, flag) ->
                         Card(
                             modifier = Modifier.weight(1f).clickable { onDynamicCountry(countryName) },
-                            shape = RoundedCornerShape(18.dp),
+                            shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = Color(0xFF111116)),
                             elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)
                         ) {
-                            Row(
+                            Column(
                                 Modifier.fillMaxWidth().background(
-                                    androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                        listOf(Color(0xFF5B461B).copy(alpha = 0.32f), Color(0xFF17171D), Color(0xFF09090C))
+                                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                                        listOf(Color(0xFF5B461B).copy(alpha = 0.32f), Color(0xFF111116), Color(0xFF09090C))
                                     )
-                                ).padding(13.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                ).padding(vertical = 12.dp, horizontal = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(5.dp)
                             ) {
-                                Text(flag, fontSize = 30.sp)
-                                Spacer(Modifier.width(9.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text(countryName, color = Color(0xFFFFD978), fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                                    Text("شبکه‌های تلویزیونی", color = Color(0xFFBDB8AA), fontSize = 9.sp)
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(flag, fontSize = 28.sp)
+                                    Icon(dynamicCountryEmblem(countryName), null, tint = Color(0xFFFFD45C),
+                                        modifier = Modifier.align(Alignment.BottomEnd).size(14.dp))
                                 }
-                                Icon(Icons.Default.PlayCircleFilled, null, tint = Color(0xFFFFD45C), modifier = Modifier.size(23.dp))
+                                Text(countryName, color = Color(0xFFFFD978), fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold, maxLines = 1)
+                                Text("شبکه تلویزیونی", color = Color(0xFFBDB8AA), fontSize = 8.sp, maxLines = 1)
                             }
                         }
                     }
-                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                    repeat(3 - rowCountries.size) { Spacer(Modifier.weight(1f)) }
+                }
+            }
+            if (overflowCountries.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { onMoreDynamicCountries() },
+                    shape = RoundedCornerShape(17.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF17130C)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)
+                ) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Public, null, tint = Color(0xFFFFD45C), modifier = Modifier.size(30.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("کشورهای منتخب", color = Color(0xFFFFD978), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                            Text("${overflowCountries.size} کشور دیگر", color = Color(0xFFBDB8AA), fontSize = 10.sp)
+                        }
+                        Icon(Icons.Default.ChevronLeft, null, tint = Color(0xFFFFD45C), modifier = Modifier.size(24.dp))
+                    }
                 }
             }
         }
@@ -1330,6 +1369,63 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
             }
         }
     }
+}
+
+@Composable
+fun SelectedDynamicCountriesPage(
+    countries: List<String>,
+    channels: List<Channel>,
+    onCountry: (String) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("کشورهای منتخب", color = Color(0xFFFFD45C), fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
+        Text("کشورهای بعد از شش جایگاه نخست؛ به ترتیب انتخاب شما",
+            color = SecondaryText, fontSize = 12.sp)
+        if (countries.isEmpty()) {
+            Text("کشور دیگری برای نمایش انتخاب نشده است.", color = SecondaryText)
+        } else {
+            countries.drop(6).forEachIndexed { index, name ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { onCountry(name) },
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF101015)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().background(
+                            androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                listOf(Color(0xFF5B461B).copy(alpha = 0.28f), Color(0xFF17171D), Color(0xFF09090C))
+                            )
+                        ).padding(15.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(Modifier.size(52.dp), contentAlignment = Alignment.Center) {
+                            Text(flagForDynamicCountry(name), fontSize = 36.sp)
+                            Icon(dynamicCountryEmblem(name), null, tint = Color(0xFFFFD45C),
+                                modifier = Modifier.align(Alignment.BottomEnd).size(18.dp))
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(name, color = Color(0xFFFFD978), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text("${channels.count { it.kind == "تلویزیون" && it.country == name }} شبکه تلویزیونی",
+                                color = Color(0xFFBDB8AA), fontSize = 10.sp)
+                        }
+                        Icon(Icons.Default.PlayCircleFilled, null, tint = Color(0xFFFFD45C), modifier = Modifier.size(25.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun dynamicCountryEmblem(name: String): androidx.compose.ui.graphics.vector.ImageVector = when (name.trim()) {
+    "آلمان", "فرانسه", "ایتالیا", "روسیه", "چین" -> Icons.Default.AccountBalance
+    "ترکیه" -> Icons.Default.Brightness4
+    "آذربایجان" -> Icons.Default.LocalFireDepartment
+    "ژاپن" -> Icons.Default.WbSunny
+    "آمریکا", "ایالات متحده", "اسرائیل" -> Icons.Default.Star
+    "بریتانیا", "انگلستان" -> Icons.Default.Castle
+    else -> Icons.Default.Public
 }
 
 @Composable
