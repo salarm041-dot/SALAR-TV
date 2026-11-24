@@ -575,6 +575,9 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(12.dp)
                                 )
                             }
+                            LiveAudioTranslationOverlay(
+                                modifier = Modifier.align(Alignment.TopStart).fillMaxWidth(0.92f).padding(8.dp)
+                            )
                             Box(Modifier.align(Alignment.TopEnd).padding(8.dp)) {
                                 IconButton(
                                     onClick = { playerMenuExpanded = true },
