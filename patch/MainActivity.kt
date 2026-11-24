@@ -1229,13 +1229,20 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
         CountryCard("ایران", "🇮🇷", "تخت جمشید", "شبکه‌های صدا و سیمای ایران", Color(0xFF42D6A4)),
         CountryCard("ترکیه", "🇹🇷", "هلال و ستاره", "شبکه‌های تلویزیونی ترکیه", Color(0xFFFF5A68)),
         CountryCard("آذربایجان", "🇦🇿", "شعله آتش", "شبکه‌های جمهوری آذربایجان", Color(0xFF42C8E8)),
-        CountryCard("عربی", "🌍", "شبکه‌های عربی", "فهرست آماده شبکه‌ها به تفکیک ۱۸ کشور", Color(0xFFFFB74D)),
-        CountryCard("سایر", "🌐", "جهان", "شبکه‌های بین‌المللی و سایر کشورها", Color(0xFFFFD45C))
+        CountryCard("عربی", "🌍", "نشان جهان عرب", "فهرست آماده شبکه‌ها به تفکیک ۱۸ کشور", Color(0xFFFFB74D)),
+        CountryCard("سایر", "🌐", "نشان جهان", "شبکه‌های بین‌المللی و سایر کشورها", Color(0xFFFFD45C))
     )
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("شبکه‌های تلویزیونی", color = Color(0xFFFFD45C), fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
         Text("کشور موردنظر را انتخاب کنید", color = SecondaryText, fontSize = 12.sp)
         countries.forEach { country ->
+            val emblem = when (country.name) {
+                "ایران" -> Icons.Default.AccountBalance
+                "ترکیه" -> Icons.Default.Brightness4
+                "آذربایجان" -> Icons.Default.LocalFireDepartment
+                "عربی" -> Icons.Default.Public
+                else -> Icons.Default.Language
+            }
             Card(
                 modifier = Modifier.fillMaxWidth().clickable { onCountry(country.name) },
                 shape = RoundedCornerShape(22.dp),
@@ -1250,7 +1257,21 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
                     ).padding(18.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(country.flag, fontSize = 38.sp)
+                    Box(
+                        modifier = Modifier.size(76.dp)
+                            .background(country.color.copy(alpha = 0.13f), RoundedCornerShape(18.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(country.flag, fontSize = 39.sp)
+                        Box(
+                            modifier = Modifier.align(Alignment.BottomEnd).size(31.dp)
+                                .background(Color(0xFF09090C), RoundedCornerShape(50)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(emblem, contentDescription = country.symbol, tint = country.color,
+                                modifier = Modifier.size(21.dp))
+                        }
+                    }
                     Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(country.name, color = Color(0xFFFFD978), fontSize = 18.sp, fontWeight = FontWeight.Bold)
