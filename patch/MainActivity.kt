@@ -827,10 +827,13 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         lockedUrls = lockedChannelUrls.toSet(),
                         currentPinHash = childPinHash,
                         onBack = { page = "تنظیمات" },
-                        onToggle = { channel, locked ->
-                            if (locked && channel.url !in lockedChannelUrls) lockedChannelUrls.add(channel.url)
-                            else if (!locked) lockedChannelUrls.remove(channel.url)
-                            saveLockedChannels()
+                        onToggle = { channel, locked, enteredPin ->
+                            if (hashChildPin(enteredPin) == childPinHash) {
+                                if (locked && channel.url !in lockedChannelUrls) lockedChannelUrls.add(channel.url)
+                                else if (!locked) lockedChannelUrls.remove(channel.url)
+                                saveLockedChannels()
+                                true
+                            } else false
                         },
                         onSavePin = { oldPin, newPin ->
                             val oldMatches = childPinHash.isBlank() || hashChildPin(oldPin) == childPinHash
@@ -1864,7 +1867,7 @@ fun ChildLockPage(
     lockedUrls: Set<String>,
     currentPinHash: String,
     onBack: () -> Unit,
-    onToggle: (Channel, Boolean) -> Unit,
+    onToggle: (Channel, Boolean, String) -> Boolean,
     onSavePin: (String, String) -> Boolean
 ) {
     var showPinEditor by remember { mutableStateOf(false) }
@@ -1872,6 +1875,9 @@ fun ChildLockPage(
     var newPin by remember { mutableStateOf("") }
     var confirmPin by remember { mutableStateOf("") }
     var pinError by remember { mutableStateOf("") }
+    var pendingLockChange by remember { mutableStateOf<Pair<Channel, Boolean>?>(null) }
+    var accessPin by remember { mutableStateOf("") }
+    var accessError by remember { mutableStateOf("") }
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         TextButton(onClick = onBack) {
             Icon(Icons.Default.ArrowBack, contentDescription = null)
@@ -1907,12 +1913,39 @@ fun ChildLockPage(
                         Switch(
                             checked = channel.url in lockedUrls,
                             enabled = currentPinHash.isNotBlank(),
-                            onCheckedChange = { onToggle(channel, it) }
+                            onCheckedChange = {
+                                pendingLockChange = channel to it
+                                accessPin = ""
+                                accessError = ""
+                            }
                         )
                     }
                 }
             }
         }
+    }
+    if (pendingLockChange != null) {
+        AlertDialog(
+            onDismissRequest = { pendingLockChange = null },
+            title = { Text("تأیید رمز والد", color = Gold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("برای تغییر وضعیت قفل این شبکه، رمز والد را وارد کنید.")
+                    OutlinedTextField(accessPin, { accessPin = it.filter(Char::isDigit).take(8); accessError = "" },
+                        label = { Text("رمز والد") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+                    if (accessError.isNotBlank()) Text(accessError, color = MaterialTheme.colorScheme.error)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val change = pendingLockChange
+                    if (change != null && onToggle(change.first, change.second, accessPin)) pendingLockChange = null
+                    else accessError = "رمز والد صحیح نیست."
+                }) { Text("تأیید", color = Gold) }
+            },
+            dismissButton = { TextButton(onClick = { pendingLockChange = null }) { Text("انصراف") } }
+        )
     }
     if (showPinEditor) {
         AlertDialog(
@@ -1987,7 +2020,7 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
                     color = SecondaryText, fontSize = 12.sp)
                 Button(onClick = onChildLock, modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
-                    Icon(Icons.Default.ChildCare, contentDescription = null)
+                    Icon(Icons.Default.Security, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
                     Text("مدیریت قفل کودک")
                 }
