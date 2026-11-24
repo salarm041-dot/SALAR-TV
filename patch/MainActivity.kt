@@ -4,6 +4,14 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import kotlinx.coroutines.delay
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.Dispatchers
@@ -132,7 +140,81 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pipMode = isInPictureInPictureMode
-        setContent { SalarTvApp(isInPip = pipMode) }
+        setContent {
+            SalarTvLaunch(isInPip = pipMode) {
+                SalarTvApp(isInPip = pipMode)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
+    var showSplash by remember { mutableStateOf(!isInPip) }
+    LaunchedEffect(isInPip) {
+        if (isInPip) {
+            showSplash = false
+        } else {
+            showSplash = true
+            delay(2300)
+            showSplash = false
+        }
+    }
+    if (showSplash) {
+        val pulse = rememberInfiniteTransition(label = "salarSplash")
+            .animateFloat(
+                initialValue = 0.96f,
+                targetValue = 1.04f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 1050),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "logoPulse"
+            )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF050505)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_salar_tv),
+                    contentDescription = "SALAR TV",
+                    modifier = Modifier
+                        .size(148.dp)
+                        .graphicsLayer {
+                            scaleX = pulse.value
+                            scaleY = pulse.value
+                        }
+                )
+                Spacer(modifier = Modifier.height(22.dp))
+                Text(
+                    text = "SALAR TV",
+                    color = Color(0xFFE2B85F),
+                    fontSize = 29.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "سید سالار موسوی ملکی",
+                    color = Color(0xFFF5F1E8),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "نسخه ۱٫۳٫۰",
+                    color = Color(0xFFB9A477),
+                    fontSize = 12.sp
+                )
+            }
+        }
+    } else {
+        content()
     }
 }
 
