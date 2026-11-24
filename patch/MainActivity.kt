@@ -1859,7 +1859,7 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
 private fun hashChildPin(pin: String): String =
     java.security.MessageDigest.getInstance("SHA-256")
         .digest(pin.toByteArray(Charsets.UTF_8))
-        .joinToString("") { "%02x".format(it) }
+        .joinToString("") { "%02x".format(it.toInt() and 0xff) }
 
 @Composable
 fun ChildLockPage(
