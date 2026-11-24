@@ -381,7 +381,7 @@ private fun ensureSpeechModel(context: Context, model: LiveSpeechModel): File {
     ZipInputStream(BufferedInputStream(archive.inputStream())).use { zip ->
         var entry = zip.nextEntry
         while (entry != null) {
-            val normalized = entry.name.replace('\\\\', '/')
+            val normalized = entry.name.replace('\\', '/')
             val relative = normalized.substringAfter('/', normalized).trimStart('/')
             if (relative.isNotBlank()) {
                 val output = File(staging, relative)
