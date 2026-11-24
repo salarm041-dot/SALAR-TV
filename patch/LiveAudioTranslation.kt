@@ -118,39 +118,6 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             .addOnFailureListener { status = "دریافت مدل ترجمه ناموفق بود؛ اینترنت را بررسی کنید." }
     }
 
-    fun requestCapture() {
-        val manager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-        projectionLauncher.launch(manager.createScreenCaptureIntent())
-    }
-
-    fun prepareAndRequest() {
-        if (isPreparing || isRunning) return
-        if (Build.VERSION.SDK_INT < 29) {
-            status = "ترجمهٔ صدای داخلی به اندروید ۱۰ یا بالاتر نیاز دارد."
-            return
-        }
-        isPreparing = true
-        status = "در حال آماده‌سازی مدل تشخیص گفتار؛ دانلود اولیه ممکن است حدود ۴۰ مگابایت باشد…"
-        val chosen = models.first { it.id == selectedModel }
-        executor.execute {
-            try {
-                val modelDir = ensureSpeechModel(context, chosen)
-                val loadedModel = Model(modelDir.absolutePath)
-                mainHandler.post {
-                    modelInstance = loadedModel
-                    isPreparing = false
-                    status = "مدل آماده شد؛ مجوز ضبط صدای داخلی را تأیید کنید."
-                    requestCapture()
-                }
-            } catch (e: Exception) {
-                mainHandler.post {
-                    isPreparing = false
-                    status = "آماده‌سازی مدل ناموفق بود: ${e.localizedMessage ?: e.javaClass.simpleName}"
-                }
-            }
-        }
-    }
-
     val projectionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -230,6 +197,41 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             }
         }
     }
+
+    fun requestCapture() {
+        val manager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        projectionLauncher.launch(manager.createScreenCaptureIntent())
+    }
+
+    fun prepareAndRequest() {
+        if (isPreparing || isRunning) return
+        if (Build.VERSION.SDK_INT < 29) {
+            status = "ترجمهٔ صدای داخلی به اندروید ۱۰ یا بالاتر نیاز دارد."
+            return
+        }
+        isPreparing = true
+        status = "در حال آماده‌سازی مدل تشخیص گفتار؛ دانلود اولیه ممکن است حدود ۴۰ مگابایت باشد…"
+        val chosen = models.first { it.id == selectedModel }
+        executor.execute {
+            try {
+                val modelDir = ensureSpeechModel(context, chosen)
+                val loadedModel = Model(modelDir.absolutePath)
+                mainHandler.post {
+                    modelInstance = loadedModel
+                    isPreparing = false
+                    status = "مدل آماده شد؛ مجوز ضبط صدای داخلی را تأیید کنید."
+                    requestCapture()
+                }
+            } catch (e: Exception) {
+                mainHandler.post {
+                    isPreparing = false
+                    status = "آماده‌سازی مدل ناموفق بود: ${e.localizedMessage ?: e.javaClass.simpleName}"
+                }
+            }
+        }
+    }
+
+
 
     val audioPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
