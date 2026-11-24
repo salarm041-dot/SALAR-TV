@@ -6,7 +6,9 @@ import dev.ffmpegkit.whisper.WhisperConfig
 import dev.ffmpegkit.whisper.WhisperModel
 import dev.ffmpegkit.whisper.WhisperResult
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.security.MessageDigest
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -20,14 +22,15 @@ internal object HebrewWhisperEngine {
     private const val MODEL_URL =
         "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin"
     private const val MODEL_FILE = "ggml-tiny.bin"
-    private const val MIN_MODEL_BYTES = 50L * 1024L * 1024L
+    private const val MODEL_BYTES = 77691713L
+    private const val MODEL_SHA256 = "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21"
 
     private fun modelFile(context: Context): File =
         File(File(context.filesDir, "salar-whisper"), MODEL_FILE)
 
     fun isModelDownloaded(context: Context): Boolean {
         val file = modelFile(context)
-        return file.isFile && file.length() >= MIN_MODEL_BYTES
+        return file.isFile && file.length() == MODEL_BYTES
     }
 
     /**
@@ -82,9 +85,23 @@ internal object HebrewWhisperEngine {
             connection.disconnect()
         }
 
-        if (!temporary.isFile || temporary.length() < MIN_MODEL_BYTES) {
+        if (!temporary.isFile || temporary.length() != MODEL_BYTES) {
             temporary.delete()
-            throw IllegalStateException("فایل مدل عبری ناقص یا نامعتبر است.")
+            throw IllegalStateException("حجم فایل مدل عبری با نسخهٔ رسمی مطابقت ندارد.")
+        }
+        val digest = MessageDigest.getInstance("SHA-256")
+        FileInputStream(temporary).use { input ->
+            val buffer = ByteArray(128 * 1024)
+            while (true) {
+                val count = input.read(buffer)
+                if (count < 0) break
+                digest.update(buffer, 0, count)
+            }
+        }
+        val actualSha256 = digest.digest().joinToString("") { "%02x".format(it) }
+        if (!actualSha256.equals(MODEL_SHA256, ignoreCase = true)) {
+            temporary.delete()
+            throw IllegalStateException("اعتبارسنجی SHA-256 مدل عبری ناموفق بود؛ مدل قبلی حفظ شد.")
         }
         if (destination.exists() && !destination.delete()) {
             temporary.delete()
