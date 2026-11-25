@@ -632,41 +632,45 @@ fun SalarTvApp(isInPip: Boolean = false) {
         Scaffold(
             containerColor = Background,
             topBar = {
-                TopAppBar(
-                    title = {
-                        Column {
-                            Text("SALAR TV", color = Gold, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
-                            Text("تلویزیون و رادیوی جهان", color = SecondaryText, fontSize = 10.sp)
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { page = "افزودن منابع" }) {
-                            Icon(Icons.Default.AddLink, "افزودن لینک", tint = Gold)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
-                )
+                if (page != "چندنمایی") {
+                    TopAppBar(
+                        title = {
+                            Column {
+                                Text("SALAR TV", color = Gold, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                                Text("تلویزیون و رادیوی جهان", color = SecondaryText, fontSize = 10.sp)
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { page = "افزودن منابع" }) {
+                                Icon(Icons.Default.AddLink, "افزودن لینک", tint = Gold)
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
+                    )
+                }
             },
             bottomBar = {
-                NavigationBar(containerColor = Panel, contentColor = Gold) {
-                    listOf("خانه" to Icons.Default.Home, "تلویزیون" to Icons.Default.Tv,
-                        "رادیو" to Icons.Default.Radio, "علاقه‌مندی‌ها" to Icons.Default.Favorite,
-                        "بیشتر" to Icons.Default.MoreHoriz).forEach { (label, icon) ->
-                        NavigationBarItem(
-                            selected = page == label,
-                            onClick = { page = label },
-                            icon = { Icon(icon, label) },
-                            label = { Text(label, fontSize = 10.sp) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Gold, selectedTextColor = Gold,
-                                indicatorColor = Color(0xFF343020), unselectedIconColor = MutedText
+                if (page != "چندنمایی") {
+                    NavigationBar(containerColor = Panel, contentColor = Gold) {
+                        listOf("خانه" to Icons.Default.Home, "تلویزیون" to Icons.Default.Tv,
+                            "رادیو" to Icons.Default.Radio, "علاقه‌مندی‌ها" to Icons.Default.Favorite,
+                            "بیشتر" to Icons.Default.MoreHoriz).forEach { (label, icon) ->
+                            NavigationBarItem(
+                                selected = page == label,
+                                onClick = { page = label },
+                                icon = { Icon(icon, label) },
+                                label = { Text(label, fontSize = 10.sp) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = Gold, selectedTextColor = Gold,
+                                    indicatorColor = Color(0xFF343020), unselectedIconColor = MutedText
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
         ) { padding ->
-            Column(Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
+            Column(Modifier.padding(padding).fillMaxSize().then(if (page == "چندنمایی") Modifier else Modifier.padding(16.dp))) {
                 if (selected != null) {
                     TextButton(onClick = { selected = null }) { Icon(Icons.Default.ArrowBack, null); Text("بازگشت") }
                     Text(selected!!.name, color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -2254,9 +2258,20 @@ fun MultiViewPage(channels: List<Channel>) {
 
     DisposableEffect(activity, players) {
         val previousOrientation = activity?.requestedOrientation
+        val decorView = activity?.window?.decorView
+        val previousSystemUi = decorView?.systemUiVisibility ?: 0
         activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        decorView?.systemUiVisibility = (
+            android.view.View.SYSTEM_UI_FLAG_FULLSCREEN or
+                android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            )
         onDispose {
             players.forEach { it.release() }
+            decorView?.systemUiVisibility = previousSystemUi
             if (previousOrientation != null) activity?.requestedOrientation = previousOrientation
         }
     }
