@@ -2607,7 +2607,7 @@ private fun MultiViewSlot(
                     IconButton(onClick = onFullscreen,
                         modifier = Modifier.size(if (compact) 25.dp else 30.dp)) {
                         Icon(Icons.Default.Fullscreen, "تمام‌صفحه", tint = Gold,
-                            modifier = Modifier.size(if (compact) 14.dp else 18.sp))
+                            modifier = Modifier.size(if (compact) 14.dp else 18.dp))
                     }
                 }
             }
