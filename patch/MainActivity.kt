@@ -2436,7 +2436,7 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
         Divider(color = Gold.copy(alpha = 0.3f))
         Text("اندازه قلم برنامه: " + (fontScale * 100).toInt() + "%", color = Gold, fontWeight = FontWeight.Bold)
         Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.85f..1.3f, steps = 8)
-        Text("پیش‌نمایش اندازه نوشته", color = TextMain, fontSize = (16f * fontScale).sp)
+        Text("پیش‌نمایش اندازه نوشته", color = TextMain, fontSize = 16.sp)
         Divider(color = Gold.copy(alpha = 0.3f))
         Text("امنیت و ورود", color = Gold, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
