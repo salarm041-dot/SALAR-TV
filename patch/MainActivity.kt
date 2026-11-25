@@ -384,14 +384,26 @@ fun SalarTvApp(isInPip: Boolean = false) {
     }
     val systemDark = isSystemInDarkTheme()
     val useDarkTheme = when (themeMode) { "light" -> false; "system" -> systemDark; else -> true }
+    val selectedPalette = when (themeMode) {
+        "ocean" -> listOf(Color(0xFF48C8FF), Color(0xFF071827), Color(0xFF102B40), Color(0xFFEAF7FF), Color(0xFFB7D5E6), Color(0xFF7897AA))
+        "emerald" -> listOf(Color(0xFF45D6A0), Color(0xFF071B17), Color(0xFF102B24), Color(0xFFE9FFF5), Color(0xFFB7DCCB), Color(0xFF789C8D))
+        "purple" -> listOf(Color(0xFFB99AFF), Color(0xFF130D22), Color(0xFF251936), Color(0xFFF5EEFF), Color(0xFFD0C0E8), Color(0xFF9988B2))
+        "ruby" -> listOf(Color(0xFFFF718B), Color(0xFF200D15), Color(0xFF351923), Color(0xFFFFF0F2), Color(0xFFE6BEC6), Color(0xFFAD8992))
+        "sunset" -> listOf(Color(0xFFFFA45B), Color(0xFF21130D), Color(0xFF382216), Color(0xFFFFF4E9), Color(0xFFE7CBB2), Color(0xFFB3957C))
+        "graphite" -> listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832), Color(0xFFF1F5F9), Color(0xFFC4CDD7), Color(0xFF8D99A8))
+        "light" -> listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
+        "system" -> if (systemDark) listOf(Color(0xFFD6AD62), Color(0xFF0B0D13), Color(0xFF171B26), Color(0xFFF5F1E8), Color.LightGray, Color.Gray)
+                    else listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
+        else -> listOf(Color(0xFFD6AD62), Color(0xFF0B0D13), Color(0xFF171B26), Color(0xFFF5F1E8), Color.LightGray, Color.Gray)
+    }
 
     SideEffect {
-        val nextGold = if (useDarkTheme) Color(0xFFD6AD62) else Color(0xFF9A6818)
-        val nextBackground = if (useDarkTheme) Color(0xFF0B0D13) else Color(0xFFF5F3EE)
-        val nextPanel = if (useDarkTheme) Color(0xFF171B26) else Color(0xFFFFFFFF)
-        val nextText = if (useDarkTheme) Color(0xFFF5F1E8) else Color(0xFF20232A)
-        val nextSecondary = if (useDarkTheme) Color.LightGray else Color(0xFF555B66)
-        val nextMuted = if (useDarkTheme) Color.Gray else Color(0xFF707782)
+        val nextGold = selectedPalette[0]
+        val nextBackground = selectedPalette[1]
+        val nextPanel = selectedPalette[2]
+        val nextText = selectedPalette[3]
+        val nextSecondary = selectedPalette[4]
+        val nextMuted = selectedPalette[5]
         if (Gold != nextGold) Gold = nextGold
         if (Background != nextBackground) Background = nextBackground
         if (Panel != nextPanel) Panel = nextPanel
@@ -2267,16 +2279,57 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
     var confirmDelete by remember { mutableStateOf(prefs.getBoolean("confirm_before_delete", true)) }
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("ظاهر و شخصی‌سازی", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text("انتخاب تم برنامه", color = TextMain, fontWeight = FontWeight.SemiBold)
-        listOf("dark" to "مشکی و طلایی نئونی", "light" to "روشن", "system" to "هماهنگ با دستگاه").forEach { (value, label) ->
+        Text("حالت نمایش", color = TextMain, fontWeight = FontWeight.SemiBold)
+        listOf("dark" to "مشکی و طلایی", "light" to "روشن", "system" to "هماهنگ با دستگاه").forEach { (value, label) ->
             Card(Modifier.fillMaxWidth().clickable { onThemeModeChange(value) },
                 colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
-                Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(when (value) { "dark" -> Icons.Default.DarkMode; "light" -> Icons.Default.LightMode; else -> Icons.Default.SettingsSuggest }, null, tint = Gold)
                     Spacer(Modifier.width(12.dp))
                     Text(label, color = TextMain, modifier = Modifier.weight(1f))
                     RadioButton(selected = themeMode == value, onClick = { onThemeModeChange(value) })
                 }
+            }
+        }
+        Divider(color = Gold.copy(alpha = 0.3f))
+        Text("تم‌های رنگی اختصاصی", color = TextMain, fontWeight = FontWeight.SemiBold)
+        Text("بدون تغییر حالت روشن و تاریک؛ هر تم ظاهر و رنگ تأکیدی مستقل دارد.", color = SecondaryText, fontSize = 11.sp)
+        data class ThemeChoice(val id: String, val title: String, val colors: List<Color>)
+        val colorThemes = listOf(
+            ThemeChoice("ocean", "اقیانوسی", listOf(Color(0xFF48C8FF), Color(0xFF071827), Color(0xFF102B40))),
+            ThemeChoice("emerald", "زمردی", listOf(Color(0xFF45D6A0), Color(0xFF071B17), Color(0xFF102B24))),
+            ThemeChoice("purple", "بنفش کهکشانی", listOf(Color(0xFFB99AFF), Color(0xFF130D22), Color(0xFF251936))),
+            ThemeChoice("ruby", "یاقوتی", listOf(Color(0xFFFF718B), Color(0xFF200D15), Color(0xFF351923))),
+            ThemeChoice("sunset", "غروب آفتاب", listOf(Color(0xFFFFA45B), Color(0xFF21130D), Color(0xFF382216))),
+            ThemeChoice("graphite", "گرافیتی", listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832)))
+        )
+        colorThemes.chunked(2).forEach { rowThemes ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                rowThemes.forEach { choice ->
+                    Card(Modifier.weight(1f).clickable { onThemeModeChange(choice.id) },
+                        colors = CardDefaults.cardColors(containerColor = choice.colors[1]),
+                        shape = RoundedCornerShape(14.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            if (themeMode == choice.id) 2.dp else 1.dp,
+                            if (themeMode == choice.id) choice.colors[0] else choice.colors[2]
+                        )) {
+                        Column(Modifier.fillMaxWidth().padding(11.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                                choice.colors.forEach { swatch ->
+                                    Box(Modifier.weight(1f).height(20.dp)
+                                        .background(swatch, RoundedCornerShape(6.dp)))
+                                }
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(choice.title, color = Color.White, fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                                if (themeMode == choice.id) Icon(Icons.Default.CheckCircle, null,
+                                    tint = choice.colors[0], modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    }
+                }
+                if (rowThemes.size == 1) Spacer(Modifier.weight(1f))
             }
         }
         Divider(color = Gold.copy(alpha = 0.3f))
