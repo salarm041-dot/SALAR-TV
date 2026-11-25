@@ -214,6 +214,41 @@ jobs:
           print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
           PY
 
+      - name: Validate Arabic country channel folders
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path("patch/arabic-channels.m3u")
+          lines = [line.strip() for line in p.read_text(encoding="utf-8-sig").splitlines() if line.strip()]
+          entries = []
+          pending = None
+          for line in lines:
+              if line.startswith("#EXTINF"):
+                  if pending is not None:
+                      raise SystemExit("Arabic M3U entry is missing its URL")
+                  pending = line
+              elif line.startswith(("http://", "https://")):
+                  if pending is None:
+                      raise SystemExit("Arabic M3U URL has no EXTINF metadata")
+                  entries.append((pending, line))
+                  pending = None
+          if pending is not None:
+              raise SystemExit("Final Arabic M3U entry is missing its URL")
+          countries = ("عربستان", "امارات", "قطر", "کویت", "بحرین", "عمان", "عراق", "اردن",
+                       "لبنان", "سوریه", "فلسطین", "مصر", "مراکش", "الجزایر", "تونس", "لیبی",
+                       "یمن", "سودان")
+          missing = [country for country in countries if not any(country in meta for meta, _ in entries)]
+          urls = [url for _, url in entries]
+          if len(entries) < 40:
+              raise SystemExit(f"Arabic channel list unexpectedly small: {len(entries)}")
+          if len(urls) != len(set(urls)):
+              raise SystemExit("Duplicate URLs in Arabic channel list")
+          if missing:
+              raise SystemExit("Arabic country folders have no channels: " + ", ".join(missing))
+          print(f"Arabic playlist OK: {len(entries)} channels across {len(countries)} country folders")
+          PY
+
       - name: Check live stream endpoints (non-blocking)
         id: streamcheck
         continue-on-error: true
@@ -458,7 +493,7 @@ jobs:
           for apk_path, abi in ((phone_apk, "arm64-v8a"), (emulator_apk, "x86_64")):
               with ZipFile(apk_path) as apk:
                   names = set(apk.namelist())
-                  required = {"AndroidManifest.xml", "classes.dex", "assets/channels.m3u"}
+                  required = {"AndroidManifest.xml", "classes.dex", "assets/channels.m3u", "assets/arabic-channels.m3u"}
                   missing = required - names
                   if missing:
                       raise SystemExit(f"{abi} APK missing required files: {sorted(missing)}")
