@@ -636,7 +636,7 @@ jobs:
           disable-animations: true
           script: |
             set -eu
-            APK="${{ github.workspace }}/SALAR-TV-emulator.apk"
+            APK="${SALAR_TV_EMULATOR_APK_PATH:?emulator APK path was not exported by the staging step}"
             echo "Installing emulator APK: $APK"
             test -f "$APK"
             adb install -r "$APK"
