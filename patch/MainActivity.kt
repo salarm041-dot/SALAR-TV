@@ -763,6 +763,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     } else if (!useExternalPlayer) {
                         var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerFullscreen by remember(selected!!.url) { mutableStateOf(false) }
+                        var recordingActive by remember(selected!!.url) { mutableStateOf(false) }
+                        var playerLandscape by remember(selected!!.url) { mutableStateOf(false) }
                         var showLiveSpeechTranslation by remember { mutableStateOf(prefs.getBoolean("live_speech_translation_enabled", true)) }
                         var liveSpeechSubtitle by remember(selected!!.url) { mutableStateOf("") }
                         var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
@@ -787,14 +789,6 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )
-                            Box(Modifier.align(Alignment.TopStart).padding(8.dp)) {
-                                IconButton(
-                                    onClick = { showPlayerFullscreen = true },
-                                    modifier = Modifier.background(Color.Black.copy(alpha = 0.62f), RoundedCornerShape(50))
-                                ) {
-                                    Icon(Icons.Default.Fullscreen, contentDescription = "تمام صفحه", tint = Color.White)
-                                }
-                            }
                             if (showLiveSpeechTranslation && liveSpeechSubtitle.isNotBlank()) {
                                 Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                                     .padding(horizontal = 12.dp, vertical = 38.dp)
@@ -812,6 +806,61 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                     Icon(Icons.Default.MoreVert, contentDescription = "تنظیمات پخش", tint = Color.White)
                                 }
                                 DropdownMenu(expanded = playerMenuExpanded, onDismissRequest = { playerMenuExpanded = false }) {
+                                    DropdownMenuItem(
+                                        text = { Text(if (showPlayerFullscreen) "خروج از تمام‌صفحه" else "نمایش تمام‌صفحه") },
+                                        leadingIcon = { Icon(if (showPlayerFullscreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen, null) },
+                                        onClick = { showPlayerFullscreen = !showPlayerFullscreen; playerMenuExpanded = false }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(if (playerLandscape) "چرخش به حالت عمودی" else "چرخش به حالت افقی") },
+                                        leadingIcon = { Icon(Icons.Default.ScreenRotation, null) },
+                                        onClick = {
+                                            val activity = context as? MainActivity
+                                            playerLandscape = !playerLandscape
+                                            activity?.requestedOrientation = if (playerLandscape)
+                                                android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                                            else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                                            playerMenuExpanded = false
+                                        }
+                                    )
+                                    if (!selected!!.url.contains("iranintl.com", ignoreCase = true)) {
+                                        DropdownMenuItem(
+                                            text = { Text(if (recordingActive) "توقف ضبط شبکه" else "شروع ضبط شبکه") },
+                                            leadingIcon = { Icon(if (recordingActive) Icons.Default.Stop else Icons.Default.FiberManualRecord, null) },
+                                            onClick = {
+                                                if (recordingActive) {
+                                                    context.stopService(Intent(context, HlsRecorderService::class.java))
+                                                    recordingActive = false
+                                                    android.widget.Toast.makeText(context, "درخواست توقف ضبط ارسال شد.", android.widget.Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    val recordIntent = Intent(context, HlsRecorderService::class.java).apply {
+                                                        putExtra("name", selected!!.name)
+                                                        putExtra("url", selected!!.url)
+                                                        putExtra("duration", 360)
+                                                    }
+                                                    runCatching {
+                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(recordIntent)
+                                                        else context.startService(recordIntent)
+                                                        recordingActive = true
+                                                        android.widget.Toast.makeText(context, "ضبط شبکه آغاز شد.", android.widget.Toast.LENGTH_LONG).show()
+                                                    }.onFailure {
+                                                        android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطای سرویس"), android.widget.Toast.LENGTH_LONG).show()
+                                                    }
+                                                }
+                                                playerMenuExpanded = false
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("زمان‌بندی ضبط همین شبکه") },
+                                            leadingIcon = { Icon(Icons.Default.CalendarMonth, null) },
+                                            onClick = { showSchedule = true; playerMenuExpanded = false }
+                                        )
+                                    }
+                                    DropdownMenuItem(
+                                        text = { Text("فایل‌های ضبط‌شده") },
+                                        leadingIcon = { Icon(Icons.Default.VideoLibrary, null) },
+                                        onClick = { page = "ضبط‌ها"; playerMenuExpanded = false }
+                                    )
                                     DropdownMenuItem(
                                         text = { Text("انتخاب زیرنویس") },
                                         leadingIcon = { Icon(Icons.Default.Subtitles, null) },
@@ -1045,47 +1094,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     }
                     Text("در صورت پشتیبانی منبع، پخش زنده در این قسمت نمایش داده می‌شود.", color = SecondaryText, fontSize = 12.sp)
                     Spacer(Modifier.height(10.dp))
-                    if (!selected!!.url.contains("iranintl.com", ignoreCase = true)) {
-                        var recordingActive by remember(selected!!.url) { mutableStateOf(false) }
-                        Button(
-                            onClick = {
-                                if (recordingActive) {
-                                    context.stopService(Intent(context, HlsRecorderService::class.java))
-                                    recordingActive = false
-                                    android.widget.Toast.makeText(context, "درخواست توقف ضبط ارسال شد.", android.widget.Toast.LENGTH_SHORT).show()
-                                } else {
-                                    val recordIntent = Intent(context, HlsRecorderService::class.java).apply {
-                                        putExtra("name", selected!!.name)
-                                        putExtra("url", selected!!.url)
-                                        putExtra("duration", 360)
-                                    }
-                                    runCatching {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(recordIntent)
-                                        else context.startService(recordIntent)
-                                        recordingActive = true
-                                        android.widget.Toast.makeText(context, "ضبط شبکه آغاز شد؛ برای پایان، همین دکمه را بزنید.", android.widget.Toast.LENGTH_LONG).show()
-                                    }.onFailure {
-                                        android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطای سرویس"), android.widget.Toast.LENGTH_LONG).show()
-                                    }
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = if (recordingActive) Color(0xFFB83D4B) else Gold)
-                        ) {
-                            Icon(if (recordingActive) Icons.Default.Stop else Icons.Default.FiberManualRecord, null, tint = Color.Black)
-                            Spacer(Modifier.width(8.dp))
-                            Text(if (recordingActive) "توقف ضبط" else "شروع ضبط همین شبکه", color = Color.Black)
-                        }
-                        Button(
-                            onClick = { showSchedule = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Panel)
-                        ) {
-                            Icon(Icons.Default.CalendarMonth, null, tint = Gold)
-                            Spacer(Modifier.width(8.dp))
-                            Text("زمان‌بندی ضبط همین شبکه", color = TextMain)
-                        }
-                    } else {
+                    if (selected!!.url.contains("iranintl.com", ignoreCase = true)) {
                         Text("پخش ایران اینترنشنال از صفحه رسمی شبکه باز می‌شود؛ ضبط مستقیم این صفحه در برنامه فعال نیست.",
                             color = SecondaryText, fontSize = 12.sp)
                     }
