@@ -2817,11 +2817,11 @@ private fun parseM3u(text: String): List<Channel> {
             val group = groupTitle.lowercase()
             val meta = "$lower $group"
             country = when {
-                "زبان کردی" in meta || "kurdish" in meta || "ckb" in meta || "kmr" in meta -> "زبان کردی"
-                "زبان روسی" in meta || "russian" in meta || "rus" in meta -> "زبان روسی"
-                "زبان فرانسوی" in meta || "french" in meta || "fra" in meta -> "زبان فرانسوی"
-                "زبان آلمانی" in meta || "german" in meta || "deu" in meta -> "زبان آلمانی"
-                "زبان انگلیسی" in meta || "english" in meta || "eng" in meta -> "زبان انگلیسی"
+                "زبان کردی" in group -> "زبان کردی"
+                "زبان روسی" in group -> "زبان روسی"
+                "زبان فرانسوی" in group -> "زبان فرانسوی"
+                "زبان آلمانی" in group -> "زبان آلمانی"
+                "زبان انگلیسی" in group -> "زبان انگلیسی"
                 "آمریکا" in meta || "united states" in meta || "usa" in meta || "us/" in meta -> "آمریکا"
                 "روسیه" in meta || "russia" in meta || "ru/" in meta -> "روسیه"
                 "فرانسه" in meta || "france" in meta || "fr/" in meta -> "فرانسه"
