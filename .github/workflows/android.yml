@@ -251,6 +251,9 @@ jobs:
           print("Configured separate ARM64 phone and x86_64 emulator APKs")
           PY
 
+      - name: Build APK
+        run: gradle -p "$PROJECT_DIR" :app:assembleDebug
+
       - name: Inspect project source
         run: |
           echo "=== PROJECT FILES ==="
@@ -546,9 +549,6 @@ jobs:
           name: SALAR-TV-Azerbaijan-TV-Report
           path: azerbaijan-stream-report.json
           if-no-files-found: ignore
-
-      - name: Build APK
-        run: gradle -p "$PROJECT_DIR" :app:assembleDebug
 
       - name: Verify APK package contents
         run: |
