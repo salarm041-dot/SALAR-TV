@@ -2242,86 +2242,161 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
 @Composable
 fun MultiViewPage(channels: List<Channel>) {
     val context = LocalContext.current
-    var first by remember { mutableStateOf<Channel?>(channels.getOrNull(0)) }
-    var second by remember { mutableStateOf<Channel?>(channels.getOrNull(1)) }
-    val firstPlayer = remember { ExoPlayer.Builder(context).build() }
-    val secondPlayer = remember { ExoPlayer.Builder(context).build() }
-    var fullScreenSlot by remember { mutableStateOf<Int?>(null) }
-    DisposableEffect(Unit) { onDispose { firstPlayer.release(); secondPlayer.release() } }
-    LaunchedEffect(first?.url) {
-        first?.let { firstPlayer.setMediaItem(MediaItem.fromUri(it.url)); firstPlayer.prepare(); firstPlayer.playWhenReady = true }
-            ?: firstPlayer.stop()
+    val activity = context as? Activity
+    var layoutCount by remember { mutableIntStateOf(2) }
+    var fullScreenSlot by remember { mutableIntStateOf(-1) }
+    val selectedChannels = remember {
+        mutableStateListOf<Channel?>().apply {
+            repeat(9) { index -> add(channels.getOrNull(index)) }
+        }
     }
-    LaunchedEffect(second?.url) {
-        second?.let { secondPlayer.setMediaItem(MediaItem.fromUri(it.url)); secondPlayer.prepare(); secondPlayer.playWhenReady = true }
-            ?: secondPlayer.stop()
+    val players = remember { List(9) { ExoPlayer.Builder(context).build() } }
+
+    DisposableEffect(activity, players) {
+        val previousOrientation = activity?.requestedOrientation
+        activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        onDispose {
+            players.forEach { it.release() }
+            if (previousOrientation != null) activity?.requestedOrientation = previousOrientation
+        }
     }
-    if (fullScreenSlot != null) {
-        val fullscreenPlayer = if (fullScreenSlot == 1) firstPlayer else secondPlayer
-        val fullscreenChannel = if (fullScreenSlot == 1) first else second
-        Column(Modifier.fillMaxSize().background(Color.Black)) {
-            Row(
-                Modifier.fillMaxWidth().background(Panel).padding(horizontal = 8.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { fullScreenSlot = null }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت", tint = Gold)
-                }
-                Text(fullscreenChannel?.name ?: "پخش تمام‌صفحه", color = TextMain,
-                    fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f), maxLines = 1)
-                IconButton(onClick = { fullScreenSlot = null }) {
-                    Icon(Icons.Default.FullscreenExit, contentDescription = "خروج از تمام‌صفحه", tint = Gold)
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(5.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth().height(38.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("چندنمایی شبکه‌ها", color = Gold, fontSize = 15.sp,
+                fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+            listOf(2, 4, 9).forEach { count ->
+                val active = layoutCount == count
+                TextButton(onClick = { layoutCount = count; fullScreenSlot = -1 },
+                    contentPadding = PaddingValues(horizontal = 9.dp, vertical = 0.dp)) {
+                    Text("$count تایی", color = if (active) Gold else SecondaryText,
+                        fontWeight = if (active) FontWeight.Bold else FontWeight.Normal, fontSize = 11.sp)
                 }
             }
-            AndroidView(
-                factory = { ctx -> PlayerView(ctx).apply { player = fullscreenPlayer; useController = true } },
-                modifier = Modifier.fillMaxWidth().weight(1f)
-            )
+            if (fullScreenSlot >= 0) {
+                IconButton(onClick = { fullScreenSlot = -1 }, modifier = Modifier.size(34.dp)) {
+                    Icon(Icons.Default.GridView, "بازگشت به چندنما", tint = Gold)
+                }
+            }
         }
-    } else {
-        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("چندنمایی هم‌زمان", color = Gold, fontSize = 21.sp, fontWeight = FontWeight.Bold)
-            Text("برای هر پنجره نام شبکه را جستجو و انتخاب کنید. برای بزرگ‌نمایی هر شبکه، دکمه تمام‌صفحه همان پنجره را بزنید. پخش هم‌زمان به توان سخت‌افزاری گوشی و نوع پخش وابسته است.",
-                color = SecondaryText, fontSize = 12.sp)
-            MultiViewSlot("پنجره اول", channels, first, { first = it }, firstPlayer, { fullScreenSlot = 1 })
-            MultiViewSlot("پنجره دوم", channels, second, { second = it }, secondPlayer, { fullScreenSlot = 2 })
-            if (channels.isEmpty()) Text("ابتدا شبکه‌های تلویزیونی را از بخش افزودن منابع اضافه کنید.", color = SecondaryText)
+        if (fullScreenSlot >= 0) {
+            MultiViewSlot(
+                title = "نمای تمام‌صفحه",
+                channels = channels,
+                selected = selectedChannels[fullScreenSlot],
+                onSelect = { selectedChannels[fullScreenSlot] = it },
+                player = players[fullScreenSlot],
+                onFullscreen = { fullScreenSlot = -1 },
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                compact = false
+            )
+        } else {
+            val visibleSlots = when (layoutCount) {
+                2 -> listOf(0, 1)
+                4 -> (0 until 4).toList()
+                else -> (0 until 9).toList()
+            }
+            val columns = when (layoutCount) { 2 -> 2; 4 -> 2; else -> 3 }
+            Column(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                visibleSlots.chunked(columns).forEachIndexed { rowIndex, rowSlots ->
+                    Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        rowSlots.forEach { slotIndex ->
+                            MultiViewSlot(
+                                title = "شبکه ${slotIndex + 1}",
+                                channels = channels,
+                                selected = selectedChannels[slotIndex],
+                                onSelect = { selectedChannels[slotIndex] = it },
+                                player = players[slotIndex],
+                                onFullscreen = { fullScreenSlot = slotIndex },
+                                modifier = Modifier.weight(1f).fillMaxHeight(),
+                                compact = layoutCount == 9
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun MultiViewSlot(title: String, channels: List<Channel>, selected: Channel?,
-                          onSelect: (Channel?) -> Unit, player: ExoPlayer, onFullscreen: () -> Unit) {
+private fun MultiViewSlot(
+    title: String,
+    channels: List<Channel>,
+    selected: Channel?,
+    onSelect: (Channel?) -> Unit,
+    player: ExoPlayer,
+    onFullscreen: () -> Unit,
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
+) {
     var showPicker by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val filteredChannels = remember(channels, searchQuery) {
-        channels.filter { it.name.contains(searchQuery.trim(), ignoreCase = true) ||
-            it.country.contains(searchQuery.trim(), ignoreCase = true) ||
-            it.groupTitle.contains(searchQuery.trim(), ignoreCase = true) }
+        channels.filter {
+            it.name.contains(searchQuery.trim(), ignoreCase = true) ||
+                it.country.contains(searchQuery.trim(), ignoreCase = true) ||
+                it.groupTitle.contains(searchQuery.trim(), ignoreCase = true)
+        }
     }
-    Card(colors = CardDefaults.cardColors(containerColor = Panel), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(title, color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                IconButton(onClick = onFullscreen) {
-                    Icon(Icons.Default.Fullscreen, contentDescription = "پخش تمام‌صفحه", tint = Gold)
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Panel),
+        modifier = modifier,
+        shape = RoundedCornerShape(if (compact) 7.dp else 12.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.42f))
+    ) {
+        Column(Modifier.fillMaxSize().padding(if (compact) 3.dp else 6.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(Modifier.fillMaxWidth().height(if (compact) 25.dp else 32.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Text(selected?.name ?: title, color = TextMain,
+                    fontSize = if (compact) 8.sp else 11.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 1,
+                    modifier = Modifier.weight(1f))
+                IconButton(onClick = { searchQuery = ""; showPicker = true },
+                    modifier = Modifier.size(if (compact) 25.dp else 30.dp)) {
+                    Icon(Icons.Default.Search, "انتخاب شبکه", tint = Gold,
+                        modifier = Modifier.size(if (compact) 14.dp else 18.dp))
                 }
-                TextButton(onClick = { searchQuery = ""; showPicker = true }) {
-                    Text(selected?.name ?: "جستجو و انتخاب شبکه", color = TextMain, maxLines = 1)
-                    Icon(Icons.Default.Search, null, tint = Gold)
+                IconButton(onClick = onFullscreen,
+                    modifier = Modifier.size(if (compact) 25.dp else 30.dp)) {
+                    Icon(Icons.Default.Fullscreen, "تمام‌صفحه", tint = Gold,
+                        modifier = Modifier.size(if (compact) 14.dp else 18.dp))
                 }
             }
-            AndroidView(factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
-                modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f))
+            AndroidView(
+                factory = { ctx ->
+                    PlayerView(ctx).apply {
+                        this.player = player
+                        useController = true
+                        resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                    }
+                },
+                update = { view ->
+                    if (view.player !== player) view.player = player
+                    view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+    LaunchedEffect(selected?.url) {
+        if (selected == null) {
+            player.stop()
+            player.clearMediaItems()
+        } else {
+            player.setMediaItem(MediaItem.fromUri(selected.url))
+            player.prepare()
+            player.playWhenReady = true
         }
     }
     if (showPicker) {
         AlertDialog(
             onDismissRequest = { showPicker = false },
-            title = { Text("جستجوی شبکه برای $title") },
+            title = { Text("انتخاب شبکه برای $title") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -2330,13 +2405,14 @@ private fun MultiViewSlot(title: String, channels: List<Channel>, selected: Chan
                         label = { Text("نام شبکه، کشور یا گروه") },
                         leadingIcon = { Icon(Icons.Default.Search, null) }
                     )
-                    LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
+                    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
                         items(filteredChannels, key = { it.url }) { channel ->
                             DropdownMenuItem(
                                 text = {
                                     Column {
                                         Text(channel.name)
-                                        Text(listOf(channel.country, channel.groupTitle).filter { it.isNotBlank() }.joinToString(" • "),
+                                        Text(listOf(channel.country, channel.groupTitle)
+                                            .filter { it.isNotBlank() }.joinToString(" • "),
                                             color = MutedText, fontSize = 10.sp)
                                     }
                                 },
@@ -2344,14 +2420,15 @@ private fun MultiViewSlot(title: String, channels: List<Channel>, selected: Chan
                             )
                         }
                         if (filteredChannels.isEmpty()) {
-                            item { Text("شبکه‌ای با این عبارت پیدا نشد.", color = SecondaryText, modifier = Modifier.padding(12.dp)) }
+                            item { Text("شبکه‌ای با این عبارت پیدا نشد.",
+                                color = SecondaryText, modifier = Modifier.padding(12.dp)) }
                         }
                     }
                 }
             },
             confirmButton = { TextButton(onClick = { showPicker = false }) { Text("بستن") } },
             dismissButton = {
-                TextButton(onClick = { onSelect(null); showPicker = false }) { Text("پاک‌کردن انتخاب") }
+                TextButton(onClick = { onSelect(null); showPicker = false }) { Text("پاک‌کردن") }
             }
         )
     }
