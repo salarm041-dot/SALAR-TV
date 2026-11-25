@@ -1021,11 +1021,5 @@ https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.a
 #EXTINF:-1 tvg-language="fas" tvg-id="GEMSeriesPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_33.png" group-title="ماهواره‌ای · جم",جم سریال پلاس
 https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemseriesplus/index-0.m3u8
 
-#EXTINF:-1 tvg-language="fas" tvg-id="GemShoppingNetwork.us@SD" tvg-logo="https://i.imgur.com/WlHEpAu.png" group-title="ماهواره‌ای · جم",Gem Shopping Network
-https://amg01460-gemshoppingnetw-gem-ono-x662c.amagi.tv/playlist.m3u8
-
 #EXTINF:-1 tvg-language="fas" tvg-id="GEMTVPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_17.png" group-title="ماهواره‌ای · جم",جم تی‌وی پلاس
 http://66.102.120.18:8000/play/a045/index.m3u8
-
-#EXTINF:-1 tvg-language="fas" tvg-id="GeminiMovies.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_MOVIES/images/LOGO_HD/image.png" group-title="ماهواره‌ای · جم",Gemini Movies
-http://103.167.255.18:8085/play/a0n5/index.m3u8
