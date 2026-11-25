@@ -81,6 +81,7 @@ jobs:
                           pending=line
                       elif line.startswith(("http://","https://")) and pending:
                           meta=pending
+                          meta=re.sub(r'\s+tvg-language="[^"]*"', "", meta, flags=re.I)
                           if re.search(r'group-title="[^"]*"',meta,re.I):
                               meta=re.sub(r'group-title="[^"]*"',f'group-title="{group}"',meta,count=1,flags=re.I)
                           else:
