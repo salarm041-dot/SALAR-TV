@@ -2148,7 +2148,7 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
     var title by remember { mutableStateOf("") }
     var streamUrl by remember { mutableStateOf("") }
     var customPlace by remember { mutableStateOf("") }
-    val defaultPlaces = listOf("مشهد مقدس", "کربلا", "نجف", "مکه مکرمه", "مدینه منوره", "سایر اماکن مذهبی")
+    val defaultPlaces = listOf("مشهد مقدس", "کربلا", "نجف اشرف", "مکه مکرمه", "مدینه منوره", "سایر اماکن مذهبی")
     val savedPlaces = savedChannels.filter { it.country == "زیارت آنلاین" }.map { it.groupTitle }.filter { it.isNotBlank() }
     val places = (defaultPlaces + savedPlaces).distinct()
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -2188,8 +2188,40 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
                 }
             }
         } else {
-            available.forEach { channel ->
-                MoreButton(channel.name, Icons.Default.PlayCircle, { onPlay(channel) })
+            available.chunked(2).forEach { cameraRow ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    cameraRow.forEach { camera ->
+                        Card(
+                            modifier = Modifier.weight(1f).height(150.dp).clickable { onPlay(camera) },
+                            colors = CardDefaults.cardColors(containerColor = Panel),
+                            shape = RoundedCornerShape(18.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = .55f))
+                        ) {
+                            Box(Modifier.fillMaxSize().background(
+                                androidx.compose.ui.graphics.Brush.verticalGradient(
+                                    listOf(Gold.copy(alpha = .16f), Panel, Background)
+                                )
+                            )) {
+                                Column(
+                                    Modifier.fillMaxSize().padding(11.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    Icon(Icons.Default.LiveTv, null, tint = Gold, modifier = Modifier.size(43.dp))
+                                    Text(camera.name, color = TextMain, fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold, maxLines = 3,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.PlayCircle, null, tint = Gold, modifier = Modifier.size(16.dp))
+                                        Spacer(Modifier.width(5.dp))
+                                        Text("مشاهده پخش زنده", color = Gold, fontSize = 10.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (cameraRow.size == 1) Spacer(Modifier.weight(1f))
+                }
             }
         }
         OutlinedTextField(value = title, onValueChange = { title = it }, modifier = Modifier.fillMaxWidth(),
