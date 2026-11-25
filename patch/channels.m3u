@@ -60,6 +60,8 @@ https://live-aburayhan1106.telewebion.ir/ek/ofogh/live/1080p/index.m3u8
 https://s1-cloud.irib.ir/securelive3/jamejam1hd/jamejam1hd.m3u8
 #EXTINF:-1 tvg-id="JameJamTVNetwork2.ir" tvg-logo="https://i.imgur.com/BjaN3W1.png" group-title="شبکه‌های سراسری سیما",شبکه جام جم ۲
 https://s1-cloud.irib.ir/securelive3/jamejam2sd/jamejam2sd.m3u8
+#EXTINF:-1 tvg-id="JameJamOfficialLive.ir" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/5/51/Jjtvlogo1401.png" group-title="شبکه‌های سراسری سیما",جام جم — صفحه رسمی پخش زنده
+https://www.jjtvn.ir/fa/live
 
 # Persian-language channels outside Iran. Entries passed the validator's latest stream probe.
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaComedy.fr.png" group-title="فارسی‌زبان خارج از ایران / سرگرمی / تلویزیون",Persiana Comedy
