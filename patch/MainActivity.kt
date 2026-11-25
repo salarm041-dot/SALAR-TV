@@ -59,6 +59,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -2459,6 +2460,8 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
 fun MultiViewPage(channels: List<Channel>) {
     val context = LocalContext.current
     val activity = context as? Activity
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     var layoutCount by remember { mutableIntStateOf(2) }
     var fullScreenSlot by remember { mutableIntStateOf(-1) }
     val selectedChannels = remember {
@@ -2472,7 +2475,7 @@ fun MultiViewPage(channels: List<Channel>) {
         val previousOrientation = activity?.requestedOrientation
         val decorView = activity?.window?.decorView
         val previousSystemUi = decorView?.systemUiVisibility ?: 0
-        activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
         decorView?.systemUiVisibility = (
             android.view.View.SYSTEM_UI_FLAG_FULLSCREEN or
                 android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
@@ -2524,7 +2527,8 @@ fun MultiViewPage(channels: List<Channel>) {
                 4 -> (0 until 4).toList()
                 else -> (0 until 9).toList()
             }
-            val columns = when (layoutCount) { 2 -> 2; 4 -> 2; else -> 3 }
+            // Two-screen mode stacks vertically in portrait and sits side-by-side in landscape.
+            val columns = when (layoutCount) { 2 -> if (isPortrait) 1 else 2; 4 -> 2; else -> 3 }
             Column(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 visibleSlots.chunked(columns).forEachIndexed { rowIndex, rowSlots ->
                     Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
