@@ -2491,37 +2491,48 @@ fun MultiViewPage(channels: List<Channel>) {
         }
     }
 
-    Column(Modifier.fillMaxSize().background(Color.Black).padding(5.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(Modifier.fillMaxWidth().height(38.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("چندنمایی شبکه‌ها", color = Gold, fontSize = 15.sp,
-                fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
-            listOf(2, 4, 9).forEach { count ->
-                val active = layoutCount == count
-                TextButton(onClick = { layoutCount = count; fullScreenSlot = -1 },
-                    contentPadding = PaddingValues(horizontal = 9.dp, vertical = 0.dp)) {
-                    Text("$count تایی", color = if (active) Gold else SecondaryText,
-                        fontWeight = if (active) FontWeight.Bold else FontWeight.Normal, fontSize = 11.sp)
+    Column(
+        Modifier.fillMaxSize().background(Color.Black)
+            .then(if (fullScreenSlot >= 0) Modifier else Modifier.padding(5.dp)),
+        verticalArrangement = Arrangement.spacedBy(if (fullScreenSlot >= 0) 0.dp else 4.dp)
+    ) {
+        if (fullScreenSlot < 0) {
+            Row(Modifier.fillMaxWidth().height(38.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("چندنمایی شبکه‌ها", color = Gold, fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+                listOf(2, 4, 9).forEach { count ->
+                    val active = layoutCount == count
+                    TextButton(onClick = { layoutCount = count; fullScreenSlot = -1 },
+                        contentPadding = PaddingValues(horizontal = 9.dp, vertical = 0.dp)) {
+                        Text("$count تایی", color = if (active) Gold else SecondaryText,
+                            fontWeight = if (active) FontWeight.Bold else FontWeight.Normal, fontSize = 11.sp)
+                    }
                 }
             }
-            if (fullScreenSlot >= 0) {
-                IconButton(onClick = { fullScreenSlot = -1 }, modifier = Modifier.size(34.dp)) {
+        } else {
+            Box(Modifier.fillMaxSize()) {
+                MultiViewSlot(
+                    title = "نمای تمام‌صفحه",
+                    channels = channels,
+                    selected = selectedChannels[fullScreenSlot],
+                    onSelect = { selectedChannels[fullScreenSlot] = it },
+                    player = players[fullScreenSlot],
+                    onFullscreen = { fullScreenSlot = -1 },
+                    modifier = Modifier.fillMaxSize(),
+                    compact = false,
+                    fullScreen = true
+                )
+                IconButton(
+                    onClick = { fullScreenSlot = -1 },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                        .padding(10.dp).size(38.dp)
+                        .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(20.dp))
+                ) {
                     Icon(Icons.Default.GridView, "بازگشت به چندنما", tint = Gold)
                 }
             }
         }
-        if (fullScreenSlot >= 0) {
-            MultiViewSlot(
-                title = "نمای تمام‌صفحه",
-                channels = channels,
-                selected = selectedChannels[fullScreenSlot],
-                onSelect = { selectedChannels[fullScreenSlot] = it },
-                player = players[fullScreenSlot],
-                onFullscreen = { fullScreenSlot = -1 },
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                compact = false
-            )
-        } else {
+        if (fullScreenSlot < 0) {
             val visibleSlots = when (layoutCount) {
                 2 -> listOf(0, 1)
                 4 -> (0 until 4).toList()
@@ -2560,7 +2571,8 @@ private fun MultiViewSlot(
     player: ExoPlayer,
     onFullscreen: () -> Unit,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
+    fullScreen: Boolean = false
 ) {
     var showPicker by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -2574,26 +2586,29 @@ private fun MultiViewSlot(
     Card(
         colors = CardDefaults.cardColors(containerColor = Panel),
         modifier = modifier,
-        shape = RoundedCornerShape(if (compact) 7.dp else 12.dp),
+        shape = RoundedCornerShape(if (fullScreen) 0.dp else if (compact) 7.dp else 12.dp),
         border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.42f))
     ) {
-        Column(Modifier.fillMaxSize().padding(if (compact) 3.dp else 6.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Row(Modifier.fillMaxWidth().height(if (compact) 25.dp else 32.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                Text(selected?.name ?: title, color = TextMain,
-                    fontSize = if (compact) 8.sp else 11.sp,
-                    fontWeight = FontWeight.Bold, maxLines = 1,
-                    modifier = Modifier.weight(1f))
-                IconButton(onClick = { searchQuery = ""; showPicker = true },
-                    modifier = Modifier.size(if (compact) 25.dp else 30.dp)) {
-                    Icon(Icons.Default.Search, "انتخاب شبکه", tint = Gold,
-                        modifier = Modifier.size(if (compact) 14.dp else 18.dp))
-                }
-                IconButton(onClick = onFullscreen,
-                    modifier = Modifier.size(if (compact) 25.dp else 30.dp)) {
-                    Icon(Icons.Default.Fullscreen, "تمام‌صفحه", tint = Gold,
-                        modifier = Modifier.size(if (compact) 14.dp else 18.dp))
+        Column(Modifier.fillMaxSize().padding(
+            if (fullScreen) 0.dp else if (compact) 3.dp else 6.dp
+        ), verticalArrangement = Arrangement.spacedBy(if (fullScreen) 0.dp else 2.dp)) {
+            if (!fullScreen) {
+                Row(Modifier.fillMaxWidth().height(if (compact) 25.dp else 32.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text(selected?.name ?: title, color = TextMain,
+                        fontSize = if (compact) 8.sp else 11.sp,
+                        fontWeight = FontWeight.Bold, maxLines = 1,
+                        modifier = Modifier.weight(1f))
+                    IconButton(onClick = { searchQuery = ""; showPicker = true },
+                        modifier = Modifier.size(if (compact) 25.dp else 30.dp)) {
+                        Icon(Icons.Default.Search, "انتخاب شبکه", tint = Gold,
+                            modifier = Modifier.size(if (compact) 14.dp else 18.sp))
+                    }
+                    IconButton(onClick = onFullscreen,
+                        modifier = Modifier.size(if (compact) 25.dp else 30.dp)) {
+                        Icon(Icons.Default.Fullscreen, "تمام‌صفحه", tint = Gold,
+                            modifier = Modifier.size(if (compact) 14.dp else 18.sp))
+                    }
                 }
             }
             AndroidView(
