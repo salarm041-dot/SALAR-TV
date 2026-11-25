@@ -1124,7 +1124,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onDelete = { file -> file.delete(); page = "ضبط‌ها" }
                     )
                     "درباره ما" -> AboutPage()
-                    "تلویزیون" -> TvCountryPage(onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" })
+                    "تلویزیون" -> TvCountryPage(
+                        onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" },
+                        onMultiView = { page = "چندنمایی" }
+                    )
                     "شبکه‌های عربی" -> ArabicCountriesPage(channels = channels, onCountry = { country -> page = "عربی:$country" })
                     "کشور:سایر" -> WorldChannelsPage(channels = channels, onGroup = { group -> page = "جهان:$group" })
                     "کشورهای منتخب" -> TvCountryPage(onCountry = { country -> page = "کشور:$country" })
@@ -1574,7 +1577,7 @@ private fun CountryArtwork(name: String, accent: Color, compact: Boolean = false
 }
 
 @Composable
-fun TvCountryPage(onCountry: (String) -> Unit) {
+fun TvCountryPage(onCountry: (String) -> Unit, onMultiView: () -> Unit = {}) {
     data class CountryCard(val name: String, val color: Color, val subtitle: String)
     val countries = listOf(
         CountryCard("ایران", Color(0xFF36D69A), "شبکه‌های سراسری و استانی"),
@@ -1587,6 +1590,13 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("شبکه‌های تلویزیونی", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
         Text("کشور و منطقهٔ موردنظر را انتخاب کنید", color = Color(0xFFB8C8E0), fontSize = 12.sp)
+        Button(onClick = onMultiView, modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Background),
+            shape = RoundedCornerShape(14.dp)) {
+            Icon(Icons.Default.GridView, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text("چندنمایی هم‌زمان شبکه‌ها")
+        }
         countries.chunked(2).forEach { rowCountries ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
                 rowCountries.forEach { country ->
