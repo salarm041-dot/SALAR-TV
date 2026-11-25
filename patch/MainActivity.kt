@@ -762,7 +762,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     } else if (!useExternalPlayer) {
                         var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerFullscreen by remember(selected!!.url) { mutableStateOf(false) }
-                        var showLiveSpeechTranslation by remember(selected!!.url) { mutableStateOf(false) }
+                        var showLiveSpeechTranslation by remember { mutableStateOf(prefs.getBoolean("live_speech_translation_enabled", false)) }
+                        var liveSpeechSubtitle by remember(selected!!.url) { mutableStateOf("") }
                         var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
@@ -791,6 +792,15 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                     modifier = Modifier.background(Color.Black.copy(alpha = 0.62f), RoundedCornerShape(50))
                                 ) {
                                     Icon(Icons.Default.Fullscreen, contentDescription = "تمام صفحه", tint = Color.White)
+                                }
+                            }
+                            if (showLiveSpeechTranslation && liveSpeechSubtitle.isNotBlank()) {
+                                Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 38.dp)
+                                    .background(Color.Black.copy(alpha = 0.78f), RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 12.dp, vertical = 8.dp)) {
+                                    Text(liveSpeechSubtitle, color = Color.White, fontSize = 15.sp,
+                                        textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                                 }
                             }
                             Box(Modifier.align(Alignment.TopEnd).padding(8.dp)) {
@@ -853,7 +863,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 Text(if (showSubtitleTranslation) "بستن ترجمه زیرنویس" else "ترجمه زیرنویس شبکه", fontSize = 10.sp)
                             }
                             OutlinedButton(
-                                onClick = { showLiveSpeechTranslation = !showLiveSpeechTranslation },
+                                onClick = {
+                                    showLiveSpeechTranslation = !showLiveSpeechTranslation
+                                    prefs.edit().putBoolean("live_speech_translation_enabled", showLiveSpeechTranslation).apply()
+                                    if (!showLiveSpeechTranslation) liveSpeechSubtitle = ""
+                                },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.outlinedButtonColors(
                                     contentColor = if (showLiveSpeechTranslation) Gold else TextMain
@@ -871,7 +885,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             )
                         }
                         if (showLiveSpeechTranslation) {
-                            LiveAudioTranslationOverlay(modifier = Modifier.fillMaxWidth())
+                            LiveAudioTranslationOverlay(
+                                modifier = Modifier.fillMaxWidth(),
+                                onTranslation = { liveSpeechSubtitle = it }
+                            )
                         }
                         if (showPlayerFullscreen) {
                             androidx.compose.ui.window.Dialog(
