@@ -385,6 +385,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
     val systemDark = isSystemInDarkTheme()
     val useDarkTheme = when (themeMode) { "light" -> false; "system" -> systemDark; else -> true }
     val selectedPalette = when (themeMode) {
+        "gold_gloss" -> listOf(Color(0xFFFFD76A), Color(0xFF050505), Color(0xFF17130A), Color(0xFFFFF8E6), Color(0xFFE5D4A8), Color(0xFFAD9664))
+        "silver_gloss" -> listOf(Color(0xFFE4EDF7), Color(0xFF080B10), Color(0xFF1B222C), Color(0xFFF5F8FC), Color(0xFFC7D0DC), Color(0xFF8793A3))
         "ocean" -> listOf(Color(0xFF48C8FF), Color(0xFF071827), Color(0xFF102B40), Color(0xFFEAF7FF), Color(0xFFB7D5E6), Color(0xFF7897AA))
         "emerald" -> listOf(Color(0xFF45D6A0), Color(0xFF071B17), Color(0xFF102B24), Color(0xFFE9FFF5), Color(0xFFB7DCCB), Color(0xFF789C8D))
         "purple" -> listOf(Color(0xFFB99AFF), Color(0xFF130D22), Color(0xFF251936), Color(0xFFF5EEFF), Color(0xFFD0C0E8), Color(0xFF9988B2))
@@ -394,6 +396,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         "light" -> listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
         "system" -> if (systemDark) listOf(Color(0xFFD6AD62), Color(0xFF0B0D13), Color(0xFF171B26), Color(0xFFF5F1E8), Color.LightGray, Color.Gray)
                     else listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
+        "dark" -> listOf(Color(0xFFFFD76A), Color(0xFF050505), Color(0xFF17130A), Color(0xFFFFF8E6), Color(0xFFE5D4A8), Color(0xFFAD9664))
         else -> listOf(Color(0xFFD6AD62), Color(0xFF0B0D13), Color(0xFF171B26), Color(0xFFF5F1E8), Color.LightGray, Color.Gray)
     }
 
@@ -1264,8 +1267,8 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
     val tvCount = channels.count { it.kind == "تلویزیون" }
     val radioCount = channels.count { it.kind == "رادیو" }
     val countries = dynamicCountries.distinctBy { it.first }
-    val gold = Color(0xFFFFC94A)
-    val neonBlue = Color(0xFF168CFF)
+    val gold = Gold
+    val neonBlue = Gold
     val quick = listOf(
         Triple("تلویزیون", "پخش زنده شبکه‌ها", Icons.Default.LiveTv),
         Triple("رادیو", "ایستگاه‌های رادیویی", Icons.Default.Radio),
@@ -1319,13 +1322,17 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                 rowItems.forEachIndexed { index, item ->
                     val itemIndex = rowIndex * 2 + index
                     val accent = accents[itemIndex]
-                    Card(Modifier.weight(1f).height(116.dp).clickable { onPage(if (item.first == "شبکه‌های خارجی") "تلویزیون" else item.first) },
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0C1B32)),
-                        border = androidx.compose.foundation.BorderStroke(1.4.dp, accent.copy(alpha = .9f))) {
+                    Card(Modifier.weight(1f).height(124.dp).clickable { onPage(if (item.first == "شبکه‌های خارجی") "تلویزیون" else item.first) },
+                        shape = RoundedCornerShape(22.dp),
+                        colors = CardDefaults.cardColors(containerColor = Panel),
+                        border = androidx.compose.foundation.BorderStroke(1.5.dp, accent.copy(alpha = .92f))) {
                         Box(Modifier.fillMaxSize().background(
-                            androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF123D70), Color(0xFF0B1830), Color(0xFF080F20))))) {
-                            Box(Modifier.align(Alignment.TopEnd).size(74.dp).background(accent.copy(alpha = .10f), RoundedCornerShape(bottomStart = 70.dp)))
+                            androidx.compose.ui.graphics.Brush.linearGradient(listOf(accent.copy(alpha = .26f), Panel, Background)))) {
+                            Box(Modifier.align(Alignment.TopEnd).size(88.dp).background(
+                                androidx.compose.ui.graphics.Brush.radialGradient(listOf(accent.copy(alpha = .28f), Color.Transparent)),
+                                RoundedCornerShape(bottomStart = 88.dp)))
+                            Box(Modifier.fillMaxWidth().height(2.dp).align(Alignment.TopCenter).background(
+                                androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(Color.Transparent, accent.copy(alpha = .95f), Color.Transparent))))
                             Column(Modifier.fillMaxSize().padding(11.dp), horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.SpaceBetween) {
                                 Box(Modifier.size(52.dp).background(
@@ -1356,12 +1363,12 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                     "اسرائیل" -> Color(0xFF77A9FF)
                     else -> accents[index % accents.size]
                 }
-                Card(Modifier.width(116.dp).height(124.dp).clickable { onDynamicCountry(name) },
-                    shape = RoundedCornerShape(19.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0B1B33)),
+                Card(Modifier.width(116.dp).height(130.dp).clickable { onDynamicCountry(name) },
+                    shape = RoundedCornerShape(21.dp),
+                    colors = CardDefaults.cardColors(containerColor = Panel),
                     border = androidx.compose.foundation.BorderStroke(1.5.dp, accent)) {
                     Box(Modifier.fillMaxSize().background(
-                        androidx.compose.ui.graphics.Brush.verticalGradient(listOf(accent.copy(alpha = .24f), Color(0xFF0A1428), Color(0xFF050B18))))) {
+                        androidx.compose.ui.graphics.Brush.verticalGradient(listOf(accent.copy(alpha = .28f), Panel, Background)))) {
                         Column(Modifier.fillMaxSize().padding(9.dp), horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceEvenly) {
                             CountryArtwork(name = name, accent = accent, compact = true)
@@ -2280,7 +2287,7 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("ظاهر و شخصی‌سازی", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text("حالت نمایش", color = TextMain, fontWeight = FontWeight.SemiBold)
-        listOf("dark" to "مشکی و طلایی", "light" to "روشن", "system" to "هماهنگ با دستگاه").forEach { (value, label) ->
+        listOf("dark" to "مشکی و طلایی براق", "light" to "روشن", "system" to "هماهنگ با دستگاه").forEach { (value, label) ->
             Card(Modifier.fillMaxWidth().clickable { onThemeModeChange(value) },
                 colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
                 Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -2296,6 +2303,8 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
         Text("بدون تغییر حالت روشن و تاریک؛ هر تم ظاهر و رنگ تأکیدی مستقل دارد.", color = SecondaryText, fontSize = 11.sp)
         data class ThemeChoice(val id: String, val title: String, val colors: List<Color>)
         val colorThemes = listOf(
+            ThemeChoice("gold_gloss", "مشکی و طلایی براق", listOf(Color(0xFFFFD76A), Color(0xFF050505), Color(0xFF5A4218))),
+            ThemeChoice("silver_gloss", "مشکی و نقره‌ای براق", listOf(Color(0xFFE4EDF7), Color(0xFF080B10), Color(0xFF657386))),
             ThemeChoice("ocean", "اقیانوسی", listOf(Color(0xFF48C8FF), Color(0xFF071827), Color(0xFF102B40))),
             ThemeChoice("emerald", "زمردی", listOf(Color(0xFF45D6A0), Color(0xFF071B17), Color(0xFF102B24))),
             ThemeChoice("purple", "بنفش کهکشانی", listOf(Color(0xFFB99AFF), Color(0xFF130D22), Color(0xFF251936))),
