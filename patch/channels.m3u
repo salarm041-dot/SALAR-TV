@@ -1,178 +1,249 @@
-#EXTM3U
-# Publicly listed HLS endpoints. Availability and territorial access can change.
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trt1.png" group-title="ترکیه / تلویزیون",TRT 1
 https://tv-trt1.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trthaber.png" group-title="ترکیه / تلویزیون",TRT Haber
 https://tv-trthaber.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtworld.png" group-title="ترکیه / تلویزیون",TRT World
 https://tv-trtworld.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtbelgesel.png" group-title="ترکیه / تلویزیون",TRT Belgesel
 https://tv-trtbelgesel.live.trt.com.tr/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtcocuk.png" group-title="ترکیه / تلویزیون",TRT Çocuk
 https://tv-trtcocuk.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtmuzik.png" group-title="ترکیه / تلویزیون",TRT Müzik
 https://tv-trtmuzik.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtavaz.png" group-title="ترکیه / تلویزیون",TRT Avaz
 https://tv-trtavaz.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://static.epg.best/az/IctimaiTV.az.png" group-title="آذربایجان / تلویزیون",İctimai TV
 https://live.itv.az/itv.m3u8
+
 #EXTINF:-1 tvg-logo="https://atv.az/assets/images/logo_white.png" group-title="آذربایجان / تلویزیون",ATV Azərbaycan
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
+
 #EXTINF:-1 tvg-logo="https://www.oonternet.com/_panel/upload/content/oonternet-8883943415280.jpeg" group-title="صدا و سیما / رادیو",رادیو ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://radiospinner.com/media/logos/180/83710/logo_ZTropL1kFU.png" group-title="صدا و سیما / رادیو",رادیو انگلیسی ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-english/playlist.m3u8
-# Iran TV endpoints from a public playlist updated 2026-11-09; may require an Iranian IP.
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1.ir.png" group-title="ایران / تلویزیون",شبکه یک
 https://live-aburayhan1108.telewebion.ir/ek/tv1/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB2.ir.png" group-title="ایران / تلویزیون",شبکه دو
 https://live-aburayhan1111.telewebion.ir/ek/tv2/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB3.ir.png" group-title="ایران / تلویزیون",شبکه سه
 https://live-aburayhan1112.telewebion.ir/ek/tv3/live/108050p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB4.ir.png" group-title="ایران / تلویزیون",شبکه چهار
 https://live-aburayhan1109.telewebion.ir/ek/tv4/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QuranTV.ir.png" group-title="ایران / تلویزیون",شبکه قرآن
 https://live-aburayhan1110.telewebion.ir/ek/quran/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SalamatTV.ir.png" group-title="ایران / تلویزیون",شبکه سلامت
 https://live-aburayhan1107.telewebion.ir/ek/salamat/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/Tamasha.ir.png" group-title="ایران / تلویزیون",شبکه تماشا
 https://live-aburayhan1105.telewebion.ir/ek/hdtest/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/VarzeshTV.ir.png" group-title="ایران / تلویزیون",شبکه ورزش
 https://live-aburayhan1110.telewebion.ir/ek/varzesh/live/108050p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRINN.ir.png" group-title="ایران / تلویزیون",شبکه خبر
 https://live-aburayhan1111.telewebion.ir/ek/irinn/live/1080p/index.m3u8
 
-
-# Additional national IRIB networks. Stream addresses are public Telewebion HLS endpoints; regional/IP restrictions may apply.
 #EXTINF:-1 tvg-id="NamayeshTV.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NamayeshTV.ir.png" group-title="شبکه‌های سراسری سیما",شبکه نمایش
 https://live-aburayhan1105.telewebion.ir/ek/namayesh/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-id="IRIBUHD.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBUHD.ir.png" group-title="شبکه‌های سراسری سیما",شبکه فراتر (UHD)
 https://live-aburayhan1111.telewebion.ir/ek/faratar/live/1440p/index.m3u8
+
 #EXTINF:-1 tvg-id="IRINN2.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRINN2.ir.png" group-title="شبکه‌های سراسری سیما",شبکه خبر ۲
 https://live-aburayhan1112.telewebion.ir/ek/irinn2/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-id="IRIBOmid.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBOmid.ir.png" group-title="شبکه‌های سراسری سیما",شبکه امید
 https://live-aburayhan1111.telewebion.ir/ek/omid/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-id="PooyaTV.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PooyaTV.ir.png" group-title="شبکه‌های سراسری سیما",شبکه پویا و نهال
 https://live-aburayhan1112.telewebion.ir/ek/pooya/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-id="OfoghTV.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/OfoghTV.ir.png" group-title="شبکه‌های سراسری سیما",شبکه افق
 https://live-aburayhan1106.telewebion.ir/ek/ofogh/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-id="JameJamTVNetwork1.ir" tvg-logo="https://i.imgur.com/BjaN3W1.png" group-title="شبکه‌های سراسری سیما",شبکه جام جم ۱
 https://s1-cloud.irib.ir/securelive3/jamejam1hd/jamejam1hd.m3u8
+
 #EXTINF:-1 tvg-id="JameJamTVNetwork2.ir" tvg-logo="https://i.imgur.com/BjaN3W1.png" group-title="شبکه‌های سراسری سیما",شبکه جام جم ۲
 https://s1-cloud.irib.ir/securelive3/jamejam2sd/jamejam2sd.m3u8
+
 #EXTINF:-1 tvg-id="JameJamOfficialLive.ir" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/5/51/Jjtvlogo1401.png" group-title="شبکه‌های سراسری سیما",جام جم — صفحه رسمی پخش زنده
 https://www.jjtvn.ir/fa/live
 
-# Persian-language channels outside Iran. Entries passed the validator's latest stream probe.
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaComedy.fr.png" group-title="فارسی‌زبان خارج از ایران / سرگرمی / تلویزیون",Persiana Comedy
 https://comedyhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaDocs.fr.png" group-title="فارسی‌زبان خارج از ایران / مستند و سفر / تلویزیون",Persiana Docs
 https://scihls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaTravel.fr.png" group-title="فارسی‌زبان خارج از ایران / مستند و سفر / تلویزیون",Persiana Travel
 https://ptravelhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaMedical.fr.png" group-title="فارسی‌زبان خارج از ایران / سلامت / تلویزیون",Persiana Medical
 https://phd2hls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaJunior.fr.png" group-title="فارسی‌زبان خارج از ایران / کودک / تلویزیون",Persiana Junior
 https://junhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaCinema.fr.png" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال / تلویزیون",Persiana Cinema
 https://cinehls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaFamily.fr.png" group-title="فارسی‌زبان خارج از ایران / عمومی / تلویزیون",Persiana Family
 https://familyhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaIranian.fr.png" group-title="فارسی‌زبان خارج از ایران / عمومی / تلویزیون",Persiana Iranian
 https://irhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaPlus.fr.png" group-title="فارسی‌زبان خارج از ایران / عمومی / تلویزیون",Persiana Plus
 https://euhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaFolk.fr.png" group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Folk
 https://sonhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaMusic.fr.png" group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Music
 https://musichls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaVibe.fr.png" group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Vibe
 https://raphls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaNostalgia.fr.png" group-title="فارسی‌زبان خارج از ایران / موسیقی / تلویزیون",Persiana Nostalgia
 https://noshls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaSeries.fr.png" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال / تلویزیون",Persiana Series
 https://onehls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaFight.fr.png" group-title="فارسی‌زبان خارج از ایران / ورزشی / تلویزیون",Persiana Fight
 https://fighthls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/VoATVPersian.us.png" group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",VOA Persian
 https://voa-ingest.akamaized.net/hls/live/2033876/tvmc07/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/OmideIranTV.us.png" group-title="فارسی‌زبان خارج از ایران / عمومی / تلویزیون",Omide Iran
 https://oitnhls.wns.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NationalIranianCongressTV.us.png" group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",National Iranian Congress TV
 https://tv.iraniancongress.com/stream/tv.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranNationalRevolutionTV.us.png" group-title="فارسی‌زبان خارج از ایران / خبری / تلویزیون",Iran National Revolution TV
 https://hls.irannrtv.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="IranInternational.fa" tvg-name="ایران اینترنشنال" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranInternational.uk.png" group-title="فارسی‌زبان خارج از ایران / خبری",ایران اینترنشنال
 https://hlspackager.akamaized.net/live/DB/IRAN_INTERNATIONAL/HLS/IRAN_INTERNATIONAL.m3u8
+
 #EXTINF:-1 tvg-id="TVITN.ir" tvg-name="ITN" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TVITN.ir.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",ITN | آی‌تی‌ان
 https://itnhls.wns.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="KhaterehTV.us" tvg-name="Khatereh TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhaterehTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی" tvg-language="fas" tvg-quality="FHD",Khatereh TV | خاطره
 https://radio.khatereh.online:5443/LiveApp/streams/jWF37YKCgZ0FSYTR863687974499636.m3u8
+
 #EXTINF:-1 tvg-id="TapeshIran.us" tvg-name="Tapesh Iran" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TapeshIran.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی" tvg-language="fas" tvg-quality="FHD",Tapesh Iran | تپش ایران
 https://iptv.tapesh.tv/tapeshiran/playlist.m3u8
+
 #EXTINF:-1 tvg-id="PBCTapeshTV.us" tvg-name="Tapesh TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PBCTapeshTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی" tvg-language="fas" tvg-quality="FHD",Tapesh TV | تپش
 https://iptv.tapesh.tv/tapesh/playlist.m3u8
+
 #EXTINF:-1 tvg-id="TinTV.us" tvg-name="Tin TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TinTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی" tvg-language="fas" tvg-quality="HD",Tin TV | تین
 https://tulixcdn.akamaized.net/tintv6/tintv/tintv/playlist.m3u8
+
 #EXTINF:-1 tvg-id="MBCPersia.ae" tvg-name="MBC Persia" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MBCPersia.ae.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / فیلم و سرگرمی" tvg-language="fas" tvg-quality="FHD",MBC Persia | ام‌بی‌سی پرشیا
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-persia/818ee8e4b592dc497608f066d825bfb4/index.m3u8
+
 #EXTINF:-1 tvg-id="PersianaChina.fr" tvg-name="Persiana China" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaChina.fr.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی و محتوای ویژه" tvg-language="fas" tvg-quality="HD",Persiana China | پرشیانا چین
 https://chinahls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="PersianaKorea.fr" tvg-name="Persiana Korea" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaKorea.fr.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی و محتوای ویژه" tvg-language="fas;kor" tvg-quality="SD",Persiana Korea | پرشیانا کره
 https://korhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="PersianaTurkiye.fr" tvg-name="Persiana Turkiye" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaTurkiye.fr.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی و محتوای ویژه" tvg-language="fas;tur" tvg-quality="SD",Persiana Turkiye | پرشیانا ترکیه
 https://turkhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="BBCPersian.uk" tvg-name="BBC News Persian" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/BBCPersian.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="HD",BBC News Persian | بی‌بی‌سی فارسی
 https://vs-hls-pushb-ww-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_persian_tv/mobile_wifi_main_hd_abr_v2.m3u8
+
 #EXTINF:-1 tvg-id="DidgahTV.us" tvg-name="Didgah TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/DidgahTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",Didgah TV | دیدگاه
 https://media.streambrothers.com:1936/8276/8276/playlist.m3u8
+
 #EXTINF:-1 tvg-id="IraneFardaTV.uk" tvg-name="IraneFarda TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IraneFardaTV.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="HD",IraneFarda TV | ایران فردا
 https://iranefardalive.com/stream/live.m3u8
+
 #EXTINF:-1 tvg-id="KanalJadid.uk" tvg-name="Kanal Jadid" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KanalJadid.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",Kanal Jadid | کانال جدید
 https://kjhls.wns.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="RadioFardaTV.us" tvg-name="Radio Farda TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/RadioFardaTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",Radio Farda TV | رادیو فردا
 https://rferl-ingest.akamaized.net/hls/live/2121768/tvmc01/playlist.m3u8
+
 #EXTINF:-1 tvg-id="SimayeAzadi.uk" tvg-name="Simaye Azadi" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SimayeAzadi.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="FHD",Simaye Azadi | سیمای آزادی
 https://simaytv.akamaized.net/hls/live/a162cb6c-3be1-4e57-87dc-a75a50b3b8d9/simayhls/index.m3u8
+
 #EXTINF:-1 tvg-id="PersianaSetMix.fr" tvg-name="Persiana SetMix" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaSetMix.fr.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / موسیقی" tvg-language="fas" tvg-quality="FHD",Persiana SetMix | پرشیانا ست‌میکس
 https://setmixhls.persiana.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="PMC.ae" tvg-name="PMC" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PMC.ae.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / موسیقی" tvg-language="fas" tvg-quality="SD",PMC | پی‌ام‌سی
 https://pmchls.wns.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="PMCRoyale.ae" tvg-name="PMC Royale" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PMCRoyale.ae.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / موسیقی" tvg-language="fas" tvg-quality="SD",PMC Royale | پی‌ام‌سی رویال
 https://pmcrohls.wns.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="RJTV.us" tvg-name="Radio Javan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/RJTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / موسیقی" tvg-language="fas" tvg-quality="SD",Radio Javan | رادیو جوان
 https://rjtvhls.wns.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="MarjaeyatTVPersian.iq" tvg-name="Marjaeyat TV Persian" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MarjaeyatTVPersian.iq.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / دینی و فرهنگی" tvg-language="fas" tvg-quality="FHD",Marjaeyat TV Persian | شبکه مرجعیت
 https://livefa.marjaeyattv.com/mtv_fa/playlist.m3u8
+
 #EXTINF:-1 tvg-id="VelayatTV.ir" tvg-name="Velayat TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/VelayatTV.ir.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / دینی و فرهنگی" tvg-language="fas" tvg-quality="HD",Velayat TV | شبکه ولایت
 https://live-aburayhan1112.telewebion.ir/ek/velayat/live/720p/index.m3u8
+
 #EXTINF:-1 tvg-id="KalemehTV.uk" tvg-name="Kalemeh TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KalemehTV.uk.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / دینی و فرهنگی" tvg-language="fas" tvg-quality="FHD",Kalemeh TV | شبکه کلمه
 https://player.kalemeh.tv/live/ngrp:kalemeh_all/playlist.m3u8
+
 #EXTINF:-1 tvg-id="Sat7Pars.cy" tvg-name="SAT-7 Pars" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/Sat7Pars.cy.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / دینی و فرهنگی" tvg-language="fas" tvg-quality="SD",SAT-7 Pars | ست سون پارس
 https://sat7phls.wns.live/hls/stream.m3u8
-# Israeli television channels. Public HLS endpoints listed by community IPTV sources; access may be geo-restricted or change.
+
 #EXTINF:-1 tvg-logo="https://i.ibb.co/j68q1Bp/i24.png" group-title="اسرائیل / خبری",i24NEWS עברית
 https://i24newshebrew-cdn.encoders.immergo.tv/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://i.ibb.co/tLYB26T/h2322.png" group-title="اسرائیل / آموزشی",כאן חינוכית 23 | Kan Educational
 https://kan23.media.kan.org.il/hls/live/2024691/2024691/master.m3u8
+
 #EXTINF:-1 tvg-logo="https://i.ibb.co/zP5vjLD/knesset.png" group-title="اسرائیل / پارلمان",ערוץ הכנסת 99 | Knesset Channel
 https://kneset.gostreaming.tv/p2-kneset/_definst_/myStream/chunklist.m3u8
+
 #EXTINF:-1 tvg-logo="https://i.ibb.co/bJVPhHD/hidabroot.png" group-title="اسرائیل / دینی و فرهنگی",Hidabroot 97
 https://cdn.cybercdn.live/HidabrootIL/Live97/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://i.ibb.co/7nYM8MK/arutz24tvtrp.png" group-title="اسرائیل / موسیقی و سرگرمی",Mako 24
 https://mako-streaming.akamaized.net/direct/hls/live/2035340/ch24live/video_10801920_p_1.m3u8
+
 #EXTINF:-1 tvg-logo="https://i.ibb.co/jzRyjBn/walla.png" group-title="اسرائیل / خبری",Walla News
 https://live.wcdn.co.il/news/prog_index.m3u8
+
 #EXTINF:-1 tvg-logo="https://i.ibb.co/93bQz4t/kabalah.png" group-title="اسرائیل / دینی و فرهنگی",Kabbalah 96
 https://edge3.uk.kab.tv/live/tv66-heb-high/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Kan11Logo.svg/512px-Kan11Logo.svg.png" group-title="اسرائیل / خبری",Kan 11 | כאן 11
 https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/en/5/56/MeKan_33_logo_2017.png" group-title="اسرائیل / خبری به زبان عربی",Makan 33 | مكان 33
 https://makan.media.kan.org.il/hls/live/2024680/2024680/source1_1.2k/chunklist.m3u8
+
 #EXTINF:-1 tvg-logo="https://i.imgur.com/028M4Ew.png" group-title="اسرائیل / شبکه عربی",Hala TV
 https://gstream4.panet.co.il/edge/halaTV/chunks.m3u8
 
-# Salin TV public catalogue additions; direct streams from a community-maintained playlist.
 #EXTINF:-1 tvg-id="TehranTV.ir" tvg-name="IRIB TV5 (Tehran)" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TehranTV.ir.png" group-title="IRIB National Networks | شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",IRIB TV5 (Tehran) | شبکه پنج (تهران)
 https://live-aburayhan1108.telewebion.ir/ek/tehran/live/1080p/index.m3u8
 
@@ -281,7 +352,6 @@ https://hls.nejat.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="FX2.ir" tvg-name="FX 2" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/FX2.ir.png" group-title="Satellite · Children | ماهواره‌ای · کودک" tvg-language="fas" tvg-quality="SD",FX 2 | اف‌ایکس ۲
 https://toonixhls.wns.live/hls/stream.m3u8
 
-# Additional Persian channels found in public community playlists; not sourced from Salin TV's private server.
 #EXTINF:-1 tvg-logo="https://images.persianagroup.cloud/channels/smallThumbnail/persiana-two.jpg" tvg-id="PersianaTwo.fr" tvg-name="Persiana Two" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال",Persiana Two | پرشیانا دو
 https://twohls.persiana.live/hls/stream.m3u8
 
@@ -303,7 +373,6 @@ https://homeplushls.wns.live/hls/stream.m3u8
 #EXTINF:-1 tvg-logo="https://i.ibb.co/GW4cMfc/cafe-trade-tv.png" tvg-id="CafeTradeTV.ir" tvg-name="Cafe Trade TV" group-title="فارسی‌زبان خارج از ایران / اقتصادی و آموزشی",Cafe Trade TV | کافه ترید
 https://cafetradehls.wns.live/hls/stream.m3u8
 
-# Additional entries matched to Salin TV public gallery; public HLS endpoints from community listings or Salin TV channel pages.
 #EXTINF:-1 tvg-id="4UPlus.ir" tvg-name="4U Plus" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/4UPlus.ir.png" group-title="فارسی‌زبان خارج از ایران / سرگرمی",4U Plus | فور یو پلاس
 https://bravoohls.wns.live/hls/stream.m3u8
 
@@ -322,334 +391,486 @@ https://familyhls.4utv.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="4Kurd.fr" tvg-name="4 Kurd" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/4Kurd.fr.png" group-title="کردی و فارسی / موسیقی",4 Kurd | فور کورد
 https://4kuhls.persiana.live/hls/stream.m3u8
 
-# شبکه‌های استانی صداوسیما — فهرست عمومی؛ منبع فهرست هشدار داده که دسترسی برخی/همه جریان‌ها ممکن است به IP ایران محدود باشد.
-# این دسته عمداً جدا از شبکه‌های سراسری قرار گرفته است.
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AbadanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",آبادان
 https://ncdn.telewebion.ir/abadan/live/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AflakTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",افلاک (لرستان)
 https://live-aburayhan1101.telewebion.ir/ek/aflak/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AftabTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",آفتاب (مرکزی)
 https://live-aburayhan1101.telewebion.ir/ek/aftab/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AlborzTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",البرز
 https://live-aburayhan1106.telewebion.ir/ek/alborz/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AtrakTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",اترک (خراسان شمالی)
 https://live-aburayhan1104.telewebion.ir/ek/atrak/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/BaranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",باران (گیلان)
 https://live-aburayhan1109.telewebion.ir/ek/baran/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/BoushehrTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",بوشهر
 https://live-aburayhan1111.telewebion.ir/ek/bushehr/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/DenaTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",دنا (کهگیلویه و بویراحمد)
 https://live-aburayhan1109.telewebion.ir/ek/dena/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/EshraghNetwork.ir.jpg" group-title="صداوسیما / شبکه‌های استانی",اشراق (زنجان)
 https://live-aburayhan1112.telewebion.ir/ek/eshragh/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/FarsTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",فارس
 https://live-aburayhan1107.telewebion.ir/ek/fars/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HamedanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",همدان
 https://ncdn.telewebion.ir/sina/live/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HamoonTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",هامون (سیستان و بلوچستان)
 https://ncdn.telewebion.ir/hamoon/live/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IlamTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",ایلام
 https://live-aburayhan1103.telewebion.ir/ek/ilam/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IsfahanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",اصفهان
 https://ncdn.telewebion.ir/esfahan/live/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/JahanbinTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",جهانبین (چهارمحال و بختیاری)
 https://ncdn.telewebion.ir/jahanbin/live/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KermanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",کرمان
 https://ncdn.telewebion.ir/kerman/live/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhalijeFarsTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خلیج فارس (هرمزگان)
 https://live-aburayhan1102.telewebion.ir/ek/khalijefars/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhavaranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خاوران (خراسان جنوبی)
 https://live-aburayhan1112.telewebion.ir/ek/khavaran/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhorasanRazaviTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خراسان رضوی
 https://live-aburayhan1108.telewebion.ir/ek/khorasanrazavi/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhozestanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",خوزستان
 https://live-aburayhan1104.telewebion.ir/ek/khoozestan/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KishTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",کیش
 https://live-aburayhan1106.telewebion.ir/ek/kish/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KordestanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",کردستان
 https://live-aburayhan1108.telewebion.ir/ek/kordestan/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MahabadTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",مهاباد
 https://ncdn.telewebion.ir/mahabad/live/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MakranTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",مکران
 https://live-aburayhan1104.telewebion.ir/na/makran/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NoorTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",نور (مازندران)
 https://live-aburayhan1107.telewebion.ir/ek/noor/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QazvinTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",قزوین
 https://live-aburayhan1113.telewebion.ir/ek/qazvin/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabalanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سبلان (اردبیل)
 https://live-aburayhan1111.telewebion.ir/ek/sabalan/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabzTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سبز (خراسان رضوی)
 https://live-aburayhan1111.telewebion.ir/ek/sabz/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SemnanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",سمنان
 https://live-aburayhan1107.telewebion.ir/ek/semnan/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TabarestanTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",تبرستان (مازندران)
 https://live-aburayhan1112.telewebion.ir/ek/tabarestan/live/1080p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/YazdTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",تابان (یزد)
 https://live-aburayhan1104.telewebion.ir/ek/taban/live/576p/index.m3u8
+
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ZagrosTV.ir.png" group-title="صداوسیما / شبکه‌های استانی",زاگرس (کرمانشاه)
 https://live-aburayhan1109.telewebion.ir/ek/zagros/live/576p/index.m3u8
 
-# Persian-language live radio streams. Direct audio endpoints selected from currently listed working streams.
 #EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو فردا
 https://stream.radiojar.com/cp13r2cpn3quv
+
 #EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو نواهنگ
 https://navairan.com/;stream.nsv
+
 #EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو سیمرغ
 https://stream.zeno.fm/9svfnobkrxrvv
+
 #EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو فاز
 https://free.rcast.net/230792
 
-# Turkey and Azerbaijan channel expansion (publicly listed HLS; availability may vary)
 #EXTINF:-1 group-title="ترکیه / عمومی",Kanal D
 https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web&ce=3
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Star TV
 https://dogus.daioncdn.net/startv/startv_720p.m3u8?app=a20ac41e-bdc3-4aa1-934d-26b484480ac9&ce=3&sid=8l4w3lst4co5
+
 #EXTINF:-1 group-title="ترکیه / عمومی",ATV
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/atv/atv_1080p.m3u8
+
 #EXTINF:-1 group-title="ترکیه / خبری",A Haber
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/ahaber/ahaber.m3u8
+
 #EXTINF:-1 group-title="ترکیه / ورزشی",A Spor
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/aspor/aspor.m3u8
+
 #EXTINF:-1 group-title="ترکیه / خبری",NTV
 https://dogus.daioncdn.net/ntv/ntv.m3u8?app=ntv_web
+
 #EXTINF:-1 group-title="ترکیه / خبری",Habertürk
 https://tv.ensonhaber.com/haberturk/haberturk.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",NOW TV
 https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Kanal 7
 https://kanal7.blutv.com/blutv_kanal7_live/live.m3u8
+
 #EXTINF:-1 group-title="ترکیه / خبری",Halk TV
 https://halktv-live.daioncdn.net/halktv/halktv.m3u8
+
 #EXTINF:-1 group-title="ترکیه / ورزشی",HT Spor
 https://ciner.daioncdn.net/ht-spor/ht-spor.m3u8?app=web
+
 #EXTINF:-1 group-title="ترکیه / اقتصادی",Ekotürk
 https://cdn.ekoturk.net/hls/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / اقتصادی",CNBC-e
 https://hnpsechtsc.turknet.ercdn.net/xpnvudnlsv/cnbc-e/cnbc-e.m3u8
+
 #EXTINF:-1 group-title="ترکیه / دینی و فرهنگی",Diyanet TV
 https://eustr73.mediatriple.net/videoonlylive/mtikoimxnztxlive/broadcast_5e3bf95a47e07.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",360 TV
 https://turkmedya-live.ercdn.net/tv360/tv360.m3u8
+
 #EXTINF:-1 group-title="ترکیه / خبری",Flash Haber TV
 https://b01c02nl.mediatriple.net/videoonlylive/mtyycglqauzjhlive/broadcast_67c053c48829f.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",AzTV
 https://az.tvstream.az/hls/stream9/index.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / خبری",Baku TV
 https://rtmp.baku.tv/hls/bakutv.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / خبری",ARB 24
 https://operativmm.az/tvs/arb24/stream/index.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Space TV
 https://operativmm.az/tvs/space/stream8/index.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",FTV
 https://stream.ftv.az/live/ftv.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",GunAz TV
 https://tv.gunaz.tv/hls/live.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Kanal S
 https://lives.atv.az:5443/KANAL-S/streams/kanals.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / موسیقی",Music Azerbaijan
 https://cdn-sinematv.yayin.com.tr/sinematv/sinematv/playlist.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Vilayət TV
 https://nl.livekadeh.com/hls2/vilayet.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / خبری",Xəzər TV
 https://xezer.tvstream.az/hls/stream/main_stream.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / موسیقی",KN Music TV
 https://cdn4.yayin.com.tr/kntv/video.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / کودک",Balacan TV
 https://v2.catcast.tv/content/50634/seg-25745099-v1-a1/index.m3u8
 
-# Expanded Turkish and Azerbaijani public streams
 #EXTINF:-1 group-title="ترکیه / عمومی",A2TV
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/a2tv/a2tv.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Afroturk TV
 https://edge.socialsmart.tv/naturaltv/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Aksu TV
 https://live.artidijitalmedya.com/artidijital_aksutv/aksutv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Alanya Posta TV
 https://api-tv3.yayin.com.tr/postatv/postatv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Almahriah TV
 https://starmenajo.com/hls/almahriah/index.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Altas TV
 https://edge1.socialsmart.tv/altastv/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Anadolu Net TV
 https://live.artidijitalmedya.com/artidijital_anadolunet/anadolunet/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",ATV Alanya
 https://cdn-alanyatv.yayin.com.tr/alanyatv/alanyatv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",ATV Avrupa
 https://flask-api-hls-atvavrupahdtrkvz-live.onrender.com/hls_stream/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Bir TV
 https://edge.taksimbilisim.com/birtv/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / اقتصادی",Bloomberg HT
 https://mumbai-edge.smartplaytv.in/BloombergHT/index.m3u8
+
 #EXTINF:-1 group-title="ترکیه / اقتصادی",BloombergHT
 https://ciner-live.daioncdn.net/bloomberght/bloomberght.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Bursa AS TV
 https://live.artidijitalmedya.com/artidijital_astv/astv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Cay TV
 https://edge1.socialsmart.tv/caytv/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Cekmeköy TV
 https://cdn-cekmekoybeltv.yayin.com.tr/cekmekoybeltv/cekmekoybeltv_1080p/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Diyar TV
 https://live.artidijitalmedya.com/artidijital_diyartv/diyartv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / دینی",Dost TV
 https://dost.stream.emsal.im/tv/live.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Dream Türk
 https://live.duhnet.tv/S2/HLS_LIVE/dreamturknp/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Edessa TV
 https://canli.edessatv.com/hls/stream.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Erzurum Web TV
 https://win29.yayin.com.tr/erzurumwebtv/erzurumwebtv/iptvdelisi.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",ES TV
 https://live.artidijitalmedya.com/artidijital_estv/estv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",ETV Kayseri
 https://live.artidijitalmedya.com/artidijital_etv/etv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Euro D
 https://live.duhnet.tv/S2/HLS_LIVE/eurodnp/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / اقتصادی",Finans Turk TV
 https://yayin30.haber100.com/live/finansturk/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Fortuna TV
 https://edge.taksimbilisim.com/ftvturk/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Guneydogu TV
 https://edge1.socialsmart.tv/gtv/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / خبری",GZT
 https://gzttv-live.lg.mncdn.com/gzttv/gzttv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Ilke TV
 https://stream.ilketv.com.tr/hls/ilkecanli.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Kanal 12
 https://live.artidijitalmedya.com/artidijital_kanal12/kanal12/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Kanal 23
 https://cdn-kanal23.yayin.com.tr/kanal23/index.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Kanal D Drama
 https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01602-themahqfrance-vivekanald-samsungspain/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Kanal Hayat
 https://tbn02a.ltnschedule.com/hls/nx21i.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Kocaeli TV
 https://edge.taksimbilisim.com/kocaelitv/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Konya Olay TV
 https://live.artidijitalmedya.com/artidijital_konyaolaytv/konyaolaytv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",KRAL Pop TV
 https://dogus-live.daioncdn.net/kralpoptv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",KRT
 https://raw.githubusercontent.com/yaskar661-lgtm/stream/refs/heads/main/filbox/krthd.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Lalegul TV
 https://lbl.netmedya.net/hls/lalegultv.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Luys TV
 https://b01c02nl.mediatriple.net/videoonlylive/mtpayqrfkgirxelive/broadcast_5e91c5ac96898.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Mekameleen TV
 https://mn-nl.mncdn.com/mekameleen/smil:mekameleentv.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Meltem TV
 https://vhxyrsly.rocketcdn.com/meltemtv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Minika Cocuk
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago_cocuk/minikago_cocuk.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Minika Go
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago/minikago.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",MTürk TV
 https://edge1.socialsmart.tv/muglaturk/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",National Geographic
 https://nord.ayakkabiparti.lol/natgeo/index.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",National Geographic Wild
 https://nord.ayakkabiparti.lol/natgeowild/index.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",NOW
 https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv_720p.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Number 1 Ask
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/u_stream_5c9e18f9cea15_1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Number 1 Damar
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/u_stream_5c9e198784bdc_1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Number 1 Dance
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/u_stream_5c9e2aa8acf44_1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Number 1 TV
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e17cd59e8b.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",On4 TV
 https://edge1.socialsmart.tv/on4/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Power Dance
 https://livetv.powerapp.com.tr/dance/dance.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Power Love
 https://livetv.powerapp.com.tr/plove/love.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Power Türk Akustik
 https://livetv.powerapp.com.tr/pturkakustik/akustik.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Power Türk Slow
 https://livetv.powerapp.com.tr/pturkslow/slow.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Power Türk Taptaze
 https://livetv.powerapp.com.tr/pturktaptaze/taptaze.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Power TV
 https://livetv.powerapp.com.tr/powerTV/powerhd.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",PowerTurk TV
 https://powerturk.blutv.com/blutv_powerturk/powerturk_sd.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",PowerTürk TV
 https://live.artidijitalmedya.com/artidijital_powerturktv/powerturktv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Qaf TV
 https://customer-9vqui33qma2rownb.cloudflarestream.com/7792e558fe54e23bdd4b462ec275cdba/manifest/video.m3u8
+
 #EXTINF:-1 group-title="ترکیه / ورزشی",S Sport 2
 https://bcovlive-a.akamaihd.net/29c60f23ea4840ba8726925a77fcfd0b/eu-central-1/6415845530001/profile_0/chunklist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",Sat7 Türk
 https://live.artidijitalmedya.com/artidijital_sat7turk/sat7turk/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / دینی",Sercem TV
 https://canli.sercemtv.com.tr/hls/0/stream.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Show Turk
 https://raw.githubusercontent.com/bnyusuf67-crypto/streams/refs/heads/main/streams/shturk.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Sozcu TV
 https://raw.githubusercontent.com/yaskar661-lgtm/stream/refs/heads/main/filbox/szchd.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TBMM TV
 https://meclistv-live.ercdn.net/meclistv/meclistv.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Tele 1
 https://tele1-live.ercdn.net/tele1/tele1.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Tempo TV
 https://live.artidijitalmedya.com/artidijital_tempotv/tempotv/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / خبری",TGRT Haber
 https://canli.tgrthaber.com/tgrt.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",Tivi 6
 https://live.artidijitalmedya.com/artidijital_tivi6/tivi6/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TJK TV
 https://tjktv-live.tjk.org/tjktv.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TRT 3
 https://vuvuu-geil-m3u8.yaskar661.workers.dev/?url=https%3A%2F%2Fvavoo.to%2Fvavoo-iptv%2Fplay%2F418740351278f04c94b243
+
 #EXTINF:-1 group-title="ترکیه / کودک",TRT Diyanet Çocuk
 https://tv-trtdiyanetcocuk.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TRT EBA Ilkokul
 https://tv-e-okul00.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TRT EBA Lise
 https://tv-e-okul02.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TRT EBA Ortaokul
 https://tv-e-okul01.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TRT Kurdî
 https://tv-trtkurdi.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",TRT Muzik
 https://stream8.cinerama.uz/1208/tracks-v1a1/mono.m3u8
+
 #EXTINF:-1 group-title="ترکیه / ورزشی",TRT Spor
 https://corestream.siteyaptim.live/trt-spor/index.m3u8
+
 #EXTINF:-1 group-title="ترکیه / موسیقی",TRT Türk
 https://tv-trtturk.medya.trt.com.tr/master.m3u8
+
 #EXTINF:-1 group-title="ترکیه / خبری",TürkHaber
 https://edge1.socialsmart.tv/turkhaber/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TV 1
 https://edge1.socialsmart.tv/tv1/bant1/playlist.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TV4
 https://turkmedya-live.ercdn.net/tv4/tv4.m3u8
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TV 8
 https://tv8.daioncdn.net/tv8/tv8.m3u8?app=7ddc255a-ef47-4e81-ab14-c0e5f2949788&ce=3
+
 #EXTINF:-1 group-title="ترکیه / عمومی",TV 24
 https://turkmedya-live.ercdn.net/tv24/tv24.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",AnewZ TV
 https://edge-rs-01.maksnet.tv/cubesanewz-secure/smil:cubesanewz-secure.smil/playlist.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Ayaz TV
 https://janya-ayaztv.vgcdn.net/ptnr-WebApp/title-Ayaz_TV/v1/vglive-sk-934820/main.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Az TV
 https://operativmm.az/tvs/az/stream9/index.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Azstar TV
 https://live.livestreamtv.ca/azstar/amlst:azstar/playlist.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",EL TV
 https://live.eltv.az/live/eltv/playlist.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / موسیقی",Kanal 65 Music
 https://v2.catcast.tv/content/47437/seg-25409996-v1-a1/index.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / موسیقی",Now Music AZ
 https://v2.catcast.tv/content/48694/seg-25410024-v1-a1/index.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Shirvan TV
 https://a8.radyotelekom.com.tr/p/3326/hybrid/play.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Show Plus TV
 https://rtmp.showplus.tv/hls/myshow.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / عمومی",Son Umid TV
 https://cdn-sonumidtv.yayin.com.tr/sonumidtv/sonumidtv/chunklist.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / موسیقی",Ulduz Music AZ
 https://v2.catcast.tv/content/50265/seg-25409976-v1-a1/index.m3u8
+
 #EXTINF:-1 group-title="آذربایجان / دینی",Zahra TV
 https://ak.imamhussein.live/alzahratvlive/alzahra.smil/playlist.m3u8
 
@@ -731,80 +952,80 @@ https://podhls.persiana.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="PersianaVoyage.fr" tvg-name="Persiana Voyage" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaVoyage.fr.png" group-title="ماهواره‌ای · مستند، فرهنگ و سبک زندگی" tvg-language="fas" tvg-quality="HD",پرشیانا سیاحت
 https://voyhls.persiana.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-name="GEM TV" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM TV
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_tv/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEM24B.tr@SD" tvg-logo="https://i.imgur.com/8LgdPst.png" group-title="ماهواره‌ای · جم",جم ۲۴ بی
+http://66.102.120.18:8000/play/a044/index.m3u8
 
-#EXTINF:-1 tvg-name="GEM 24B" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM 24B
-https://d2e40kvaojifd6.cloudfront.net/stream/24b/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMBollywood.tr@SD" tvg-logo="https://i.imgur.com/2XASeBk.png" group-title="ماهواره‌ای · جم",جم بالیوود
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gembollywood/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Academy" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Academy
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_usa/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMClassic.tr@SD" tvg-logo="https://i.imgur.com/25BhuOf.png" group-title="ماهواره‌ای · جم",جم کلاسیک
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemclassic/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Arabia" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Arabia
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_arabia/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMComedy.tr@SD" tvg-logo="https://i.imgur.com/FuscfJW.png" group-title="ماهواره‌ای · جم",جم کمدی
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemcomedy/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM AZ" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM AZ
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_az/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMDrama.tr@SD" tvg-logo="https://i.imgur.com/k2pGyRH.png" group-title="ماهواره‌ای · جم",جم دراما
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemdrama/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Bollywood" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Bollywood
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_bollywood/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMDramaPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_7.png" group-title="ماهواره‌ای · جم",جم دراما پلاس
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemdramaplus/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Classic" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Classic
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_classic/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMFilm.tr@SD" tvg-logo="https://i.imgur.com/nrFz3LU.png" group-title="ماهواره‌ای · جم",جم فیلم
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemfilm/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Comedy" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Comedy
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_comedy/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMFit.tr@SD" tvg-logo="https://i.imgur.com/7FQxaII.png" group-title="ماهواره‌ای · جم",جم فیت
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemfit/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Drama" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Drama
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_drama/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMFood.tr@SD" tvg-logo="https://i.imgur.com/SMtSinK.png" group-title="ماهواره‌ای · جم",جم غذا
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemfood/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Fit" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Fit
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_fit/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMJunior.tr@SD" tvg-logo="https://i.imgur.com/jK8yzj2.png" group-title="ماهواره‌ای · جم",جم جونیور
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemjunior/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Food" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Food
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_food/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMKids.tr@SD" tvg-logo="https://i.imgur.com/ArkjaFk.png" group-title="ماهواره‌ای · جم",جم کودک
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemkids/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Film" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Film
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_film/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMLife.tr@SD" tvg-logo="https://i.imgur.com/gI8qePa.png" group-title="ماهواره‌ای · جم",جم لایف
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemlife/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Junior" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Junior
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_junior/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMMifa.tr@SD" tvg-logo="https://i.imgur.com/qlI7o7V.png" group-title="ماهواره‌ای · جم",جم میفا
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemmifa/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Kids" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Kids
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_kids/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMMifaPlus.tr@SD" tvg-logo="https://i.imgur.com/8FIAqR5.png" group-title="ماهواره‌ای · جم",جم میفا پلاس
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemmifaplus/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Latino" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Latino
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_latino/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMNature.tr@SD" tvg-logo="https://i.imgur.com/ENvOMDQ.png" group-title="ماهواره‌ای · جم",جم طبیعت
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemnature/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Life" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Life
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_life/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMOnyx.tr@SD" tvg-logo="https://i.imgur.com/gXRIAw4.png" group-title="ماهواره‌ای · جم",جم اونیکس
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemonyx/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM MAX" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM MAX
-https://d2e40kvaojifd6.cloudfront.net/stream/maxx/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMPixel.tr@SD" tvg-logo="https://i.ibb.co/Q3tkbPrn/icon-27.png" group-title="ماهواره‌ای · جم",جم پیکسل
+https://glserver1.tamashaland.com/live/aBCH96886YznRbGOiqTnnQ__/stream_0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Mifa" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Mifa
-https://d2e40kvaojifd6.cloudfront.net/stream/mifa/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMRiver.tr@SD" tvg-logo="https://i.imgur.com/yJ6f1B6.png" group-title="ماهواره‌ای · جم",جم ریور
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemriver/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Modern Economy" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Modern Economy
-https://d2e40kvaojifd6.cloudfront.net/stream/modern_economy/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMRiverPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_29.png" group-title="ماهواره‌ای · جم",جم ریور پلاس
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemriverplus/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Nature" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Nature
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_nature/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMRubix.tr@SD" tvg-logo="https://i.imgur.com/cDjOj58.png" group-title="ماهواره‌ای · جم",جم روبیکس
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemrubix/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Onyx" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Onyx
-https://d2e40kvaojifd6.cloudfront.net/stream/onyx/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMRubixPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_31.png" group-title="ماهواره‌ای · جم",جم روبیکس پلاس
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemrubixplus/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Property" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Property
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_property/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMSeries.tr@SD" tvg-logo="https://i.imgur.com/M0WMDXm.png" group-title="ماهواره‌ای · جم",جم سریال
+https://wild-dawn-81ef.srmhoburfqyupzwxbu.workers.dev/?url=https://ca-rt.onetv.app/gemseries/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM River" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM River
-https://d2e40kvaojifd6.cloudfront.net/stream/river/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMSeriesPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_33.png" group-title="ماهواره‌ای · جم",جم سریال پلاس
+https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.app/gemseriesplus/index-0.m3u8
 
-#EXTINF:-1 tvg-name="GEM Rubix" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Rubix
-https://d2e40kvaojifd6.cloudfront.net/stream/rubix/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GemShoppingNetwork.us@SD" tvg-logo="https://i.imgur.com/WlHEpAu.png" group-title="ماهواره‌ای · جم",Gem Shopping Network
+https://amg01460-gemshoppingnetw-gem-ono-x662c.amagi.tv/playlist.m3u8
 
-#EXTINF:-1 tvg-name="GEM Series" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Series
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_series/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GEMTVPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_17.png" group-title="ماهواره‌ای · جم",جم تی‌وی پلاس
+http://66.102.120.18:8000/play/a045/index.m3u8
 
-#EXTINF:-1 tvg-name="GEM Travel" group-title="ماهواره‌ای · جم" tvg-language="fas",GEM Travel
-https://d2e40kvaojifd6.cloudfront.net/stream/gem_travel/playlist.m3u8
+#EXTINF:-1 tvg-language="fas" tvg-id="GeminiMovies.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_MOVIES/images/LOGO_HD/image.png" group-title="ماهواره‌ای · جم",Gemini Movies
+http://103.167.255.18:8085/play/a0n5/index.m3u8
