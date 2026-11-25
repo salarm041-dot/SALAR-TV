@@ -770,6 +770,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
+                        var showPlayerHelp by remember(selected!!.url) { mutableStateOf(false) }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
                         var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
                         var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
@@ -897,6 +898,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         leadingIcon = { Icon(Icons.Default.Translate, null) },
                                         onClick = { showDubbingDialog = true; playerMenuExpanded = false }
                                     )
+                                    DropdownMenuItem(
+                                        text = { Text("راهنمای زیرنویس و دوبله") },
+                                        leadingIcon = { Icon(Icons.Default.HelpOutline, null) },
+                                        onClick = { showPlayerHelp = true; playerMenuExpanded = false }
+                                    )
                                 }
                             }
                         }
@@ -1021,6 +1027,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                                 leadingIcon = { Icon(Icons.Default.VideoLibrary, null) },
                                                 onClick = { page = "ضبط‌ها"; showPlayerFullscreen = false; playerMenuExpanded = false }
                                             )
+                                            DropdownMenuItem(
+                                                text = { Text("راهنمای زیرنویس و دوبله") },
+                                                leadingIcon = { Icon(Icons.Default.HelpOutline, null) },
+                                                onClick = { showPlayerHelp = true; playerMenuExpanded = false }
+                                            )
                                         }
                                     }
                                     IconButton(
@@ -1063,6 +1074,31 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                     }
                                 },
                                 confirmButton = { TextButton(onClick = { showSubtitleDialog = false }) { Text("بستن") } }
+                            )
+                        }
+                        if (showPlayerHelp) {
+                            AlertDialog(
+                                onDismissRequest = { showPlayerHelp = false },
+                                title = { Text("راهنمای زیرنویس و دوبله") },
+                                text = {
+                                    Column(
+                                        modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()),
+                                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Text("۱) انتخاب زیرنویس شبکه", fontWeight = FontWeight.Bold, color = Gold)
+                                        Text("از منوی سه‌نقطه گزینه «انتخاب زیرنویس» را بزنید. اگر شبکه زیرنویس متنی ارائه کند، زبان‌های موجود نمایش داده می‌شوند؛ در غیر این صورت گزینه‌ای برای انتخاب وجود ندارد.")
+                                        Text("۲) ترجمه زیرنویس", fontWeight = FontWeight.Bold, color = Gold)
+                                        Text("برای ترجمه، دکمه «ترجمه زیرنویس شبکه» زیر تصویر پخش را فعال کنید. این قابلیت به وجود زیرنویس متنی قابل‌خواندن در جریان شبکه وابسته است.")
+                                        Text("۳) ترجمه گفتار زنده", fontWeight = FontWeight.Bold, color = Gold)
+                                        Text("دکمه «ترجمه گفتار زنده» برای دریافت متن گفتار در حال پخش در نظر گرفته شده است. عملکرد آن به اتصال اینترنت، دسترسی سرویس و پشتیبانی نسخه برنامه بستگی دارد.")
+                                        Text("۴) تنظیمات دوبله", fontWeight = FontWeight.Bold, color = Gold)
+                                        Text("از منوی سه‌نقطه وارد «تنظیمات دوبله» شوید تا گزینه‌های دوبله، زیرنویس هوشمند و زیر و بمی صدا را ببینید. توجه کنید که نمایش تنظیمات به معنی فعال‌بودن کامل دوبله صوتی فارسی در همه شبکه‌ها نیست.")
+                                        Text("این راهنما فقط با انتخاب شما باز می‌شود و هنگام تماشای شبکه روی تصویر باقی نمی‌ماند.", color = SecondaryText, fontSize = 12.sp)
+                                    }
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = { showPlayerHelp = false }) { Text("متوجه شدم") }
+                                }
                             )
                         }
                         if (showDubbingDialog) {
