@@ -445,28 +445,58 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         } finally { connection.disconnect() }
                     }
                 }
-                result.onSuccess { remote ->
-                    val knownUrls = channels.map { it.url.trim().lowercase(Locale.ROOT) }.toMutableSet()
-                    val fresh = remote.filter { channel ->
-                        val normalized = channel.url.trim().lowercase(Locale.ROOT)
-                        normalized.isNotBlank() && knownUrls.add(normalized)
+                try {
+                    result.onSuccess { remote ->
+                        val remoteByUrl = remote
+                            .filter { it.url.isNotBlank() }
+                            .associateBy { it.url.trim().lowercase(Locale.ROOT) }
+                        var updated = 0
+                        val existingUrls = channels.map { it.url.trim().lowercase(Locale.ROOT) }.toMutableSet()
+
+                        // Refresh metadata for built-in channels while preserving favorites and user-only entries.
+                        channels.indices.forEach { index ->
+                            val current = channels[index]
+                            if (current.kind == requestedKind) {
+                                val latest = remoteByUrl[current.url.trim().lowercase(Locale.ROOT)]
+                                if (latest != null) {
+                                    channels[index] = current.copy(
+                                        name = latest.name,
+                                        country = latest.country,
+                                        logoUrl = latest.logoUrl,
+                                        groupTitle = latest.groupTitle,
+                                        favorite = current.favorite
+                                    )
+                                    updated++
+                                }
+                            }
+                        }
+
+                        val fresh = remote.filter { channel ->
+                            val normalized = channel.url.trim().lowercase(Locale.ROOT)
+                            normalized.isNotBlank() && existingUrls.add(normalized)
+                        }
+                        channels.addAll(fresh)
+                        saveChannels()
+                        val refreshedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))
+                        lastChannelRefresh = refreshedAt
+                        prefs.edit()
+                            .putString("last_channel_refresh", refreshedAt)
+                            .putLong("last_auto_refresh_${requestedKind}", System.currentTimeMillis())
+                            .apply()
+                        val message = when {
+                            fresh.isNotEmpty() && updated > 0 -> "${fresh.size} شبکه جدید اضافه و اطلاعات ${updated} شبکه به‌روز شد."
+                            fresh.isNotEmpty() -> "${fresh.size} شبکه جدید اضافه شد."
+                            updated > 0 -> "اطلاعات ${updated} شبکه به‌روز شد؛ شبکه جدیدی نبود."
+                            else -> "فهرست دریافت و بررسی شد؛ تغییری در شبکه‌ها پیدا نشد."
+                        }
+                        android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+                    }.onFailure { error ->
+                        android.widget.Toast.makeText(context, "بروزرسانی انجام نشد؛ فهرست قبلی حفظ شد. ${error.message ?: "خطای اتصال"}",
+                            android.widget.Toast.LENGTH_LONG).show()
                     }
-                    channels.addAll(fresh)
-                    saveChannels()
-                    val refreshedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))
-                    lastChannelRefresh = refreshedAt
-                    prefs.edit()
-                        .putString("last_channel_refresh", refreshedAt)
-                        .putLong("last_auto_refresh_${requestedKind}", System.currentTimeMillis())
-                        .apply()
-                    android.widget.Toast.makeText(context,
-                        if (fresh.isEmpty()) "فهرست بررسی شد؛ شبکه جدیدی برای افزودن وجود نداشت." else "${fresh.size} شبکه جدید اضافه شد.",
-                        android.widget.Toast.LENGTH_LONG).show()
-                }.onFailure { error ->
-                    android.widget.Toast.makeText(context, "بروزرسانی انجام نشد؛ فهرست قبلی حفظ شد. ${error.message ?: "خطای اتصال"}",
-                        android.widget.Toast.LENGTH_LONG).show()
+                } finally {
+                    isRefreshingChannels = false
                 }
-                isRefreshingChannels = false
             }
         }
     }
