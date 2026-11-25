@@ -520,7 +520,7 @@ jobs:
           disable-animations: true
           script: |
             set -eu
-            APK="$SALAR_TV_EMULATOR_APK_PATH"
+            APK="$GITHUB_WORKSPACE/SALAR-TV-emulator.apk"
             echo "Installing emulator APK: $APK"
             test -f "$APK"
             adb install -r "$APK"
