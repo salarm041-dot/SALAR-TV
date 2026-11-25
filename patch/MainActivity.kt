@@ -377,12 +377,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
     var rememberPlayerChoice by remember { mutableStateOf(false) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
     var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "dark") ?: "dark") }
-    var liveDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
+    var liveDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
     var keepOriginalAudio by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
     DisposableEffect(prefs) {
         val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
-                "live_dubbing_enabled" -> liveDubbingEnabled = prefs.getBoolean("live_dubbing_enabled", false)
+                "live_dubbing_enabled" -> liveDubbingEnabled = prefs.getBoolean("live_dubbing_enabled", true)
                 "live_dubbing_original" -> keepOriginalAudio = prefs.getBoolean("live_dubbing_original", true)
             }
         }
@@ -763,13 +763,13 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     } else if (!useExternalPlayer) {
                         var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerFullscreen by remember(selected!!.url) { mutableStateOf(false) }
-                        var showLiveSpeechTranslation by remember { mutableStateOf(prefs.getBoolean("live_speech_translation_enabled", false)) }
+                        var showLiveSpeechTranslation by remember { mutableStateOf(prefs.getBoolean("live_speech_translation_enabled", true)) }
                         var liveSpeechSubtitle by remember(selected!!.url) { mutableStateOf("") }
                         var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
-                        var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
+                        var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
                         var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
                         var menuDubbingVoice by remember { mutableStateOf(if (prefs.getString("live_dubbing_voice", "زیر") == "بم" || prefs.getString("live_dubbing_voice", "") == "مرد") "بم" else "زیر") }
                         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
@@ -2842,7 +2842,7 @@ fun LiveDubbingPage() {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var subtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
-    var enabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", false)) }
+    var enabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
     var keepOriginal by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
     var voice by remember { mutableStateOf(if (prefs.getString("live_dubbing_voice", "زیر") == "بم" || prefs.getString("live_dubbing_voice", "") == "مرد") "بم" else "زیر") }
     var volume by remember { mutableFloatStateOf(prefs.getFloat("live_dubbing_volume", 1f)) }
