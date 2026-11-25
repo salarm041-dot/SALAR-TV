@@ -762,6 +762,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     } else if (!useExternalPlayer) {
                         var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerFullscreen by remember(selected!!.url) { mutableStateOf(false) }
+                        var showLiveSpeechTranslation by remember(selected!!.url) { mutableStateOf(false) }
+                        var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
@@ -837,6 +839,39 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                     )
                                 }
                             }
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { showSubtitleTranslation = !showSubtitleTranslation },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = if (showSubtitleTranslation) Gold else TextMain
+                                )
+                            ) {
+                                Icon(Icons.Default.Subtitles, contentDescription = null)
+                                Spacer(Modifier.width(5.dp))
+                                Text(if (showSubtitleTranslation) "بستن ترجمه زیرنویس" else "ترجمه زیرنویس شبکه", fontSize = 10.sp)
+                            }
+                            OutlinedButton(
+                                onClick = { showLiveSpeechTranslation = !showLiveSpeechTranslation },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = if (showLiveSpeechTranslation) Gold else TextMain
+                                )
+                            ) {
+                                Icon(Icons.Default.RecordVoiceOver, contentDescription = null)
+                                Spacer(Modifier.width(5.dp))
+                                Text(if (showLiveSpeechTranslation) "بستن ترجمه گفتار" else "ترجمه گفتار زنده", fontSize = 10.sp)
+                            }
+                        }
+                        if (showSubtitleTranslation) {
+                            LiveSubtitleTranslationOverlay(
+                                player = player,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        if (showLiveSpeechTranslation) {
+                            LiveAudioTranslationOverlay(modifier = Modifier.fillMaxWidth())
                         }
                         if (showPlayerFullscreen) {
                             androidx.compose.ui.window.Dialog(
@@ -931,7 +966,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                                 }, label = { Text(voiceOption) })
                                             }
                                         }
-                                        Text("ترجمه زیرنویس متنی با موتور ML Kit به برنامه متصل شده است؛ باید زیرنویس شبکه را انتخاب کنید. دوبله صوتی زنده هنوز متصل نیست.",
+                                        Text("ترجمه زیرنویس فقط وقتی زیرنویس متنی شبکه موجود باشد کار می‌کند. برای ترجمه مستقل از زیرنویس، دکمه «ترجمه گفتار زنده» زیر تصویر پخش را بزنید؛ برنامه صدای خروجی خودش را با اجازه شما دریافت می‌کند.",
                                             color = Color(0xFFFFCC80), fontSize = 11.sp)
                                     }
                                 },
