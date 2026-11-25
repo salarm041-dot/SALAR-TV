@@ -41,3 +41,37 @@ https://stream.zeno.fm/9svfnobkrxrvv
 https://radio.gachsaran.org/gach
 #EXTINF:-1 group-title="رادیو فارسی ایران",رادیو سیمرغ
 https://stream.zeno.fm/jl8n7thgcdftv
+
+# شبکه‌های سراسری ایران‌صدا — جریان‌های زنده شناخته‌شده
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو جوان
+http://s1.cdn1.iranseda.ir:1935/liveedge/radio-javan/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو پیام
+http://s1.cdn1.iranseda.ir:1935/liveedge/radio-payam/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو فرهنگ
+http://s0.cdn1.iranseda.ir:1935/liveedge/radio-farhang/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو ورزش
+http://s0.cdn1.iranseda.ir:1935/liveedge/radio-varzesh/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو ایران
+http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو تهران
+http://s1.cdn1.iranseda.ir:1935/liveedge/radio-tehran/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو اقتصاد
+http://s2.cdn1.iranseda.ir:1935/liveedge/radio-eghtesad/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو سلامت
+http://cdn1.live.irib.ir:1935/e-radio/r-salamat.stream/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو قرآن
+http://cdn1.live.irib.ir:1935/e-radio/r-quran.stream/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو معارف
+http://cdn1.live.irib.ir:1935/e-radio/r-maaref.stream/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو گفت‌وگو
+http://cdn1.live.irib.ir:1935/e-radio/r-goftogoo.stream/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو نمایش
+http://cdn1.live.irib.ir:1935/e-radio/r-namayesh.stream/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های سراسری رادیو",رادیو صبا
+http://cdn1.live.irib.ir:1935/e-radio/r-saba.stream/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های استانی رادیو",رادیو آذربایجان شرقی (تبریز)
+http://altcdn.iranseda.ir:1935/channel-live/smil:r-tabriz/playlist.m3u8
+#EXTINF:-1 group-title="ایران / شبکه‌های استانی رادیو",رادیو باران (گیلان)
+http://cdn1.live.irib.ir:1935/e-radio/r-baran.stream/playlist.m3u8
+#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / موسیقی",رادیو جوان (جریان جایگزین HTTPS)
+https://radio.sr-api.ir/hls/stream.m3u8
