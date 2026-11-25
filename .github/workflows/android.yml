@@ -97,7 +97,7 @@ jobs:
               try:
                   with urllib.request.urlopen(req,timeout=14) as r:
                       data=r.read(8192)
-                      head=data.lstrip(b"\\xef\\xbb\\xbf\\r\\n \\t")[:2048].decode("utf-8","ignore")
+                      head=data.lstrip(b"\xef\xbb\xbf\r\n \t")[:2048].decode("utf-8","ignore")
                       ct=r.headers.get("Content-Type","").lower()
                       ok=r.status in (200,206) and ("#EXTM3U" in head or "mpegurl" in ct or url.lower().split("?")[0].endswith(".m3u8"))
                       return (group,meta,url,ok,f"HTTP {r.status} {ct}")
@@ -119,7 +119,7 @@ jobs:
           out=["#EXTM3U"]
           for group,meta,url,ok,detail in good:
               out.extend((meta,url))
-          pathlib.Path("patch/world-channels.m3u").write_text("\\n".join(out)+"\\n",encoding="utf-8")
+          pathlib.Path("patch/world-channels.m3u").write_text("\n".join(out)+"\n",encoding="utf-8")
           print("WORLD PLAYLIST READY:",len(good),"validated streams",counts)
           PY
       - name: Upload international stream report
