@@ -1284,17 +1284,17 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(17.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(54.dp).background(
-                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFFFD66B), Color(0xFF8C5B12))),
+                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Gold.copy(alpha = .98f), Gold.copy(alpha = .42f), Background)),
                 RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.LiveTv, null, tint = Color(0xFF071326), modifier = Modifier.size(35.dp))
+                Icon(Icons.Default.LiveTv, null, tint = Background, modifier = Modifier.size(35.dp))
             }
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("SALAR ", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                    Text("SALAR ", color = TextMain, fontSize = 24.sp, fontWeight = FontWeight.Black)
                     Text("TV", color = gold, fontSize = 24.sp, fontWeight = FontWeight.Black)
                 }
-                Text("تلویزیون، رادیو و سرگرمی آنلاین", color = Color(0xFFB8C8E0), fontSize = 11.sp)
+                Text("تلویزیون، رادیو و سرگرمی آنلاین", color = SecondaryText, fontSize = 11.sp)
             }
             Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFF101F36),
                 border = androidx.compose.foundation.BorderStroke(1.dp, gold.copy(alpha = 0.65f))) {
@@ -1303,12 +1303,12 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("$tvCount شبکه تلویزیونی" to Icons.Default.Tv, "$radioCount ایستگاه رادیویی" to Icons.Default.Radio).forEach { item ->
-                Surface(Modifier.weight(1f), color = Color(0xFF101E34), shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF176DC0).copy(alpha = .65f))) {
+                Surface(Modifier.weight(1f), color = Panel, shape = RoundedCornerShape(14.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = .52f))) {
                     Row(Modifier.padding(horizontal = 10.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(item.second, null, tint = gold, modifier = Modifier.size(19.dp))
                         Spacer(Modifier.width(7.dp))
-                        Text(item.first, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(item.first, color = TextMain, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -1340,8 +1340,8 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                                     RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
                                     Icon(item.third, null, tint = accent, modifier = Modifier.size(34.dp))
                                 }
-                                Text(item.first, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
-                                Text(item.second, color = Color(0xFFB8C8E0), fontSize = 9.sp, maxLines = 1)
+                                Text(item.first, color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                                Text(item.second, color = SecondaryText, fontSize = 9.sp, maxLines = 1)
                             }
                         }
                     }
@@ -1372,7 +1372,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                         Column(Modifier.fillMaxSize().padding(9.dp), horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceEvenly) {
                             CountryArtwork(name = name, accent = accent, compact = true)
-                            Text(name, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                            Text(name, color = TextMain, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
                             Text("مشاهده شبکه‌ها  ›", color = accent, fontSize = 9.sp)
                         }
                     }
@@ -1428,7 +1428,7 @@ private fun CountryArtwork(name: String, accent: Color, compact: Boolean = false
     val artworkHeight = if (compact) 58.dp else 82.dp
     Box(
         Modifier.fillMaxWidth().height(artworkHeight)
-            .background(Color(0xFF071326), RoundedCornerShape(13.dp))
+            .background(Panel, RoundedCornerShape(13.dp))
             .border(1.dp, accent.copy(alpha = .65f), RoundedCornerShape(13.dp))
             .clip(RoundedCornerShape(13.dp))
     ) {
