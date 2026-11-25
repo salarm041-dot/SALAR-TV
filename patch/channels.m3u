@@ -42,6 +42,25 @@ https://live-aburayhan1110.telewebion.ir/ek/varzesh/live/108050p/index.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRINN.ir.png" group-title="ایران / تلویزیون",شبکه خبر
 https://live-aburayhan1111.telewebion.ir/ek/irinn/live/1080p/index.m3u8
 
+
+# Additional national IRIB networks. Stream addresses are public Telewebion HLS endpoints; regional/IP restrictions may apply.
+#EXTINF:-1 tvg-id="NamayeshTV.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NamayeshTV.ir.png" group-title="شبکه‌های سراسری سیما",شبکه نمایش
+https://live-aburayhan1105.telewebion.ir/ek/namayesh/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IRIBUHD.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBUHD.ir.png" group-title="شبکه‌های سراسری سیما",شبکه فراتر (UHD)
+https://live-aburayhan1111.telewebion.ir/ek/faratar/live/1440p/index.m3u8
+#EXTINF:-1 tvg-id="IRINN2.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRINN2.ir.png" group-title="شبکه‌های سراسری سیما",شبکه خبر ۲
+https://live-aburayhan1112.telewebion.ir/ek/irinn2/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IRIBOmid.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBOmid.ir.png" group-title="شبکه‌های سراسری سیما",شبکه امید
+https://live-aburayhan1111.telewebion.ir/ek/omid/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="PooyaTV.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PooyaTV.ir.png" group-title="شبکه‌های سراسری سیما",شبکه پویا و نهال
+https://live-aburayhan1112.telewebion.ir/ek/pooya/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="OfoghTV.ir" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/OfoghTV.ir.png" group-title="شبکه‌های سراسری سیما",شبکه افق
+https://live-aburayhan1106.telewebion.ir/ek/ofogh/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="JameJamTVNetwork1.ir" tvg-logo="https://i.imgur.com/BjaN3W1.png" group-title="شبکه‌های سراسری سیما",شبکه جام جم ۱
+https://s1-cloud.irib.ir/securelive3/jamejam1hd/jamejam1hd.m3u8
+#EXTINF:-1 tvg-id="JameJamTVNetwork2.ir" tvg-logo="https://i.imgur.com/BjaN3W1.png" group-title="شبکه‌های سراسری سیما",شبکه جام جم ۲
+https://s1-cloud.irib.ir/securelive3/jamejam2sd/jamejam2sd.m3u8
+
 # Persian-language channels outside Iran. Entries passed the validator's latest stream probe.
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaComedy.fr.png" group-title="فارسی‌زبان خارج از ایران / سرگرمی / تلویزیون",Persiana Comedy
 https://comedyhls.persiana.live/hls/stream.m3u8
