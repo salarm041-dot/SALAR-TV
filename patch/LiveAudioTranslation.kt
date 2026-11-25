@@ -92,6 +92,9 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
         }
     }
     val executor = remember { Executors.newSingleThreadExecutor() }
+    DisposableEffect(executor) {
+        onDispose { executor.shutdownNow() }
+    }
     val models = remember {
         listOf(
             LiveSpeechModel("en", TranslateLanguage.ENGLISH, "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"),
@@ -345,7 +348,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier) {
             return
         }
         isPreparing = true
-        status = "در حال آماده‌سازی مدل تشخیص گفتار؛ دانلود اولیه ممکن است حدود ۴۰ مگابایت باشد…"
+        status = "در حال آماده‌سازی مدل تشخیص گفتار؛ حجم دانلود بسته به زبان انتخابی متفاوت است و ممکن است زیاد باشد…"
         val chosen = models.firstOrNull { it.id == selectedModel }
         if (chosen == null) {
             isPreparing = false
