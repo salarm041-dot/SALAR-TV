@@ -1526,28 +1526,28 @@ fun IranTvPage(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite:
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text("تلویزیون ایران", color = Color(0xFFE8EDF5), fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
-                Text(filtered.size.toString() + " شبکه در این بخش", color = Color(0xFF9EACC0), fontSize = 11.sp)
+                Text("تلویزیون ایران", color = TextMain, fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
+                Text(filtered.size.toString() + " شبکه در این بخش", color = SecondaryText, fontSize = 11.sp)
             }
-            Surface(color = Color(0xFF1B3544), shape = RoundedCornerShape(13.dp)) {
+            Surface(color = Panel, shape = RoundedCornerShape(13.dp)) {
                 Text("🇮🇷", fontSize = 24.sp, modifier = Modifier.padding(horizontal = 11.dp, vertical = 6.dp))
             }
         }
-        Row(Modifier.fillMaxWidth().background(Color(0xFF141F30), RoundedCornerShape(15.dp)).padding(4.dp),
+        Row(Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(15.dp)).padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             listOf("همه", "سراسری", "استانی", "ماهواره").forEach { tab ->
                 val selected = section == tab
                 Surface(Modifier.weight(1f).clickable { section = tab },
-                    color = if (selected) Color(0xFF64D8CA) else Color.Transparent, shape = RoundedCornerShape(11.dp)) {
-                    Text(tab, color = if (selected) Color(0xFF102536) else Color(0xFFB8C4D5),
+                    color = if (selected) Gold else Color.Transparent, shape = RoundedCornerShape(11.dp)) {
+                    Text(tab, color = if (selected) Background else SecondaryText,
                         fontSize = 11.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 11.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
             }
         }
-        if (section == "سراسری") Text("شبکه‌های ملی صدا و سیما", color = Color(0xFF64D8CA), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        else if (section == "استانی") Text("شبکه‌های استانی به تفکیک استان", color = Color(0xFF64D8CA), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        else if (section == "ماهواره") Text("شبکه‌های فارسی‌زبان و ماهواره‌ای", color = Color(0xFF64D8CA), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        if (section == "سراسری") Text("شبکه‌های ملی صدا و سیما", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        else if (section == "استانی") Text("همه شبکه‌های استانی در یک فهرست", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        else if (section == "ماهواره") Text("شبکه‌های فارسی‌زبان و ماهواره‌ای", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.weight(1f)) {
             ChannelList(filtered, onSelect = onSelect, onFavorite = onFavorite, onEdit = onEdit, onDelete = onDelete,
                 onRefresh = onRefresh, isRefreshing = isRefreshing, lastRefresh = lastRefresh, largeCards = true)
@@ -2151,7 +2151,7 @@ fun PilgrimagePage(savedChannels: List<Channel>, onPlay: (Channel) -> Unit, onAd
     val defaultPlaces = listOf("مشهد مقدس", "کربلا", "نجف اشرف", "مکه مکرمه", "مدینه منوره", "سایر اماکن مذهبی")
     val savedPlaces = savedChannels.filter { it.country == "زیارت آنلاین" }.map { it.groupTitle }.filter { it.isNotBlank() }
     val places = (defaultPlaces + savedPlaces).distinct()
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("زیارت آنلاین", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Text("مکان را انتخاب کن و یکی از پخش‌های رسمی آماده را اجرا کن؛ امکان افزودن مکان و لینک تازه نیز وجود دارد.",
             color = SecondaryText, fontSize = 12.sp)
