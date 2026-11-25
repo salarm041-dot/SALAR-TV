@@ -757,6 +757,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             color = SecondaryText, fontSize = 11.sp)
                     } else if (!useExternalPlayer) {
                         var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
+                        var showPlayerFullscreen by remember(selected!!.url) { mutableStateOf(false) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
@@ -774,10 +775,18 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 update = { view ->
                                     if (view.player !== player) view.player = player
                                     view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-                                    view.subtitleView?.visibility = android.view.View.VISIBLE
+                                    view.subtitleView?.visibility = android.view.View.INVISIBLE
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )
+                            Box(Modifier.align(Alignment.TopStart).padding(8.dp)) {
+                                IconButton(
+                                    onClick = { showPlayerFullscreen = true },
+                                    modifier = Modifier.background(Color.Black.copy(alpha = 0.62f), RoundedCornerShape(50))
+                                ) {
+                                    Icon(Icons.Default.Fullscreen, contentDescription = "تمام صفحه", tint = Color.White)
+                                }
+                            }
                             Box(Modifier.align(Alignment.TopEnd).padding(8.dp)) {
                                 IconButton(
                                     onClick = { playerMenuExpanded = true },
@@ -822,6 +831,37 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         leadingIcon = { Icon(Icons.Default.Translate, null) },
                                         onClick = { showDubbingDialog = true; playerMenuExpanded = false }
                                     )
+                                }
+                            }
+                        }
+                        if (showPlayerFullscreen) {
+                            androidx.compose.ui.window.Dialog(
+                                onDismissRequest = { showPlayerFullscreen = false },
+                                properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+                            ) {
+                                Box(Modifier.fillMaxSize().background(Color.Black)) {
+                                    AndroidView(
+                                        factory = { ctx -> PlayerView(ctx).apply {
+                                            this.player = player
+                                            useController = true
+                                            resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                                            setKeepContentOnPlayerReset(true)
+                                            subtitleView?.visibility = android.view.View.VISIBLE
+                                        } },
+                                        update = { view ->
+                                            if (view.player !== player) view.player = player
+                                            view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                                            view.subtitleView?.visibility = android.view.View.VISIBLE
+                                        },
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                    IconButton(
+                                        onClick = { showPlayerFullscreen = false },
+                                        modifier = Modifier.align(Alignment.TopEnd).padding(12.dp)
+                                            .background(Color.Black.copy(alpha = 0.65f), RoundedCornerShape(50))
+                                    ) {
+                                        Icon(Icons.Default.FullscreenExit, contentDescription = "خروج از تمام صفحه", tint = Color.White)
+                                    }
                                 }
                             }
                         }
