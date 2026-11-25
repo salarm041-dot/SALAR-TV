@@ -439,7 +439,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             if (code !in 200..299) error("دریافت فهرست ناموفق بود؛ HTTP $code")
                             val body = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
                             require(body.trimStart().startsWith("#EXTM3U", ignoreCase = true)) { "پاسخ سرور، فهرست معتبر M3U نیست." }
-                            val parsed = parseM3u(body).filter { it.kind == requestedKind && it.url.startsWith("https://") }
+                            val parsed = parseM3u(body).filter { it.kind == requestedKind && (it.url.startsWith("https://") || it.url.startsWith("http://")) }
                             require(parsed.isNotEmpty()) { "هیچ شبکه معتبری در فهرست دریافتی پیدا نشد." }
                             parsed
                         } finally { connection.disconnect() }
