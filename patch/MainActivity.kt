@@ -633,7 +633,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         Scaffold(
             containerColor = Background,
             topBar = {
-                if (page != "چندنمایی") {
+                if (page != "چندنمایی" && selected == null) {
                     TopAppBar(
                         title = {
                             Column {
@@ -651,7 +651,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 }
             },
             bottomBar = {
-                if (page != "چندنمایی") {
+                if (page != "چندنمایی" && selected == null) {
                     NavigationBar(containerColor = Panel, contentColor = Gold) {
                         listOf("خانه" to Icons.Default.Home, "تلویزیون" to Icons.Default.Tv,
                             "رادیو" to Icons.Default.Radio, "علاقه‌مندی‌ها" to Icons.Default.Favorite,
