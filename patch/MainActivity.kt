@@ -291,8 +291,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
         val arabic = runCatching {
             context.assets.open("arabic-channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
         }.getOrDefault(emptyList())
+        val world = runCatching {
+            context.assets.open("world-channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
+        }.getOrDefault(emptyList())
         val existing = channels.map { it.url }.toSet()
-        channels.addAll((bundled + pilgrimage + arabic).distinctBy { it.url }.filter { it.url !in existing })
+        channels.addAll((bundled + pilgrimage + arabic + world).distinctBy { it.url }.filter { it.url !in existing })
         saveChannels()
         prefs.edit().putBoolean("built_in_seeded", true).apply()
     }
@@ -1022,10 +1025,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> TvCountryPage(onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" })
                     "شبکه‌های عربی" -> ArabicCountriesPage(channels = channels, onCountry = { country -> page = "عربی:$country" })
-                    "کشور:سایر" -> TvCountryPage(onCountry = { country ->
-                        rememberDynamicCountry(country)
-                        page = "کشور:$country"
-                    })
+                    "کشور:سایر" -> WorldChannelsPage(channels = channels, onGroup = { group -> page = "جهان:$group" })
                     "کشورهای منتخب" -> TvCountryPage(onCountry = { country -> page = "کشور:$country" })
                     "کشور:ایران" -> IranTvPage(
                         channels = channels,
@@ -1064,9 +1064,9 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selectChannel(it) },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
-                    else -> if (page.startsWith("عربی:")) {
-                        val arabicCountry = page.removePrefix("عربی:")
-                        ChannelList(channels.filter { it.kind == "تلویزیون" && it.country == arabicCountry },
+                    else -> if (page.startsWith("عربی:") || page.startsWith("جهان:")) {
+                        val group = if (page.startsWith("عربی:")) page.removePrefix("عربی:") else page.removePrefix("جهان:")
+                        ChannelList(channels.filter { it.kind == "تلویزیون" && it.country == group },
                             onSelect = { selectChannel(it) },
                             onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                             onEdit = { editingChannel = it },
@@ -1556,6 +1556,53 @@ fun ArabicCountriesPage(channels: List<Channel>, onCountry: (String) -> Unit) {
                     }
                 }
                 if (rowCountries.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+
+@Composable
+fun WorldChannelsPage(channels: List<Channel>, onGroup: (String) -> Unit) {
+    data class WorldGroup(val name: String, val flag: String, val accent: Color)
+    val groups = listOf(
+        WorldGroup("روسیه", "🇷🇺", Color(0xFF6EA8FF)),
+        WorldGroup("آمریکا", "🇺🇸", Color(0xFFE77B85)),
+        WorldGroup("فرانسه", "🇫🇷", Color(0xFF7A9DFF)),
+        WorldGroup("آلمان", "🇩🇪", Color(0xFFFFBD65)),
+        WorldGroup("زبان کردی", "🟩", Color(0xFF55C99A)),
+        WorldGroup("زبان روسی", "🟥", Color(0xFF7AA7F5)),
+        WorldGroup("زبان فرانسوی", "🟦", Color(0xFF72A9E8)),
+        WorldGroup("زبان آلمانی", "⬛", Color(0xFFE2B45F)),
+        WorldGroup("زبان انگلیسی", "🌐", Color(0xFFB28BDE))
+    )
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(13.dp)) {
+        Text("شبکه‌های جهان", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+        Text("انتخاب کشور یا زبان؛ فهرست‌ها با لینک‌های پخش تلویزیونی بارگذاری می‌شوند",
+            color = Color(0xFFB8C8E0), fontSize = 11.sp)
+        groups.chunked(2).forEach { rowGroups ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
+                rowGroups.forEach { group ->
+                    val count = channels.count { it.kind == "تلویزیون" && it.country == group.name }
+                    Card(Modifier.weight(1f).height(125.dp).clickable { onGroup(group.name) },
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF09182E)),
+                        border = androidx.compose.foundation.BorderStroke(1.4.dp, group.accent)) {
+                        Box(Modifier.fillMaxSize().background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                listOf(group.accent.copy(alpha = .24f), Color(0xFF102342), Color(0xFF070F20))))) {
+                            Column(Modifier.fillMaxSize().padding(9.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceEvenly) {
+                                Text(group.flag, fontSize = 28.sp)
+                                Text(group.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
+                                Text("$count شبکه", color = group.accent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+                if (rowGroups.size == 1) Spacer(Modifier.weight(1f))
             }
         }
     }
@@ -2770,6 +2817,15 @@ private fun parseM3u(text: String): List<Channel> {
             val group = groupTitle.lowercase()
             val meta = "$lower $group"
             country = when {
+                "زبان کردی" in meta || "kurdish" in meta || "ckb" in meta || "kmr" in meta -> "زبان کردی"
+                "زبان روسی" in meta || "russian" in meta || "rus" in meta -> "زبان روسی"
+                "زبان فرانسوی" in meta || "french" in meta || "fra" in meta -> "زبان فرانسوی"
+                "زبان آلمانی" in meta || "german" in meta || "deu" in meta -> "زبان آلمانی"
+                "زبان انگلیسی" in meta || "english" in meta || "eng" in meta -> "زبان انگلیسی"
+                "آمریکا" in meta || "united states" in meta || "usa" in meta || "us/" in meta -> "آمریکا"
+                "روسیه" in meta || "russia" in meta || "ru/" in meta -> "روسیه"
+                "فرانسه" in meta || "france" in meta || "fr/" in meta -> "فرانسه"
+                "آلمان" in meta || "germany" in meta || "de/" in meta -> "آلمان"
                 "خارج از ایران" in meta -> "خارج از ایران"
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
