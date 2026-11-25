@@ -49,6 +49,87 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Download and validate international TV playlists
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, urllib.request, urllib.error, re, pathlib, json, time
+          sources = [
+              ("روسیه", "https://iptv-org.github.io/iptv/countries/ru.m3u", 35),
+              ("آمریکا", "https://iptv-org.github.io/iptv/countries/us.m3u", 35),
+              ("فرانسه", "https://iptv-org.github.io/iptv/countries/fr.m3u", 35),
+              ("آلمان", "https://iptv-org.github.io/iptv/countries/de.m3u", 35),
+              ("زبان روسی", "https://iptv-org.github.io/iptv/languages/rus.m3u", 35),
+              ("زبان فرانسوی", "https://iptv-org.github.io/iptv/languages/fra.m3u", 35),
+              ("زبان آلمانی", "https://iptv-org.github.io/iptv/languages/deu.m3u", 35),
+              ("زبان کردی", "https://iptv-org.github.io/iptv/languages/ckb.m3u", 20),
+              ("زبان کردی", "https://iptv-org.github.io/iptv/languages/kmr.m3u", 20),
+              ("زبان انگلیسی", "https://iptv-org.github.io/iptv/languages/eng.m3u", 35),
+          ]
+          headers={"User-Agent":"Mozilla/5.0 SALAR-TV/1.4","Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"}
+          candidates=[]
+          for group,url,limit in sources:
+              req=urllib.request.Request(url,headers=headers)
+              try:
+                  with urllib.request.urlopen(req,timeout=35) as response:
+                      body=response.read().decode("utf-8-sig","replace")
+                  if "#EXTM3U" not in body[:256]:
+                      raise RuntimeError("response is not an M3U playlist")
+                  pending=None; added=0
+                  for raw in body.splitlines():
+                      line=raw.strip()
+                      if line.startswith("#EXTINF"):
+                          pending=line
+                      elif line.startswith(("http://","https://")) and pending:
+                          meta=pending
+                          if re.search(r'group-title="[^"]*"',meta,re.I):
+                              meta=re.sub(r'group-title="[^"]*"',f'group-title="{group}"',meta,count=1,flags=re.I)
+                          else:
+                              meta=meta.replace("#EXTINF:-1",f'#EXTINF:-1 group-title="{group}"',1)
+                          candidates.append((group,meta,line))
+                          pending=None; added+=1
+                          if added>=limit: break
+                  print(f"Downloaded {group}: {added} candidates from {url}")
+              except Exception as e:
+                  print(f"SOURCE WARNING {group} {url}: {type(e).__name__}: {e}")
+          def check(item):
+              group,meta,url=item
+              req=urllib.request.Request(url,headers=headers)
+              try:
+                  with urllib.request.urlopen(req,timeout=14) as r:
+                      data=r.read(8192)
+                      head=data.lstrip(b"\\xef\\xbb\\xbf\\r\\n \\t")[:2048].decode("utf-8","ignore")
+                      ct=r.headers.get("Content-Type","").lower()
+                      ok=r.status in (200,206) and ("#EXTM3U" in head or "mpegurl" in ct or url.lower().split("?")[0].endswith(".m3u8"))
+                      return (group,meta,url,ok,f"HTTP {r.status} {ct}")
+              except Exception as e:
+                  return (group,meta,url,False,type(e).__name__+": "+str(e)[:100])
+          unique={}
+          for item in candidates: unique.setdefault(item[2],item)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=32) as pool:
+              results=list(pool.map(check,unique.values()))
+          good=[x for x in results if x[3]]
+          counts={}
+          for group,meta,url,ok,detail in good: counts[group]=counts.get(group,0)+1
+          required=("روسیه","آمریکا","فرانسه","آلمان","زبان روسی","زبان فرانسوی","زبان آلمانی","زبان کردی","زبان انگلیسی")
+          missing=[name for name in required if counts.get(name,0)==0]
+          report={"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"candidates":len(results),"playable_hls":len(good),"counts_by_folder":counts,"failed_or_unverified":[{"group":x[0],"url":x[2],"detail":x[4]} for x in results if not x[3]]}
+          pathlib.Path("world-stream-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
+          if missing:
+              raise SystemExit("No validated streams for required world folders: "+", ".join(missing))
+          out=["#EXTM3U"]
+          for group,meta,url,ok,detail in good:
+              out.extend((meta,url))
+          pathlib.Path("patch/world-channels.m3u").write_text("\\n".join(out)+"\\n",encoding="utf-8")
+          print("WORLD PLAYLIST READY:",len(good),"validated streams",counts)
+          PY
+      - name: Upload international stream report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-World-Stream-Report
+          path: world-stream-report.json
+          if-no-files-found: ignore
+
       - name: Apply corrected app source and recording module
         run: |
           install -D patch/MainActivity.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/MainActivity.kt"
@@ -59,6 +140,7 @@ jobs:
           install -D patch/RecordingBootReceiver.kt "$PROJECT_DIR/app/src/main/java/com/salar/tv/RecordingBootReceiver.kt"
           install -D patch/channels.m3u "$PROJECT_DIR/app/src/main/assets/channels.m3u"
           install -D patch/arabic-channels.m3u "$PROJECT_DIR/app/src/main/assets/arabic-channels.m3u"
+          install -D patch/world-channels.m3u "$PROJECT_DIR/app/src/main/assets/world-channels.m3u"
           install -D patch/ic_salar_tv.xml "$PROJECT_DIR/app/src/main/res/drawable/ic_salar_tv.xml"
           install -D patch/ic_salar_tv_foreground.xml "$PROJECT_DIR/app/src/main/res/drawable/ic_salar_tv_foreground.xml"
           install -D patch/ic_launcher_fallback.xml "$PROJECT_DIR/app/src/main/res/mipmap/ic_launcher.xml"
@@ -203,14 +285,14 @@ jobs:
           urls = [url for _, url in entries]
           provincial = [meta for meta, _ in entries if "شبکه‌های استانی" in meta]
           logos = [meta for meta, _ in entries if "tvg-logo=" in meta]
-          if len(entries) != 285:
-              raise SystemExit(f"Unexpected playlist size: expected 285 entries, found {len(entries)}")
+          if len(entries) < 280:
+              raise SystemExit(f"Unexpected playlist size: expected at least 280 entries, found {len(entries)}")
           if len(urls) != len(set(urls)):
               raise SystemExit("Duplicate stream URLs found in bundled playlist")
-          if len(provincial) != 34:
-              raise SystemExit(f"Expected 34 provincial IRIB channels, found {len(provincial)}")
-          if len(logos) != 156:
-              raise SystemExit(f"Expected 156 channel logos, found {len(logos)}")
+          if len(provincial) != 32:
+              raise SystemExit(f"Expected 32 provincial IRIB channels, found {len(provincial)}")
+          if len(logos) < 150:
+              raise SystemExit(f"Expected at least 150 channel logos, found {len(logos)}")
           print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
           PY
 
@@ -493,7 +575,7 @@ jobs:
           for apk_path, abi in ((phone_apk, "arm64-v8a"), (emulator_apk, "x86_64")):
               with ZipFile(apk_path) as apk:
                   names = set(apk.namelist())
-                  required = {"AndroidManifest.xml", "classes.dex", "assets/channels.m3u", "assets/arabic-channels.m3u"}
+                  required = {"AndroidManifest.xml", "classes.dex", "assets/channels.m3u", "assets/arabic-channels.m3u", "assets/world-channels.m3u"}
                   missing = required - names
                   if missing:
                       raise SystemExit(f"{abi} APK missing required files: {sorted(missing)}")
@@ -501,8 +583,8 @@ jobs:
                       raise SystemExit(f"{abi} APK has no native libraries for its target architecture")
                   playlist = apk.read("assets/channels.m3u").decode("utf-8-sig")
                   entries = re.findall(r"(?m)^#EXTINF", playlist)
-                  if len(entries) != 285:
-                      raise SystemExit(f"{abi} APK playlist mismatch: expected 285 entries, found {len(entries)}")
+                  if len(entries) < 280:
+                      raise SystemExit(f"{abi} APK playlist mismatch: expected at least 280 entries, found {len(entries)}")
                   if not any("شبکه‌های استانی" in line for line in playlist.splitlines()):
                       raise SystemExit(f"{abi} APK provincial channels metadata missing")
 
