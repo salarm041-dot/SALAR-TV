@@ -765,20 +765,18 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var menuDubbingVoice by remember { mutableStateOf(if (prefs.getString("live_dubbing_voice", "زیر") == "بم" || prefs.getString("live_dubbing_voice", "") == "مرد") "بم" else "زیر") }
                         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
                             AndroidView(
-                                factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
+                                factory = { ctx -> PlayerView(ctx).apply {
+                                    this.player = player
+                                    useController = true
+                                    resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                                    setKeepContentOnPlayerReset(true)
+                                } },
                                 update = { view ->
-                                    view.subtitleView?.visibility = if (menuSubtitleEnabled) android.view.View.INVISIBLE else android.view.View.VISIBLE
+                                    if (view.player !== player) view.player = player
+                                    view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                                    view.subtitleView?.visibility = android.view.View.VISIBLE
                                 },
                                 modifier = Modifier.fillMaxSize()
-                            )
-                            if (menuSubtitleEnabled) {
-                                LiveSubtitleTranslationOverlay(
-                                    player = player,
-                                    modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(12.dp)
-                                )
-                            }
-                            LiveAudioTranslationOverlay(
-                                modifier = Modifier.align(Alignment.TopStart).fillMaxWidth(0.92f).padding(8.dp)
                             )
                             Box(Modifier.align(Alignment.TopEnd).padding(8.dp)) {
                                 IconButton(
@@ -951,14 +949,44 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     Text("در صورت پشتیبانی منبع، پخش زنده در این قسمت نمایش داده می‌شود.", color = SecondaryText, fontSize = 12.sp)
                     Spacer(Modifier.height(10.dp))
                     if (!selected!!.url.contains("iranintl.com", ignoreCase = true)) {
+                        var recordingActive by remember(selected!!.url) { mutableStateOf(false) }
+                        Button(
+                            onClick = {
+                                if (recordingActive) {
+                                    context.stopService(Intent(context, HlsRecorderService::class.java))
+                                    recordingActive = false
+                                    android.widget.Toast.makeText(context, "درخواست توقف ضبط ارسال شد.", android.widget.Toast.LENGTH_SHORT).show()
+                                } else {
+                                    val recordIntent = Intent(context, HlsRecorderService::class.java).apply {
+                                        putExtra("name", selected!!.name)
+                                        putExtra("url", selected!!.url)
+                                        putExtra("duration", 360)
+                                    }
+                                    runCatching {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(recordIntent)
+                                        else context.startService(recordIntent)
+                                        recordingActive = true
+                                        android.widget.Toast.makeText(context, "ضبط شبکه آغاز شد؛ برای پایان، همین دکمه را بزنید.", android.widget.Toast.LENGTH_LONG).show()
+                                    }.onFailure {
+                                        android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطای سرویس"), android.widget.Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = if (recordingActive) Color(0xFFB83D4B) else Gold)
+                        ) {
+                            Icon(if (recordingActive) Icons.Default.Stop else Icons.Default.FiberManualRecord, null, tint = Color.Black)
+                            Spacer(Modifier.width(8.dp))
+                            Text(if (recordingActive) "توقف ضبط" else "شروع ضبط همین شبکه", color = Color.Black)
+                        }
                         Button(
                             onClick = { showSchedule = true },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Gold)
+                            colors = ButtonDefaults.buttonColors(containerColor = Panel)
                         ) {
-                            Icon(Icons.Default.CalendarMonth, null, tint = Color.Black)
+                            Icon(Icons.Default.CalendarMonth, null, tint = Gold)
                             Spacer(Modifier.width(8.dp))
-                            Text("زمان‌بندی ضبط همین شبکه", color = Color.Black)
+                            Text("زمان‌بندی ضبط همین شبکه", color = TextMain)
                         }
                     } else {
                         Text("پخش ایران اینترنشنال از صفحه رسمی شبکه باز می‌شود؛ ضبط مستقیم این صفحه در برنامه فعال نیست.",
@@ -1087,10 +1115,16 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                             onRefresh = { refreshChannels("تلویزیون") }, isRefreshing = isRefreshingChannels, lastRefresh = lastChannelRefresh)
                     }
-                    "رادیو" -> ChannelList(channels.filter { it.kind == "رادیو" }, onSelect = { selectChannel(it) },
+                    "رادیو" -> RadioChannelsPage(
+                        channels = channels.filter { it.kind == "رادیو" },
+                        onSelect = { selectChannel(it) },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
-                        onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
-                        onRefresh = { refreshChannels("رادیو") }, isRefreshing = isRefreshingChannels, lastRefresh = lastChannelRefresh)
+                        onEdit = { editingChannel = it },
+                        onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
+                        onRefresh = { refreshChannels("رادیو") },
+                        isRefreshing = isRefreshingChannels,
+                        lastRefresh = lastChannelRefresh
+                    )
                     "علاقه‌مندی‌ها" -> ChannelList(channels.filter { it.favorite }, onSelect = { selectChannel(it) },
                         onFavorite = { c -> toggleFavorite(channels, c, ::saveChannels) },
                         onEdit = { editingChannel = it }, onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() })
@@ -2892,4 +2926,86 @@ private fun parseM3u(text: String): List<Channel> {
         }
     }
     return result.distinctBy { it.url }
+}
+
+
+@Composable
+fun RadioChannelsPage(
+    channels: List<Channel>,
+    onSelect: (Channel) -> Unit,
+    onFavorite: (Channel) -> Unit,
+    onEdit: (Channel) -> Unit,
+    onDelete: (Channel) -> Unit,
+    onRefresh: () -> Unit,
+    isRefreshing: Boolean,
+    lastRefresh: String
+) {
+    var query by remember { mutableStateOf("") }
+    val filtered = channels.filter { it.name.contains(query, ignoreCase = true) || it.groupTitle.contains(query, ignoreCase = true) }
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("رادیو زنده", color = TextMain, fontSize = 23.sp, fontWeight = FontWeight.ExtraBold)
+                Text("\${filtered.size} ایستگاه رادیویی • پخش زنده", color = SecondaryText, fontSize = 11.sp)
+            }
+            Surface(shape = RoundedCornerShape(16.dp), color = Panel) {
+                Icon(Icons.Default.GraphicEq, null, tint = Gold, modifier = Modifier.padding(12.dp).size(28.dp))
+            }
+        }
+        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(20.dp)) {
+            Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Radio, null, tint = Gold, modifier = Modifier.size(32.dp))
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("صدای زنده، همیشه همراه", color = TextMain, fontWeight = FontWeight.Bold)
+                    Text("شبکه‌های سراسری، استانی و فارسی‌زبان", color = SecondaryText, fontSize = 11.sp)
+                }
+                Icon(Icons.Default.Waves, null, tint = Gold, modifier = Modifier.size(26.dp))
+            }
+        }
+        OutlinedTextField(
+            value = query, onValueChange = { query = it },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            leadingIcon = { Icon(Icons.Default.Search, null) },
+            placeholder = { Text("جست‌وجوی شبکه رادیویی") }
+        )
+        Button(onClick = onRefresh, enabled = !isRefreshing, modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color.Black)) {
+            if (isRefreshing) CircularProgressIndicator(Modifier.size(18.dp), color = Color.Black, strokeWidth = 2.dp)
+            else Icon(Icons.Default.Sync, null)
+            Spacer(Modifier.width(8.dp))
+            Text(if (isRefreshing) "در حال دریافت فهرست..." else "بروزرسانی شبکه‌های رادیویی")
+        }
+        if (lastRefresh.isNotBlank()) Text("آخرین بروزرسانی موفق: $lastRefresh", color = MutedText, fontSize = 10.sp)
+        LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+            items(filtered, key = { it.url }) { channel ->
+                Card(colors = CardDefaults.cardColors(containerColor = Panel),
+                    shape = RoundedCornerShape(17.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.22f))) {
+                    Row(Modifier.fillMaxWidth().clickable { onSelect(channel) }.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(54.dp).background(
+                            androidx.compose.ui.graphics.Brush.linearGradient(listOf(Gold.copy(alpha = 0.35f), Color(0xFF202B3A))),
+                            RoundedCornerShape(15.dp)), contentAlignment = Alignment.Center) {
+                            ChannelLogo(channel.logoUrl, "رادیو", 42.dp)
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(channel.name, color = TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(channel.groupTitle.ifBlank { "رادیو زنده" }, color = SecondaryText, fontSize = 10.sp)
+                        }
+                        IconButton(onClick = { onFavorite(channel) }) {
+                            Icon(if (channel.favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                null, tint = if (channel.favorite) Gold else MutedText)
+                        }
+                        IconButton(onClick = { onSelect(channel) }) {
+                            Icon(Icons.Default.PlayCircleFilled, null, tint = Gold, modifier = Modifier.size(32.dp))
+                        }
+                    }
+                }
+            }
+            if (filtered.isEmpty()) item { Text("ایستگاهی پیدا نشد؛ فهرست را بروزرسانی یا منبعی اضافه کنید.", color = SecondaryText) }
+        }
+    }
 }
