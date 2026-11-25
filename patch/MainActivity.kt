@@ -1587,7 +1587,8 @@ private fun ChannelLogo(logoUrl: String, kind: String, size: androidx.compose.ui
 @Composable
 fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
                 onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {},
-                onRefresh: (() -> Unit)? = null, isRefreshing: Boolean = false, lastRefresh: String = "") {
+                onRefresh: (() -> Unit)? = null, isRefreshing: Boolean = false, lastRefresh: String = "",
+                largeCards: Boolean = false) {
     var searchQuery by remember { mutableStateOf("") }
     if (channels.isEmpty()) {
         Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally,
@@ -1655,27 +1656,76 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                     }
                     Divider(color = Gold.copy(alpha = 0.28f))
                 }
-                items(sectionChannels.sortedWith(
-                    compareBy<Channel> { channelSortOrder(it) }.thenBy { it.name.lowercase(Locale.ROOT) }
-                ), key = { it.url }) { c ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().clickable { onSelect(c) },
-                        colors = CardDefaults.cardColors(containerColor = Panel),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            ChannelLogo(c.logoUrl, c.kind)
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
-                                Text("${c.country} • ${c.kind}", color = MutedText, fontSize = 11.sp)
+                items(
+                    sectionChannels.sortedWith(
+                        compareBy<Channel> { channelSortOrder(it) }.thenBy { it.name.lowercase(Locale.ROOT) }
+                    ).chunked(if (largeCards) 2 else 1),
+                    key = { rowChannels -> rowChannels.first().url }
+                ) { rowChannels ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        rowChannels.forEach { c ->
+                            if (largeCards) {
+                                Card(
+                                    modifier = Modifier.weight(1f).height(178.dp).clickable { onSelect(c) },
+                                    colors = CardDefaults.cardColors(containerColor = Panel),
+                                    shape = RoundedCornerShape(18.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = .48f))
+                                ) {
+                                    Column(
+                                        Modifier.fillMaxSize().padding(9.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        ChannelLogo(c.logoUrl, c.kind, size = 86.dp)
+                                        Text(
+                                            c.name,
+                                            color = TextMain,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp,
+                                            maxLines = 2,
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                        Row(
+                                            Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceEvenly,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            IconButton(onClick = { onFavorite(c) }, modifier = Modifier.size(30.dp)) {
+                                                Icon(Icons.Default.Favorite, "علاقه‌مندی",
+                                                    tint = if (c.favorite) Gold else MutedText, modifier = Modifier.size(17.dp))
+                                            }
+                                            IconButton(onClick = { onEdit(c) }, modifier = Modifier.size(30.dp)) {
+                                                Icon(Icons.Default.Edit, "ویرایش", tint = SecondaryText, modifier = Modifier.size(17.dp))
+                                            }
+                                            IconButton(onClick = { onDelete(c) }, modifier = Modifier.size(30.dp)) {
+                                                Icon(Icons.Default.Delete, "حذف", tint = Color(0xFFE57373), modifier = Modifier.size(17.dp))
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth().clickable { onSelect(c) },
+                                    colors = CardDefaults.cardColors(containerColor = Panel),
+                                    shape = RoundedCornerShape(14.dp)
+                                ) {
+                                    Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        ChannelLogo(c.logoUrl, c.kind)
+                                        Spacer(Modifier.width(12.dp))
+                                        Column(Modifier.weight(1f)) {
+                                            Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
+                                            Text("${c.country} • ${c.kind}", color = MutedText, fontSize = 11.sp)
+                                        }
+                                        IconButton(onClick = { onFavorite(c) }) {
+                                            Icon(Icons.Default.Favorite, null, tint = if (c.favorite) Gold else MutedText)
+                                        }
+                                        IconButton(onClick = { onEdit(c) }) { Icon(Icons.Default.Edit, "ویرایش", tint = SecondaryText) }
+                                        IconButton(onClick = { onDelete(c) }) { Icon(Icons.Default.Delete, "حذف", tint = Color(0xFFE57373)) }
+                                    }
+                                }
                             }
-                            IconButton(onClick = { onFavorite(c) }) {
-                                Icon(Icons.Default.Favorite, null, tint = if (c.favorite) Gold else MutedText)
-                            }
-                            IconButton(onClick = { onEdit(c) }) { Icon(Icons.Default.Edit, "ویرایش", tint = SecondaryText) }
-                            IconButton(onClick = { onDelete(c) }) { Icon(Icons.Default.Delete, "حذف", tint = Color(0xFFE57373)) }
                         }
+                        if (largeCards && rowChannels.size == 1) Spacer(Modifier.weight(1f))
                     }
                 }
             }
