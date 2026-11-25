@@ -99,7 +99,7 @@ jobs:
                       data=r.read(8192)
                       head=data.lstrip(b"\xef\xbb\xbf\r\n \t")[:2048].decode("utf-8","ignore")
                       ct=r.headers.get("Content-Type","").lower()
-                      ok=r.status in (200,206) and ("#EXTM3U" in head or "mpegurl" in ct or url.lower().split("?")[0].endswith(".m3u8"))
+                      ok=r.status in (200,206) and ("#EXTM3U" in head or "mpegurl" in ct)
                       return (group,meta,url,ok,f"HTTP {r.status} {ct}")
               except Exception as e:
                   return (group,meta,url,False,type(e).__name__+": "+str(e)[:100])
