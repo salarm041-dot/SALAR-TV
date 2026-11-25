@@ -228,9 +228,8 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
 
     DisposableEffect(identifier) {
         onDispose {
-            running.set(false); runCatching { recorder?.stop() }; runCatching { recorder?.release() }
-            runCatching { projection?.stop() }; captureThread?.interrupt(); recognitionThread?.interrupt()
-            runCatching { model?.let { LiveWhisperEngine.releaseModel(it) } }; identifier.close()
+            stopCapture()
+            identifier.close()
         }
     }
 
