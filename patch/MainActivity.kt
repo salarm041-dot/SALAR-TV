@@ -1048,7 +1048,6 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onBackupExport = { backupExportLauncher.launch("SALAR-TV-Backup.json") },
                         onBackupImport = { backupImportLauncher.launch(arrayOf("application/json", "text/json", "*/*")) },
                         onPilgrimage = { page = "زیارت آنلاین" },
-                        onMultiView = { page = "چندنمایی" },
                     )
                     "چندنمایی" -> MultiViewPage(
                         channels = channels.filter { it.kind == "تلویزیون" && it.url !in lockedChannelUrls }
@@ -1133,7 +1132,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onDelete = { c -> channels.removeAll { it.url == c.url }; saveChannels() },
                         onRefresh = { refreshChannels("تلویزیون") },
                         isRefreshing = isRefreshingChannels,
-                        lastRefresh = lastChannelRefresh
+                        lastRefresh = lastChannelRefresh,
+                        onMultiView = { page = "چندنمایی" }
                     )
                     page.takeIf { it.startsWith("کشور:") } -> {
                         val country = page.removePrefix("کشور:")
@@ -1715,7 +1715,8 @@ fun WorldChannelsPage(channels: List<Channel>, onGroup: (String) -> Unit) {
 @Composable
 fun IranTvPage(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
                onEdit: (Channel) -> Unit, onDelete: (Channel) -> Unit,
-               onRefresh: () -> Unit, isRefreshing: Boolean, lastRefresh: String) {
+               onRefresh: () -> Unit, isRefreshing: Boolean, lastRefresh: String,
+               onMultiView: () -> Unit = {}) {
     var section by remember { mutableStateOf("همه") }
     val iran = channels.filter { it.kind == "تلویزیون" && it.country == "ایران" }
     fun isNational(c: Channel) = categoryForChannel(c) == "شبکه‌های سراسری"
@@ -1741,6 +1742,13 @@ fun IranTvPage(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite:
             Surface(color = Panel, shape = RoundedCornerShape(13.dp)) {
                 Text("🇮🇷", fontSize = 24.sp, modifier = Modifier.padding(horizontal = 11.dp, vertical = 6.dp))
             }
+        }
+        Button(onClick = onMultiView, modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Background),
+            shape = RoundedCornerShape(14.dp)) {
+            Icon(Icons.Default.GridView, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text("چندنمایی هم‌زمان شبکه‌ها")
         }
         Row(Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(15.dp)).padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -2055,8 +2063,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
 @Composable
 fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
              onRecordings: () -> Unit, onLiveDubbing: () -> Unit, onSettings: () -> Unit,
-             onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit,
-             onMultiView: () -> Unit) {
+             onBackupExport: () -> Unit, onBackupImport: () -> Unit, onPilgrimage: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("امکانات بیشتر", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(16.dp)) {
@@ -2072,7 +2079,6 @@ fun MorePage(onSchedule: () -> Unit, onAbout: () -> Unit, onSources: () -> Unit,
                 }
             }
         }
-        MoreButton("چندنمایی هم‌زمان", Icons.Default.GridView, onMultiView)
         MoreButton("تنظیمات", Icons.Default.Settings, onSettings)
         MoreButton("مترجم و دوبلور هوشمند زنده", Icons.Default.Translate, onLiveDubbing)
         MoreButton("افزودن لینک و سرور", Icons.Default.AddLink, onSources)
