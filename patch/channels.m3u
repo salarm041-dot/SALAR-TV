@@ -951,6 +951,9 @@ https://hlspackager.akamaized.net/live/DB/ALTERNATIVE_SHORAI_TV/HLS/ALTERNATIVE_
 #EXTINF:-1 tvg-id="ZedTV.ir" tvg-name="Zed TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ZedTV.ir.png" group-title="ماهواره‌ای · خبر و امور جاری" tvg-language="fas" tvg-quality="HD",ضد تی‌وی | Zed TV
 https://zedhls.wns.live/hls/stream.m3u8
 
+#EXTINF:-1 tvg-id="SolhSports.ir" tvg-name="Solh Sports" tvg-logo="" group-title="ماهواره‌ای · ورزش" tvg-language="fas" tvg-quality="HD",صلح اسپورت
+https://solhtvhls.wns.live/hls/stream.m3u8
+
 #EXTINF:-1 tvg-id="GEMSport.tr" tvg-name="GEM Sport" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/GEMSport.tr.png" group-title="ماهواره‌ای · ورزش" tvg-language="fas" tvg-quality="SD",جم ورزش
 https://steep-wildflower-284d.nhhwkiszzzvcuojxdo.workers.dev/?url=https://gg.hls2.xyz/live/IR+-+GEM+Sport/chunks.m3u8
 
