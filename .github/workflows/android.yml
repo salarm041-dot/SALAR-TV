@@ -209,8 +209,6 @@ jobs:
           additions = [
               '    implementation("com.google.mlkit:translate:17.0.3")',
               '    implementation("com.google.mlkit:language-id:17.0.6")',
-              '    implementation("net.java.dev.jna:jna:5.18.1@aar")',
-              '    implementation("com.alphacephei:vosk-android:0.3.75@aar")',
               '    implementation("dev.ffmpegkit-maintained:whisper-android:1.0.0")',
           ]
           insert_at = dep_block.end()
