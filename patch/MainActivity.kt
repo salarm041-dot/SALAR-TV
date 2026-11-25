@@ -937,38 +937,43 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         }
                         Row(
                             Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            FilledTonalButton(
-                                onClick = { showSubtitleTranslation = !showSubtitleTranslation },
-                                modifier = Modifier.weight(1f).height(42.dp),
-                                contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp),
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = if (showSubtitleTranslation) Gold.copy(alpha = 0.20f) else Panel,
-                                    contentColor = if (showSubtitleTranslation) Gold else TextMain
-                                )
-                            ) {
-                                Icon(Icons.Default.Subtitles, contentDescription = "ترجمه زیرنویس", modifier = Modifier.size(17.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text(if (showSubtitleTranslation) "زیرنویس: روشن" else "ترجمه زیرنویس", fontSize = 10.sp, maxLines = 1)
+                            @Composable
+                            fun PlayerTool(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, active: Boolean = false, action: () -> Unit) {
+                                Surface(
+                                    modifier = Modifier.weight(1f).clickable(onClick = action),
+                                    shape = RoundedCornerShape(11.dp),
+                                    color = if (active) Gold.copy(alpha = 0.18f) else Panel,
+                                    contentColor = if (active) Gold else TextMain,
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, if (active) Gold.copy(alpha = 0.65f) else Color.White.copy(alpha = 0.08f))
+                                ) {
+                                    Column(
+                                        Modifier.padding(vertical = 6.dp, horizontal = 2.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                                    ) {
+                                        Icon(icon, contentDescription = label, modifier = Modifier.size(19.dp))
+                                        Text(label, fontSize = 9.sp, maxLines = 1)
+                                    }
+                                }
                             }
-                            FilledTonalButton(
-                                onClick = {
-                                    showLiveSpeechTranslation = !showLiveSpeechTranslation
-                                    prefs.edit().putBoolean("live_speech_translation_enabled", showLiveSpeechTranslation).apply()
-                                    if (!showLiveSpeechTranslation) liveSpeechSubtitle = ""
-                                },
-                                modifier = Modifier.weight(1f).height(42.dp),
-                                contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp),
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = if (showLiveSpeechTranslation) Gold.copy(alpha = 0.20f) else Panel,
-                                    contentColor = if (showLiveSpeechTranslation) Gold else TextMain
-                                )
-                            ) {
-                                Icon(Icons.Default.RecordVoiceOver, contentDescription = "ترجمه گفتار زنده", modifier = Modifier.size(17.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text(if (showLiveSpeechTranslation) "گفتار: روشن" else "ترجمه گفتار", fontSize = 10.sp, maxLines = 1)
+                            PlayerTool(Icons.Default.Subtitles, "ترجمه زیرنویس", showSubtitleTranslation) {
+                                showSubtitleTranslation = !showSubtitleTranslation
+                            }
+                            PlayerTool(Icons.Default.RecordVoiceOver, "ترجمه گفتار", showLiveSpeechTranslation) {
+                                showLiveSpeechTranslation = !showLiveSpeechTranslation
+                                prefs.edit().putBoolean("live_speech_translation_enabled", showLiveSpeechTranslation).apply()
+                                if (!showLiveSpeechTranslation) liveSpeechSubtitle = ""
+                            }
+                            PlayerTool(Icons.Default.Translate, "دوبله فارسی", menuDubbingEnabled) {
+                                showDubbingDialog = true
+                            }
+                            PlayerTool(Icons.Default.GridView, "چندنمایی") {
+                                player.pause()
+                                selected = null
+                                page = "چندنمایی"
                             }
                         }
                         if (showSubtitleTranslation) {
