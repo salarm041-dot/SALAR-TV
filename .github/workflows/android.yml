@@ -638,7 +638,22 @@ jobs:
             set -eu
             echo "Installing emulator APK: ${{ github.workspace }}/SALAR-TV-emulator.apk"
             test -f "${{ github.workspace }}/SALAR-TV-emulator.apk"
-            adb install -r "${{ github.workspace }}/SALAR-TV-emulator.apk"
+            # Recover ADB after emulator boot; transient offline states can break streamed APK installs.
+            adb kill-server || true
+            adb start-server
+            adb wait-for-device
+            for attempt in 1 2 3 4 5; do
+              adb reconnect offline || true
+              if adb install -r "${{ github.workspace }}/SALAR-TV-emulator.apk"; then
+                break
+              fi
+              if [ "$attempt" -eq 5 ]; then
+                echo "APK install failed after 5 ADB recovery attempts"
+                exit 1
+              fi
+              sleep 5
+              adb wait-for-device
+            done
             adb logcat -c
             adb shell am force-stop com.salar.tv || true
             adb shell am start -W -n com.salar.tv/.MainActivity
