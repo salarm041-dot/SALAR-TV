@@ -2826,7 +2826,7 @@ private fun parseM3u(text: String): List<Channel> {
                 "روسیه" in meta || "russia" in meta || "ru/" in meta -> "روسیه"
                 "فرانسه" in meta || "france" in meta || "fr/" in meta -> "فرانسه"
                 "آلمان" in meta || "germany" in meta || "de/" in meta -> "آلمان"
-                "خارج از ایران" in meta -> "خارج از ایران"
+                "ماهواره" in meta || "satellite" in meta || "خارج از ایران" in meta || "tvg-language=\\"fas" in meta -> "ایران"
                 "azerbaijan" in meta || "azərbaycan" in meta || "آذربایجان" in meta || "az/" in meta -> "آذربایجان"
                 "turkey" in meta || "turkiye" in meta || "türkiye" in meta || "ترکیه" in meta || "tr/" in meta -> "ترکیه"
                 "صداوسیما" in meta || "صدا و سیما" in meta ||
