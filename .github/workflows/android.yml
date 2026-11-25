@@ -642,18 +642,7 @@ jobs:
             adb kill-server || true
             adb start-server
             adb wait-for-device
-            for attempt in 1 2 3 4 5; do
-              adb reconnect offline || true
-              if adb install -r "${{ github.workspace }}/SALAR-TV-emulator.apk"; then
-                break
-              fi
-              if [ "$attempt" -eq 5 ]; then
-                echo "APK install failed after 5 ADB recovery attempts"
-                exit 1
-              fi
-              sleep 5
-              adb wait-for-device
-            done
+            python3 -c 'exec("import subprocess,time,sys\\napk=\"${{ github.workspace }}/SALAR-TV-emulator.apk\"\\nfor attempt in range(1,6):\\n    subprocess.run([\"adb\",\"reconnect\",\"offline\"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)\\n    result=subprocess.run([\"adb\",\"install\",\"-r\",apk])\\n    if result.returncode == 0: sys.exit(0)\\n    if attempt == 5: sys.exit(result.returncode)\\n    time.sleep(5)\\n    subprocess.run([\"adb\",\"wait-for-device\"],check=True)")'
             adb logcat -c
             adb shell am force-stop com.salar.tv || true
             adb shell am start -W -n com.salar.tv/.MainActivity
