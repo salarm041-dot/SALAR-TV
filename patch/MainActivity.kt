@@ -619,7 +619,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         }
     }
 
-    CompositionLocalProvider(LocalDensity provides LocalDensity.current.copy(fontScale = appFontScale)) {
+    CompositionLocalProvider(LocalDensity provides androidx.compose.ui.unit.Density(LocalDensity.current.density, appFontScale)) {
     MaterialTheme(
         colorScheme = if (useDarkTheme) darkColorScheme(
             primary = Gold, background = Background, surface = Panel,
