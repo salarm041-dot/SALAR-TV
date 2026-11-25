@@ -673,8 +673,37 @@ fun SalarTvApp(isInPip: Boolean = false) {
         ) { padding ->
             Column(Modifier.padding(padding).fillMaxSize().then(if (page == "چندنمایی") Modifier else Modifier.padding(16.dp))) {
                 if (selected != null) {
-                    TextButton(onClick = { selected = null }) { Icon(Icons.Default.ArrowBack, null); Text("بازگشت") }
-                    Text(selected!!.name, color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Row(
+                        Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IconButton(onClick = { selected = null }, modifier = Modifier.size(40.dp)) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت", tint = Gold)
+                        }
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(selected!!.name, color = Gold, fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp, maxLines = 1)
+                            Text(
+                                listOf(selected!!.country, selected!!.groupTitle).filter { it.isNotBlank() }.joinToString(" • ").ifBlank { "SALAR TV" },
+                                color = SecondaryText, fontSize = 10.sp, maxLines = 1
+                            )
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(50),
+                            color = Color(0xFF153D32),
+                            contentColor = Color(0xFF66E0AD)
+                        ) {
+                            Row(
+                                Modifier.padding(horizontal = 11.dp, vertical = 7.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                            ) {
+                                Icon(Icons.Default.FiberManualRecord, contentDescription = null, modifier = Modifier.size(8.dp))
+                                Text(if (selected!!.kind == "وب") "آنلاین" else "پخش زنده", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                    }
                     if (selected!!.kind != "وب") {
                         Text("انتخاب پخش‌کننده", color = Gold, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -906,32 +935,40 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 }
                             }
                         }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            FilledTonalButton(
                                 onClick = { showSubtitleTranslation = !showSubtitleTranslation },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.outlinedButtonColors(
+                                modifier = Modifier.weight(1f).height(42.dp),
+                                contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp),
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = if (showSubtitleTranslation) Gold.copy(alpha = 0.20f) else Panel,
                                     contentColor = if (showSubtitleTranslation) Gold else TextMain
                                 )
                             ) {
-                                Icon(Icons.Default.Subtitles, contentDescription = null)
-                                Spacer(Modifier.width(5.dp))
-                                Text(if (showSubtitleTranslation) "بستن ترجمه زیرنویس" else "ترجمه زیرنویس شبکه", fontSize = 10.sp)
+                                Icon(Icons.Default.Subtitles, contentDescription = "ترجمه زیرنویس", modifier = Modifier.size(17.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(if (showSubtitleTranslation) "زیرنویس: روشن" else "ترجمه زیرنویس", fontSize = 10.sp, maxLines = 1)
                             }
-                            OutlinedButton(
+                            FilledTonalButton(
                                 onClick = {
                                     showLiveSpeechTranslation = !showLiveSpeechTranslation
                                     prefs.edit().putBoolean("live_speech_translation_enabled", showLiveSpeechTranslation).apply()
                                     if (!showLiveSpeechTranslation) liveSpeechSubtitle = ""
                                 },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.outlinedButtonColors(
+                                modifier = Modifier.weight(1f).height(42.dp),
+                                contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp),
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = if (showLiveSpeechTranslation) Gold.copy(alpha = 0.20f) else Panel,
                                     contentColor = if (showLiveSpeechTranslation) Gold else TextMain
                                 )
                             ) {
-                                Icon(Icons.Default.RecordVoiceOver, contentDescription = null)
-                                Spacer(Modifier.width(5.dp))
-                                Text(if (showLiveSpeechTranslation) "بستن ترجمه گفتار" else "ترجمه گفتار زنده", fontSize = 10.sp)
+                                Icon(Icons.Default.RecordVoiceOver, contentDescription = "ترجمه گفتار زنده", modifier = Modifier.size(17.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(if (showLiveSpeechTranslation) "گفتار: روشن" else "ترجمه گفتار", fontSize = 10.sp, maxLines = 1)
                             }
                         }
                         if (showSubtitleTranslation) {
