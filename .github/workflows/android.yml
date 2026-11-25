@@ -636,10 +636,9 @@ jobs:
           disable-animations: true
           script: |
             set -eu
-            APK="${{ github.workspace }}/SALAR-TV-emulator.apk"
-            echo "Installing emulator APK: $APK"
-            test -f "$APK"
-            adb install -r "$APK"
+            echo "Installing emulator APK: ${{ github.workspace }}/SALAR-TV-emulator.apk"
+            test -f "${{ github.workspace }}/SALAR-TV-emulator.apk"
+            adb install -r "${{ github.workspace }}/SALAR-TV-emulator.apk"
             adb logcat -c
             adb shell am force-stop com.salar.tv || true
             adb shell am start -W -n com.salar.tv/.MainActivity
