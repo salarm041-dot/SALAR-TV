@@ -60,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -230,6 +231,7 @@ private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
 fun SalarTvApp(isInPip: Boolean = false) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
+    var appFontScale by remember { mutableFloatStateOf(prefs.getFloat("font_scale", 1f).coerceIn(0.85f, 1.3f)) }
     val channels = remember {
         mutableStateListOf<Channel>().apply {
             val raw = prefs.getString("channels", "[]") ?: "[]"
@@ -280,10 +282,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
         channels.removeAll { it.country == "زیارت آنلاین" && it.url in obsoletePilgrimageUrls }
         val pilgrimage = listOf(
             Channel("حرم مطهر رضوی — پخش زنده رسمی", "https://haram.razavi.ir/live", "زیارت آنلاین", "وب", groupTitle = "مشهد مقدس"),
-            Channel("حرم مطهر امام حسین (ع) — پخش زنده رسمی (۹ تا ۲۱ به وقت کربلا)", "https://imamhussain.org/english/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
+            Channel("حرم امام حسین (ع) — پخش زنده ۲۴ ساعته رسمی", "https://www.youtube.com/@imamhussainlivestream/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
+            Channel("حرم امام حسین (ع) — پخش زنده وبگاه رسمی", "https://imamhussain.gov.iq/persian/live", "زیارت آنلاین", "وب", groupTitle = "کربلا"),
             Channel("حرم مطهر امام علی (ع) — پخش زنده رسمی", "https://en.imamali.net/live/", "زیارت آنلاین", "وب", groupTitle = "نجف اشرف"),
-            Channel("مسجدالحرام مکه — پخش زنده رسمی قرآن TV", "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA&autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه"),
-            Channel("مسجدالنبی مدینه — کانال رسمی السنة النبوية", "https://www.youtube.com/@SaudiSunnahTv/live", "زیارت آنلاین", "وب", groupTitle = "مدینه منوره")
+            Channel("مسجدالحرام مکه — پخش زنده قرآن TV", "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA&autoplay=1&playsinline=1", "زیارت آنلاین", "وب", groupTitle = "مکه مکرمه"),
+            Channel("مسجدالنبی مدینه — پخش زنده ۲۴ ساعته شبکه السنة النبوية", "https://www.youtube.com/@SaudiSunnahTv/live", "زیارت آنلاین", "وب", groupTitle = "مدینه منوره")
         )
         val arabic = runCatching {
             context.assets.open("arabic-channels.m3u").bufferedReader().use { parseM3u(it.readText()) }
@@ -583,6 +586,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         }
     }
 
+    CompositionLocalProvider(LocalDensity provides LocalDensity.current.copy(fontScale = appFontScale)) {
     MaterialTheme(
         colorScheme = if (useDarkTheme) darkColorScheme(
             primary = Gold, background = Background, surface = Panel,
@@ -960,7 +964,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             themeMode = mode
                             prefs.edit().putString("theme_mode", mode).apply()
                         },
-                        onChildLock = { page = "قفل کودک" }
+                        onChildLock = { page = "قفل کودک" },
+                        fontScale = appFontScale,
+                        onFontScaleChange = { scale ->
+                            appFontScale = scale.coerceIn(0.85f, 1.3f)
+                            prefs.edit().putFloat("font_scale", appFontScale).apply()
+                        }
                     )
                     "قفل کودک" -> ChildLockPage(
                         channels = channels.distinctBy { it.url },
@@ -1081,6 +1090,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 }
             }
         }
+    }
     }
 
     if (showChildPinDialog) {
@@ -1500,7 +1510,7 @@ fun IranTvPage(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite:
     var section by remember { mutableStateOf("همه") }
     val iran = channels.filter { it.kind == "تلویزیون" && it.country == "ایران" }
     fun isNational(c: Channel) = categoryForChannel(c) == "شبکه‌های سراسری"
-    fun isProvincial(c: Channel) = categoryForChannel(c).startsWith("استانی")
+    fun isProvincial(c: Channel) = categoryForChannel(c) == "شبکه‌های استانی"
     fun isSatellite(c: Channel): Boolean {
         val v = (c.name + " " + c.groupTitle).lowercase()
         return listOf("ماهواره", "satellite", "persiana", "gem ", "manoto", "ایران اینترنشنال",
@@ -1540,13 +1550,13 @@ fun IranTvPage(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite:
         else if (section == "ماهواره") Text("شبکه‌های فارسی‌زبان و ماهواره‌ای", color = Color(0xFF64D8CA), fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.weight(1f)) {
             ChannelList(filtered, onSelect = onSelect, onFavorite = onFavorite, onEdit = onEdit, onDelete = onDelete,
-                onRefresh = onRefresh, isRefreshing = isRefreshing, lastRefresh = lastRefresh)
+                onRefresh = onRefresh, isRefreshing = isRefreshing, lastRefresh = lastRefresh, largeCards = true)
         }
     }
 }
 @Composable
 // Reads optional tvg-logo URLs from M3U and renders a safe TV/radio fallback.
-private fun ChannelLogo(logoUrl: String, kind: String) {
+private fun ChannelLogo(logoUrl: String, kind: String, size: androidx.compose.ui.unit.Dp = 42.dp) {
     var bitmap by remember(logoUrl) { mutableStateOf<android.graphics.Bitmap?>(null) }
     LaunchedEffect(logoUrl) {
         bitmap = if (logoUrl.startsWith("https://") || logoUrl.startsWith("http://")) {
@@ -1561,7 +1571,7 @@ private fun ChannelLogo(logoUrl: String, kind: String) {
         } else null
     }
     Box(
-        Modifier.size(42.dp).background(Color(0xFF252B38), RoundedCornerShape(9.dp)),
+        Modifier.size(size).background(Panel, RoundedCornerShape(12.dp)),
         contentAlignment = Alignment.Center
     ) {
         if (bitmap != null) {
@@ -1569,7 +1579,7 @@ private fun ChannelLogo(logoUrl: String, kind: String) {
                 modifier = Modifier.fillMaxSize().padding(3.dp), contentScale = ContentScale.Fit)
         } else {
             Icon(if (kind == "رادیو") Icons.Default.Radio else Icons.Default.Tv,
-                contentDescription = null, tint = Gold, modifier = Modifier.size(23.dp))
+                contentDescription = null, tint = Gold, modifier = Modifier.size(size * 0.55f))
         }
     }
 }
@@ -2279,12 +2289,12 @@ fun ChildLockPage(
 }
 
 @Composable
-fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit) {
+fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit,
+                 fontScale: Float, onFontScaleChange: (Float) -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
-    var fontScale by remember { mutableFloatStateOf(prefs.getFloat("font_scale", 1f).coerceIn(0.85f, 1.3f)) }
     var confirmDelete by remember { mutableStateOf(prefs.getBoolean("confirm_before_delete", true)) }
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("ظاهر و شخصی‌سازی", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text("حالت نمایش", color = TextMain, fontWeight = FontWeight.SemiBold)
         listOf("dark" to "مشکی و طلایی براق", "light" to "روشن", "system" to "هماهنگ با دستگاه").forEach { (value, label) ->
@@ -2342,11 +2352,8 @@ fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChild
             }
         }
         Divider(color = Gold.copy(alpha = 0.3f))
-        Text("اندازه قلم: " + (fontScale * 100).toInt() + "%", color = Gold, fontWeight = FontWeight.Bold)
-        Slider(value = fontScale, onValueChange = {
-            fontScale = it
-            prefs.edit().putFloat("font_scale", it).apply()
-        }, valueRange = 0.85f..1.3f, steps = 8)
+        Text("اندازه قلم برنامه: " + (fontScale * 100).toInt() + "%", color = Gold, fontWeight = FontWeight.Bold)
+        Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.85f..1.3f, steps = 8)
         Text("پیش‌نمایش اندازه نوشته", color = TextMain, fontSize = (16f * fontScale).sp)
         Divider(color = Gold.copy(alpha = 0.3f))
         Text("امنیت و ورود", color = Gold, fontWeight = FontWeight.Bold)
@@ -2544,7 +2551,7 @@ private fun categoryForChannel(channel: Channel): String {
     // Official IRIB structure takes precedence over genre keywords:
     // national, provincial and international networks must not be mixed
     // into generic news/sports/entertainment sections.
-    if (listOf("شبکه‌های استانی", "شبکه های استانی", "استانی").any { it in group }) return "استانی / ${provinceForChannel(channel)}"
+    if (listOf("شبکه‌های استانی", "شبکه های استانی", "استانی").any { it in group }) return "شبکه‌های استانی"
     if (listOf("شبکه‌های سراسری", "شبکه های سراسری", "سراسری").any { it in group }) return "شبکه‌های سراسری"
     if (listOf("برون‌مرزی", "برون مرزی", "بین‌الملل", "بین الملل").any { it in group }) return "شبکه‌های برون‌مرزی"
     val nationalNames = listOf(
@@ -2552,8 +2559,10 @@ private fun categoryForChannel(channel: Channel): String {
         "شبکه چهار", "شبکه ۴", "شبکه پنج", "شبکه ۵", "شبکه خبر",
         "شبکه آموزش", "شبکه قرآن", "شبکه ورزش", "شبکه مستند", "شبکه سلامت",
         "شبکه افق", "شبکه نسیم", "شبکه تماشا", "شبکه نمایش", "شبکه امید",
-        "شبکه کودک", "شبکه پویا", "شبکه نهال", "irib tv1", "irib tv2",
-        "irib tv3", "irib tv4", "irib tv5"
+        "شبکه کودک", "شبکه پویا", "شبکه نهال", "فراتر", "شبکه فراتر", "faratar",
+        "خبر ۲", "خبر دو", "irinn 2", "جام جم ۱", "جام جم ۲", "جام جم یک", "جام جم دو",
+        "jame jam 1", "jame jam 2", "jamejam1", "jamejam2",
+        "irib tv1", "irib tv2", "irib tv3", "irib tv4", "irib tv5"
     )
     if (nationalNames.any { it in value }) return "شبکه‌های سراسری"
     return when {
@@ -2588,7 +2597,7 @@ private fun channelSortOrder(channel: Channel): Int {
             "شبکه یک", "شبکه دو", "شبکه سه", "شبکه چهار", "شبکه پنج",
             "شبکه آموزش", "شبکه قرآن", "شبکه خبر", "شبکه ورزش", "شبکه مستند",
             "شبکه سلامت", "شبکه افق", "شبکه نسیم", "شبکه تماشا", "شبکه نمایش",
-            "شبکه امید", "شبکه کودک", "شبکه پویا", "شبکه نهال"
+            "شبکه امید", "شبکه کودک", "شبکه پویا", "شبکه نهال", "فراتر", "خبر ۲", "جام جم ۱", "جام جم ۲"
         )
         val index = nationalOrder.indexOfFirst { name.contains(it, ignoreCase = true) }
         return if (index >= 0) index else 100
