@@ -1021,7 +1021,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     )
                     "درباره ما" -> AboutPage()
                     "تلویزیون" -> TvCountryPage(onCountry = { country -> page = if (country == "عربی") "شبکه‌های عربی" else "کشور:$country" })
-                    "شبکه‌های عربی" -> TvCountryPage(onCountry = { country -> page = "عربی:$country" })
+                    "شبکه‌های عربی" -> ArabicCountriesPage(channels = channels, onCountry = { country -> page = "عربی:$country" })
                     "کشور:سایر" -> TvCountryPage(onCountry = { country ->
                         rememberDynamicCountry(country)
                         page = "کشور:$country"
@@ -1498,6 +1498,64 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ArabicCountriesPage(channels: List<Channel>, onCountry: (String) -> Unit) {
+    data class ArabicCountry(val name: String, val flag: String, val accent: Color)
+    val countries = listOf(
+        ArabicCountry("عربستان", "🇸🇦", Color(0xFF45D483)),
+        ArabicCountry("امارات", "🇦🇪", Color(0xFF39C9E8)),
+        ArabicCountry("قطر", "🇶🇦", Color(0xFFB58BDB)),
+        ArabicCountry("کویت", "🇰🇼", Color(0xFF67A9FF)),
+        ArabicCountry("بحرین", "🇧🇭", Color(0xFFFFB45E)),
+        ArabicCountry("عمان", "🇴🇲", Color(0xFF45C9A1)),
+        ArabicCountry("عراق", "🇮🇶", Color(0xFFE5B84D)),
+        ArabicCountry("اردن", "🇯🇴", Color(0xFFE77C75)),
+        ArabicCountry("لبنان", "🇱🇧", Color(0xFF68C9B0)),
+        ArabicCountry("سوریه", "🇸🇾", Color(0xFFD58A62)),
+        ArabicCountry("فلسطین", "🇵🇸", Color(0xFF6BCB8C)),
+        ArabicCountry("مصر", "🇪🇬", Color(0xFFE0B45D)),
+        ArabicCountry("مراکش", "🇲🇦", Color(0xFFDB7777)),
+        ArabicCountry("الجزایر", "🇩🇿", Color(0xFF75B98A)),
+        ArabicCountry("تونس", "🇹🇳", Color(0xFFE06D75)),
+        ArabicCountry("لیبی", "🇱🇾", Color(0xFF79A9D9)),
+        ArabicCountry("یمن", "🇾🇪", Color(0xFFCE9B65)),
+        ArabicCountry("سودان", "🇸🇩", Color(0xFFB28BD6))
+    )
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(13.dp)) {
+        Text("شبکه‌های کشورهای عربی", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+        Text("کشور را انتخاب کنید تا شبکه‌های همان کشور نمایش داده شوند",
+            color = Color(0xFFB8C8E0), fontSize = 12.sp)
+        countries.chunked(2).forEach { rowCountries ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
+                rowCountries.forEach { country ->
+                    val count = channels.count { it.kind == "تلویزیون" && it.country == country.name }
+                    Card(Modifier.weight(1f).height(132.dp).clickable { onCountry(country.name) },
+                        shape = RoundedCornerShape(19.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF09182E)),
+                        border = androidx.compose.foundation.BorderStroke(1.4.dp, country.accent)) {
+                        Box(Modifier.fillMaxSize().background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                listOf(country.accent.copy(alpha = .25f), Color(0xFF102342), Color(0xFF070F20))))) {
+                            Column(Modifier.fillMaxSize().padding(10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceEvenly) {
+                                Text(country.flag, fontSize = 30.sp)
+                                Text(country.name, color = Color.White, fontSize = 15.sp,
+                                    fontWeight = FontWeight.ExtraBold)
+                                Text("$count شبکه", color = country.accent, fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+                if (rowCountries.size == 1) Spacer(Modifier.weight(1f))
             }
         }
     }
