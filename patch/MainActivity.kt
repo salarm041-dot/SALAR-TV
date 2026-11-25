@@ -961,6 +961,68 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         },
                                         modifier = Modifier.fillMaxSize()
                                     )
+                                    Box(Modifier.align(Alignment.TopStart).padding(12.dp)) {
+                                        IconButton(
+                                            onClick = { playerMenuExpanded = true },
+                                            modifier = Modifier.background(Color.Black.copy(alpha = 0.68f), RoundedCornerShape(50))
+                                        ) {
+                                            Icon(Icons.Default.MoreVert, contentDescription = "گزینه‌های پخش", tint = Color.White)
+                                        }
+                                        DropdownMenu(expanded = playerMenuExpanded, onDismissRequest = { playerMenuExpanded = false }) {
+                                            DropdownMenuItem(
+                                                text = { Text("خروج از تمام‌صفحه") },
+                                                leadingIcon = { Icon(Icons.Default.FullscreenExit, null) },
+                                                onClick = { showPlayerFullscreen = false; playerMenuExpanded = false }
+                                            )
+                                            DropdownMenuItem(
+                                                text = { Text(if (playerLandscape) "چرخش به حالت عمودی" else "چرخش به حالت افقی") },
+                                                leadingIcon = { Icon(Icons.Default.ScreenRotation, null) },
+                                                onClick = {
+                                                    playerLandscape = !playerLandscape
+                                                    (context as? MainActivity)?.requestedOrientation =
+                                                        if (playerLandscape) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                                                        else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                                                    playerMenuExpanded = false
+                                                }
+                                            )
+                                            if (!selected!!.url.contains("iranintl.com", ignoreCase = true)) {
+                                                DropdownMenuItem(
+                                                    text = { Text(if (recordingActive) "توقف ضبط شبکه" else "شروع ضبط شبکه") },
+                                                    leadingIcon = { Icon(if (recordingActive) Icons.Default.Stop else Icons.Default.FiberManualRecord, null) },
+                                                    onClick = {
+                                                        if (recordingActive) {
+                                                            context.stopService(Intent(context, HlsRecorderService::class.java))
+                                                            recordingActive = false
+                                                        } else {
+                                                            val intent = Intent(context, HlsRecorderService::class.java).apply {
+                                                                putExtra("name", selected!!.name)
+                                                                putExtra("url", selected!!.url)
+                                                                putExtra("duration", 360)
+                                                            }
+                                                            runCatching {
+                                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent)
+                                                                else context.startService(intent)
+                                                                recordingActive = true
+                                                            }.onFailure {
+                                                                android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطا"), android.widget.Toast.LENGTH_LONG).show()
+                                                            }
+                                                        }
+                                                        playerMenuExpanded = false
+                                                    }
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text("زمان‌بندی ضبط همین شبکه") },
+                                                    leadingIcon = { Icon(Icons.Default.CalendarMonth, null) },
+                                                    onClick = { showSchedule = true; playerMenuExpanded = false }
+                                                )
+                                            }
+                                            DropdownMenuItem(
+                                                text = { Text("فایل‌های ضبط‌شده") },
+                                                leadingIcon = { Icon(Icons.Default.VideoLibrary, null) },
+                                                onClick = { page = "ضبط‌ها"; showPlayerFullscreen = false; playerMenuExpanded = false }
+                                            )
+                                        }
+                                    }
                                     IconButton(
                                         onClick = { showPlayerFullscreen = false },
                                         modifier = Modifier.align(Alignment.TopEnd).padding(12.dp)
