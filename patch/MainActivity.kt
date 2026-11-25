@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.clip
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -1351,10 +1352,7 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
                         androidx.compose.ui.graphics.Brush.verticalGradient(listOf(accent.copy(alpha = .24f), Color(0xFF0A1428), Color(0xFF050B18))))) {
                         Column(Modifier.fillMaxSize().padding(9.dp), horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceEvenly) {
-                            Box(Modifier.size(53.dp)
-                                .background(Color(0xFF071326), RoundedCornerShape(27.dp))
-                                .border(1.dp, accent.copy(alpha = .8f), RoundedCornerShape(27.dp)),
-                                contentAlignment = Alignment.Center) { Text(flag, fontSize = 31.sp) }
+                            CountryArtwork(name = name, accent = accent, compact = true)
                             Text(name, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
                             Text("مشاهده شبکه‌ها  ›", color = accent, fontSize = 9.sp)
                         }
@@ -1387,15 +1385,67 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
 }
 
 @Composable
+private fun CountryArtwork(name: String, accent: Color, compact: Boolean = false) {
+    val emblem = when (name) {
+        "ایران" -> "🏛️"
+        "ترکیه" -> "🕌"
+        "آذربایجان", "جمهوری آذربایجان" -> "🔥"
+        "عربی" -> "🌙"
+        "اسرائیل" -> "🏙️"
+        else -> "🌐"
+    }
+    val landmark = when (name) {
+        "ایران" -> "برج آزادی"
+        "ترکیه" -> "ایاصوفیه"
+        "آذربایجان", "جمهوری آذربایجان" -> "برج‌های شعله"
+        else -> "شبکه‌های جهانی"
+    }
+    val flagColors = when (name) {
+        "ایران" -> listOf(Color(0xFF239B56), Color.White, Color(0xFFDA3A3A))
+        "ترکیه" -> listOf(Color(0xFFE32636), Color(0xFFE32636), Color(0xFFE32636))
+        "آذربایجان", "جمهوری آذربایجان" -> listOf(Color(0xFF20A7E8), Color(0xFFE84155), Color(0xFF36A66A))
+        else -> listOf(accent, Color(0xFF182A48), accent)
+    }
+    val artworkHeight = if (compact) 58.dp else 82.dp
+    Box(
+        Modifier.fillMaxWidth().height(artworkHeight)
+            .background(Color(0xFF071326), RoundedCornerShape(13.dp))
+            .border(1.dp, accent.copy(alpha = .65f), RoundedCornerShape(13.dp))
+            .clip(RoundedCornerShape(13.dp))
+    ) {
+        Column(Modifier.fillMaxSize()) {
+            flagColors.forEach { color -> Box(Modifier.fillMaxWidth().weight(1f).background(color.copy(alpha = .72f))) }
+        }
+        Box(Modifier.fillMaxSize().background(
+            androidx.compose.ui.graphics.Brush.horizontalGradient(
+                listOf(Color(0xFF061225).copy(alpha = .08f), Color(0xFF061225).copy(alpha = .82f))
+            )
+        ))
+        Row(Modifier.fillMaxSize().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(emblem, fontSize = if (compact) 29.sp else 43.sp)
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Center) {
+                if (name == "ترکیه") Text("☾ ★", color = Color.White, fontSize = if (compact) 12.sp else 16.sp,
+                    fontWeight = FontWeight.Black)
+                if (name == "آذربایجان" || name == "جمهوری آذربایجان") Text("☾ ★", color = Color.White,
+                    fontSize = if (compact) 12.sp else 16.sp, fontWeight = FontWeight.Black)
+                Text(landmark, color = Color.White, fontSize = if (compact) 8.sp else 11.sp,
+                    fontWeight = FontWeight.ExtraBold, maxLines = 1)
+            }
+        }
+    }
+}
+
+@Composable
 fun TvCountryPage(onCountry: (String) -> Unit) {
-    data class CountryCard(val name: String, val flag: String, val color: Color, val subtitle: String)
+    data class CountryCard(val name: String, val color: Color, val subtitle: String)
     val countries = listOf(
-        CountryCard("ایران", "🇮🇷", Color(0xFF36D69A), "شبکه‌های سراسری و استانی"),
-        CountryCard("ترکیه", "🇹🇷", Color(0xFFFF6578), "شبکه‌های ملی و خصوصی"),
-        CountryCard("آذربایجان", "🇦🇿", Color(0xFF36C9F1), "شبکه‌های جمهوری آذربایجان"),
-        CountryCard("اسرائیل", "🇮🇱", Color(0xFF78A9FF), "شبکه‌های داخلی و بین‌المللی"),
-        CountryCard("عربی", "🌍", Color(0xFFFFB84A), "شبکه‌های کشورهای عربی"),
-        CountryCard("سایر", "🌐", Color(0xFFB69AFF), "دیگر شبکه‌های جهان")
+        CountryCard("ایران", Color(0xFF36D69A), "شبکه‌های سراسری و استانی"),
+        CountryCard("ترکیه", Color(0xFFFF6578), "شبکه‌های ملی و خصوصی"),
+        CountryCard("آذربایجان", Color(0xFF36C9F1), "شبکه‌های جمهوری آذربایجان"),
+        CountryCard("اسرائیل", Color(0xFF78A9FF), "شبکه‌های داخلی و بین‌المللی"),
+        CountryCard("عربی", Color(0xFFFFB84A), "شبکه‌های کشورهای عربی"),
+        CountryCard("سایر", Color(0xFFB69AFF), "دیگر شبکه‌های جهان")
     )
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("شبکه‌های تلویزیونی", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
@@ -1403,21 +1453,16 @@ fun TvCountryPage(onCountry: (String) -> Unit) {
         countries.chunked(2).forEach { rowCountries ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
                 rowCountries.forEach { country ->
-                    Card(Modifier.weight(1f).height(145.dp).clickable { onCountry(country.name) },
+                    Card(Modifier.weight(1f).height(174.dp).clickable { onCountry(country.name) },
                         shape = RoundedCornerShape(21.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF09182E)),
                         border = androidx.compose.foundation.BorderStroke(1.5.dp, country.color)) {
                         Box(Modifier.fillMaxSize().background(
                             androidx.compose.ui.graphics.Brush.verticalGradient(listOf(country.color.copy(alpha = .28f),
                                 Color(0xFF102342), Color(0xFF070F20))))) {
-                            Box(Modifier.align(Alignment.TopEnd).size(72.dp).background(country.color.copy(alpha = .12f),
-                                RoundedCornerShape(bottomStart = 72.dp)))
-                            Column(Modifier.fillMaxSize().padding(11.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                            Column(Modifier.fillMaxSize().padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.SpaceEvenly) {
-                                Box(Modifier.size(59.dp)
-                                    .background(Color(0xFF071326), RoundedCornerShape(30.dp))
-                                    .border(1.dp, country.color, RoundedCornerShape(30.dp)),
-                                    contentAlignment = Alignment.Center) { Text(country.flag, fontSize = 35.sp) }
+                                CountryArtwork(country.name, country.color)
                                 Text(country.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
                                 Text(country.subtitle, color = country.color, fontSize = 9.sp, maxLines = 1)
                             }
