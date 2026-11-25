@@ -127,6 +127,14 @@ https://noshls.persiana.live/hls/stream.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaSeries.fr.png" group-title="فارسی‌زبان خارج از ایران / فیلم و سریال / تلویزیون",Persiana Series
 https://onehls.persiana.live/hls/stream.m3u8
 
+#EXTINF:-1 tvg-id="PersianaSports1.fr" tvg-name="Persiana Sports 1" tvg-logo="https://www.lyngsat.com/logo/tv/pp/persiana-sports-fr.png" group-title="فارسی‌زبان خارج از ایران / ورزشی / تلویزیون" tvg-language="fas" tvg-quality="HD",Persiana Sports 1 | پرشیانا اسپورت ۱
+https://spstr.abntv.live/hls/psstream.m3u8
+#EXTINF:-1 tvg-id="PersianaSports2.fr" tvg-name="Persiana Sports 2" tvg-logo="https://www.lyngsat.com/logo/tv/pp/persiana-sports-fr.png" group-title="فارسی‌زبان خارج از ایران / ورزشی / تلویزیون" tvg-language="fas" tvg-quality="HD",Persiana Sports 2 | پرشیانا اسپورت ۲
+https://pepsi.abntv.live/hls/4spstream.m3u8
+#EXTINF:-1 tvg-id="PersianaSports3.fr" tvg-name="Persiana Sports 3" tvg-logo="https://www.lyngsat.com/logo/tv/pp/persiana-sports-fr.png" group-title="فارسی‌زبان خارج از ایران / ورزشی / تلویزیون" tvg-language="fas" tvg-quality="HD",Persiana Sports 3 | پرشیانا اسپورت ۳
+https://pepsi3.abntv.live/hls/psp3.m3u8
+#EXTINF:-1 tvg-id="PersianaSports4.fr" tvg-name="Persiana Sports 4" tvg-logo="https://www.lyngsat.com/logo/tv/pp/persiana-sports-fr.png" group-title="فارسی‌زبان خارج از ایران / ورزشی / تلویزیون" tvg-language="fas" tvg-quality="HD",Persiana Sports 4 | پرشیانا اسپورت ۴
+https://pepsi4.abntv.live/hls/psp4.m3u8
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PersianaFight.fr.png" group-title="فارسی‌زبان خارج از ایران / ورزشی / تلویزیون",Persiana Fight
 https://fighthls.persiana.live/hls/stream.m3u8
 
@@ -145,7 +153,7 @@ https://hls.irannrtv.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="IranInternational.fa" tvg-name="ایران اینترنشنال" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranInternational.uk.png" group-title="فارسی‌زبان خارج از ایران / خبری",ایران اینترنشنال
 https://hlspackager.akamaized.net/live/DB/IRAN_INTERNATIONAL/HLS/IRAN_INTERNATIONAL.m3u8
 
-#EXTINF:-1 tvg-id="TVITN.ir" tvg-name="ITN" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TVITN.ir.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / خبری" tvg-language="fas" tvg-quality="SD",ITN | آی‌تی‌ان
+#EXTINF:-1 tvg-id="TVITN.ir" tvg-name="ITN" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TVITN.ir.png" group-title="فارسی‌زبان خارج از ایران / عمومی / تلویزیون" tvg-language="fas" tvg-quality="SD",ITN | آی‌تی‌ان
 https://itnhls.wns.live/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="KhaterehTV.us" tvg-name="Khatereh TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhaterehTV.us.png" group-title="فارسی‌زبان خارج از ایران / یاهست و ترکمن‌عالم ۵۲ درجه / عمومی" tvg-language="fas" tvg-quality="FHD",Khatereh TV | خاطره
@@ -934,13 +942,13 @@ https://pleonhls.wns.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="PulseMedia.us" tvg-name="Pulse Media" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PulseMedia.us.png" group-title="ماهواره‌ای · خبر و امور جاری" tvg-language="fas",پالس مدیا
 https://pulsehls.wns.live/hls/stream.m3u8
 
-#EXTINF:-1 tvg-id="SetarehTV.uk" tvg-name="Setareh TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SetarehTV.uk.png" group-title="ماهواره‌ای · خبر و امور جاری" tvg-language="fas" tvg-quality="SD",ستاره
+#EXTINF:-1 tvg-id="SetarehTV.uk" tvg-name="Setareh TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SetarehTV.uk.png" group-title="ماهواره‌ای · خبر و امور جاری" tvg-language="fas" tvg-quality="SD",ستاره تی‌وی
 https://setarehhls.wns.live/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="ShoraiTV.us" tvg-name="Shorai TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ShoraiTV.us.png" group-title="ماهواره‌ای · خبر و امور جاری" tvg-language="fas" tvg-quality="FHD",تلویزیون دمکراسی شورایی
 https://hlspackager.akamaized.net/live/DB/ALTERNATIVE_SHORAI_TV/HLS/ALTERNATIVE_SHORAI_TV.m3u8
 
-#EXTINF:-1 tvg-id="ZedTV.ir" tvg-name="Zed TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ZedTV.ir.png" group-title="ماهواره‌ای · خبر و امور جاری" tvg-language="fas" tvg-quality="HD",زد
+#EXTINF:-1 tvg-id="ZedTV.ir" tvg-name="Zed TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ZedTV.ir.png" group-title="ماهواره‌ای · خبر و امور جاری" tvg-language="fas" tvg-quality="HD",ضد تی‌وی | Zed TV
 https://zedhls.wns.live/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="GEMSport.tr" tvg-name="GEM Sport" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/GEMSport.tr.png" group-title="ماهواره‌ای · ورزش" tvg-language="fas" tvg-quality="SD",جم ورزش
