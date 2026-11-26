@@ -450,20 +450,32 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 }
                 try {
                     result.onSuccess { remote ->
-                        val remoteByUrl = remote
-                            .filter { it.url.isNotBlank() }
+                        fun channelIdentity(channel: Channel): String =
+                            channel.kind + "|" + channel.name.lowercase(Locale.ROOT)
+                                .replace(Regex("[^\\p{L}\\p{N}]"), "")
+
+                        val remoteByUrl = remote.filter { it.url.isNotBlank() }
                             .associateBy { it.url.trim().lowercase(Locale.ROOT) }
+                        val remoteByIdentity = remote.filter { it.url.isNotBlank() }
+                            .associateBy { channelIdentity(it) }
                         var updated = 0
                         val existingUrls = channels.map { it.url.trim().lowercase(Locale.ROOT) }.toMutableSet()
+                        val existingIdentities = channels.map { channelIdentity(it) }.toMutableSet()
 
-                        // Refresh metadata for built-in channels while preserving favorites and user-only entries.
+                        // A provider may rotate a stream URL without changing the channel.
+                        // Match by URL first, then stable channel name; replace the old URL
+                        // while preserving the user's favorite flag and custom-only entries.
                         channels.indices.forEach { index ->
                             val current = channels[index]
                             if (current.kind == requestedKind) {
                                 val latest = remoteByUrl[current.url.trim().lowercase(Locale.ROOT)]
+                                    ?: remoteByIdentity[channelIdentity(current)]
                                 if (latest != null) {
+                                    existingUrls.remove(current.url.trim().lowercase(Locale.ROOT))
+                                    existingUrls.add(latest.url.trim().lowercase(Locale.ROOT))
                                     channels[index] = current.copy(
                                         name = latest.name,
+                                        url = latest.url,
                                         country = latest.country,
                                         logoUrl = latest.logoUrl,
                                         groupTitle = latest.groupTitle,
@@ -475,8 +487,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         }
 
                         val fresh = remote.filter { channel ->
-                            val normalized = channel.url.trim().lowercase(Locale.ROOT)
-                            normalized.isNotBlank() && existingUrls.add(normalized)
+                            val normalizedUrl = channel.url.trim().lowercase(Locale.ROOT)
+                            val identity = channelIdentity(channel)
+                            normalizedUrl.isNotBlank() &&
+                                identity !in existingIdentities &&
+                                existingUrls.add(normalizedUrl) &&
+                                existingIdentities.add(identity)
                         }
                         channels.addAll(fresh)
                         saveChannels()
@@ -512,7 +528,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         }
         if (requestedKind != null) {
             val lastAutoRefresh = prefs.getLong("last_auto_refresh_${requestedKind}", 0L)
-            val refreshInterval = 24L * 60L * 60L * 1000L
+            val refreshInterval = 6L * 60L * 60L * 1000L
             if (System.currentTimeMillis() - lastAutoRefresh >= refreshInterval) {
                 refreshChannels(requestedKind)
             }
