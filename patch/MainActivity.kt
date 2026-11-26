@@ -104,6 +104,7 @@ data class Channel(
 )
 
 data class SubtitleChoice(val groupIndex: Int, val trackIndex: Int, val label: String)
+data class VideoQualityChoice(val groupIndex: Int, val trackIndex: Int, val label: String)
 
 data class ScheduledRecording(val name: String, val url: String, val startMillis: Long, val durationMinutes: Int) {
     val requestCode: Int get() = (name + url + startMillis).hashCode()
@@ -799,6 +800,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var liveSpeechSubtitle by remember(selected!!.url) { mutableStateOf("") }
                         var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
+                        var showQualityDialog by remember(selected!!.url) { mutableStateOf(false) }
+                        var qualityChoices by remember(selected!!.url) { mutableStateOf(emptyList<VideoQualityChoice>()) }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerHelp by remember(selected!!.url) { mutableStateOf(false) }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
@@ -891,6 +894,29 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         text = { Text("فایل‌های ضبط‌شده") },
                                         leadingIcon = { Icon(Icons.Default.VideoLibrary, null) },
                                         onClick = { page = "ضبط‌ها"; playerMenuExpanded = false }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("کیفیت تصویر") },
+                                        leadingIcon = { Icon(Icons.Default.HighQuality, null) },
+                                        onClick = {
+                                            qualityChoices = buildList {
+                                                player.currentTracks.groups.forEachIndexed { groupIndex, group ->
+                                                    if (group.type == androidx.media3.common.C.TRACK_TYPE_VIDEO) {
+                                                        for (trackIndex in 0 until group.length) {
+                                                            if (group.isTrackSupported(trackIndex)) {
+                                                                val format = group.getTrackFormat(trackIndex)
+                                                                val height = format.height
+                                                                val width = format.width
+                                                                val label = if (height > 0) "${height}p" else if (width > 0) "${width}p" else "کیفیت نامشخص"
+                                                                add(VideoQualityChoice(groupIndex, trackIndex, label))
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }.distinctBy { it.label }.sortedByDescending { it.label.removeSuffix("p").toIntOrNull() ?: 0 }
+                                            showQualityDialog = true
+                                            playerMenuExpanded = false
+                                        }
                                     )
                                     DropdownMenuItem(
                                         text = { Text("انتخاب زیرنویس") },
@@ -1019,6 +1045,29 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         }
                                         DropdownMenu(expanded = playerMenuExpanded, onDismissRequest = { playerMenuExpanded = false }) {
                                             DropdownMenuItem(
+                                                text = { Text("کیفیت تصویر") },
+                                                leadingIcon = { Icon(Icons.Default.HighQuality, null) },
+                                                onClick = {
+                                                    qualityChoices = buildList {
+                                                        player.currentTracks.groups.forEachIndexed { groupIndex, group ->
+                                                            if (group.type == androidx.media3.common.C.TRACK_TYPE_VIDEO) {
+                                                                for (trackIndex in 0 until group.length) {
+                                                                    if (group.isTrackSupported(trackIndex)) {
+                                                                        val format = group.getTrackFormat(trackIndex)
+                                                                        val height = format.height
+                                                                        val width = format.width
+                                                                        val label = if (height > 0) "${height}p" else if (width > 0) "${width}p" else "کیفیت نامشخص"
+                                                                        add(VideoQualityChoice(groupIndex, trackIndex, label))
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }.distinctBy { it.label }.sortedByDescending { it.label.removeSuffix("p").toIntOrNull() ?: 0 }
+                                                    showQualityDialog = true
+                                                    playerMenuExpanded = false
+                                                }
+                                            )
+                                            DropdownMenuItem(
                                                 text = { Text("خروج از تمام‌صفحه") },
                                                 leadingIcon = { Icon(Icons.Default.FullscreenExit, null) },
                                                 onClick = { showPlayerFullscreen = false; playerMenuExpanded = false }
@@ -1086,6 +1135,39 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                     }
                                 }
                             }
+                        }
+                        if (showQualityDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showQualityDialog = false },
+                                title = { Text("انتخاب کیفیت تصویر") },
+                                text = {
+                                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        Text("خودکار (پیشنهادی)", modifier = Modifier.fillMaxWidth().clickable {
+                                            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                                                .clearOverridesOfType(androidx.media3.common.C.TRACK_TYPE_VIDEO)
+                                                .build()
+                                            showQualityDialog = false
+                                        }.padding(vertical = 9.dp))
+                                        if (qualityChoices.isEmpty()) {
+                                            Text("اطلاعات کیفیت این شبکه هنوز دریافت نشده است؛ پس از شروع پخش دوباره امتحان کنید.",
+                                                color = SecondaryText)
+                                        } else qualityChoices.forEach { choice ->
+                                            Text(choice.label, modifier = Modifier.fillMaxWidth().clickable {
+                                                val group = player.currentTracks.groups.getOrNull(choice.groupIndex)
+                                                if (group != null) {
+                                                    player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                                                        .clearOverridesOfType(androidx.media3.common.C.TRACK_TYPE_VIDEO)
+                                                        .addOverride(androidx.media3.common.TrackSelectionOverride(
+                                                            group.mediaTrackGroup, listOf(choice.trackIndex)
+                                                        )).build()
+                                                }
+                                                showQualityDialog = false
+                                            }.padding(vertical = 9.dp))
+                                        }
+                                    }
+                                },
+                                confirmButton = { TextButton(onClick = { showQualityDialog = false }) { Text("بستن") } }
+                            )
                         }
                         if (showSubtitleDialog) {
                             AlertDialog(
