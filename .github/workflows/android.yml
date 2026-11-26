@@ -8,7 +8,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -608,6 +608,18 @@ jobs:
           name: SALAR-TV-APK
           path: SALAR-TV-debug.apk
           if-no-files-found: error
+
+      - name: Publish direct phone APK download
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: salar-tv-build-${{ github.run_number }}
+          name: SALAR TV Android APK build ${{ github.run_number }}
+          body: |
+            SALAR TV Android phone APK (ARM64).
+            Built and smoke-tested in the Android 11 emulator.
+          files: SALAR-TV-debug.apk
+          draft: false
+          prerelease: true
 
       - name: Enable KVM access for Android emulator
         run: |
