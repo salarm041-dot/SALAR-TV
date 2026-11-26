@@ -643,20 +643,11 @@ jobs:
             adb start-server
             adb wait-for-device
             adb devices -l
-            for attempt in 1 2 3 4 5; do
-              echo "ADB install attempt $attempt/5"
-              adb reconnect offline || true
-              adb wait-for-device
-              if adb install -r "${{ github.workspace }}/SALAR-TV-emulator.apk"; then
-                echo "APK install succeeded"
-                break
-              fi
-              if [ "$attempt" -eq 5 ]; then
-                echo "APK install failed after five attempts"
-                exit 1
-              fi
-              sleep 5
-            done
+            echo "Installing APK once after ADB recovery"
+            adb reconnect offline || true
+            adb wait-for-device
+            adb install -r "${{ github.workspace }}/SALAR-TV-emulator.apk"
+            echo "APK install succeeded"
             adb logcat -c
             adb shell am force-stop com.salar.tv || true
             adb shell am start -W -n com.salar.tv/.MainActivity
