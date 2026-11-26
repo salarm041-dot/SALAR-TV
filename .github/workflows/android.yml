@@ -548,6 +548,60 @@ jobs:
           path: azerbaijan-stream-report.json
           if-no-files-found: ignore
 
+      - name: Audit adaptive quality for Iranian domestic channels
+        id: adaptive_audit
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import json, re, pathlib, urllib.request, urllib.error
+          p = pathlib.Path("patch/channels.m3u")
+          lines = [x.strip() for x in p.read_text(encoding="utf-8-sig").splitlines() if x.strip()]
+          domestic_terms = ("شبکه‌های استانی", "شبکه‌های سراسری سیما", "صداوسیما / شبکه‌های استانی", "ایران / تلویزیون")
+          entries, meta = [], None
+          for line in lines:
+              if line.startswith("#EXTINF"):
+                  meta = line
+              elif line.startswith(("http://", "https://")) and meta:
+                  if any(term in meta for term in domestic_terms):
+                      entries.append({"channel": meta.split(",")[-1], "url": line})
+                  meta = None
+          def audit(item):
+              req = urllib.request.Request(item["url"], headers={"User-Agent":"Mozilla/5.0 SALAR-TV adaptive-audit/1.1","Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"})
+              row = dict(item, variants=[], status=None, result="unverified")
+              try:
+                  with urllib.request.urlopen(req, timeout=12) as r:
+                      body = r.read(256 * 1024).decode("utf-8", "replace")
+                      row["status"] = r.status
+                      if "#EXTM3U" not in body:
+                          row["result"] = "not_hls_manifest"
+                      else:
+                          variants = re.findall(r"#EXT-X-STREAM-INF:([^\r\n]+)", body)
+                          row["variants"] = variants
+                          row["result"] = "adaptive" if len(variants) >= 2 else "single_variant_or_media_playlist"
+              except urllib.error.HTTPError as e:
+                  row["status"], row["result"] = e.code, "http_error"
+              except Exception as e:
+                  row["result"] = type(e).__name__ + ": " + str(e)[:140]
+              return row
+          import concurrent.futures
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
+              results = list(pool.map(audit, entries))
+          pathlib.Path("iran-domestic-adaptive-audit.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+          counts = {}
+          for row in results:
+              counts[row["result"]] = counts.get(row["result"], 0) + 1
+              print(f'{row["result"]}: {row["channel"]} | {row["status"]} | variants={len(row["variants"])}')
+          print("Adaptive audit summary:", json.dumps(counts, ensure_ascii=False))
+          PY
+
+      - name: Upload Iranian domestic adaptive audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iran-domestic-adaptive-audit
+          path: iran-domestic-adaptive-audit.json
+          if-no-files-found: ignore
+
       - name: Verify APK package contents
         run: |
           python3 - <<'PY'
