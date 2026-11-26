@@ -654,9 +654,5 @@ jobs:
             sleep 15
             adb shell pidof com.salar.tv
             adb logcat -d -t 5000 > startup-log.txt
-            if grep -E "FATAL EXCEPTION|Process: com.salar.tv" startup-log.txt; then
-              echo "App crashed during startup smoke test"
-              exit 1
-            fi
-            echo "Android 11 emulator launch smoke test passed"
+            if ! grep -Eq "FATAL EXCEPTION|Process: com.salar.tv" startup-log.txt; then echo "Android 11 emulator launch smoke test passed"; else echo "App crashed during startup smoke test"; exit 1; fi
 
