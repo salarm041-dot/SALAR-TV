@@ -548,15 +548,15 @@ jobs:
           path: azerbaijan-stream-report.json
           if-no-files-found: ignore
 
-      - name: Audit adaptive quality for Iranian domestic channels
+      - name: Verify adaptive HLS variants and playable media segments for Iranian domestic channels
         id: adaptive_audit
-        continue-on-error: true
         run: |
           python3 - <<'PY'
           import json, re, pathlib, urllib.request, urllib.error
+          from urllib.parse import urljoin
           p = pathlib.Path("patch/channels.m3u")
           lines = [x.strip() for x in p.read_text(encoding="utf-8-sig").splitlines() if x.strip()]
-          domestic_terms = ("شبکه‌های استانی", "شبکه‌های سراسری سیما", "صداوسیما / شبکه‌های استانی", "ایران / تلویزیون")
+          domestic_terms = ("شبکه‌های استانی", "شبکه‌های سراسری سیما", "صداوسیما / شبکه‌های استانی", "ایران / تلویزیون", "شبکه‌های سراسری")
           entries, meta = [], None
           for line in lines:
               if line.startswith("#EXTINF"):
@@ -565,33 +565,82 @@ jobs:
                   if any(term in meta for term in domestic_terms):
                       entries.append({"channel": meta.split(",")[-1], "url": line})
                   meta = None
+
+          headers = {"User-Agent":"Mozilla/5.0 SALAR-TV stream-validator/2.0",
+                     "Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"}
+          def get_text(url):
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=15) as r:
+                  body = r.read(512 * 1024).decode("utf-8", "replace")
+                  if r.status != 200 or "#EXTM3U" not in body:
+                      raise ValueError("invalid HLS response")
+                  return body
+
+          def segment_ok(url):
+              req = urllib.request.Request(url, headers={**headers, "Range":"bytes=0-2047"})
+              with urllib.request.urlopen(req, timeout=15) as r:
+                  chunk = r.read(2048)
+                  return r.status in (200, 206) and len(chunk) > 0
+
+          def variant_playable(master_url, variant_url, depth=0):
+              child_url = urljoin(master_url, variant_url)
+              body = get_text(child_url)
+              nested = []
+              rows = body.splitlines()
+              for idx, line in enumerate(rows):
+                  if line.startswith("#EXT-X-STREAM-INF:"):
+                      nxt = next((x.strip() for x in rows[idx+1:] if x.strip() and not x.startswith("#")), None)
+                      if nxt: nested.append(nxt)
+              if nested and depth < 2:
+                  return any(variant_playable(child_url, x, depth+1) for x in nested)
+              rows = [x.strip() for x in rows]
+              for idx, line in enumerate(rows):
+                  if line.startswith("#EXTINF:"):
+                      seg = next((x for x in rows[idx+1:] if x and not x.startswith("#")), None)
+                      if seg:
+                          return segment_ok(urljoin(child_url, seg))
+              raise ValueError("media playlist has no segment")
+
           def audit(item):
-              req = urllib.request.Request(item["url"], headers={"User-Agent":"Mozilla/5.0 SALAR-TV adaptive-audit/1.1","Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"})
-              row = dict(item, variants=[], status=None, result="unverified")
+              row = dict(item, variants=0, playable_variants=0, result="unverified")
               try:
-                  with urllib.request.urlopen(req, timeout=12) as r:
-                      body = r.read(256 * 1024).decode("utf-8", "replace")
-                      row["status"] = r.status
-                      if "#EXTM3U" not in body:
-                          row["result"] = "not_hls_manifest"
-                      else:
-                          variants = re.findall(r"#EXT-X-STREAM-INF:([^\r\n]+)", body)
-                          row["variants"] = variants
-                          row["result"] = "adaptive" if len(variants) >= 2 else "single_variant_or_media_playlist"
+                  body = get_text(item["url"])
+                  rows = body.splitlines()
+                  variants = []
+                  for idx, line in enumerate(rows):
+                      if line.startswith("#EXT-X-STREAM-INF:"):
+                          nxt = next((x.strip() for x in rows[idx+1:] if x.strip() and not x.startswith("#")), None)
+                          if nxt: variants.append(nxt)
+                  row["variants"] = len(variants)
+                  if len(variants) < 2:
+                      raise ValueError("not a multi-variant master playlist")
+                  for variant in variants:
+                      try:
+                          if variant_playable(item["url"], variant):
+                              row["playable_variants"] += 1
+                      except Exception:
+                          pass
+                  if row["playable_variants"] >= 2:
+                      row["result"] = "adaptive_and_segments_playable"
+                  else:
+                      row["result"] = "not_enough_playable_variants"
               except urllib.error.HTTPError as e:
-                  row["status"], row["result"] = e.code, "http_error"
+                  row["result"] = "http_error_" + str(e.code)
               except Exception as e:
-                  row["result"] = type(e).__name__ + ": " + str(e)[:140]
+                  row["result"] = type(e).__name__ + ": " + str(e)[:120]
               return row
+
           import concurrent.futures
-          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
+          with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
               results = list(pool.map(audit, entries))
-          pathlib.Path("iran-domestic-adaptive-audit.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
-          counts = {}
+          pathlib.Path("iran-domestic-adaptive-audit.json").write_text(
+              json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
           for row in results:
-              counts[row["result"]] = counts.get(row["result"], 0) + 1
-              print(f'{row["result"]}: {row["channel"]} | {row["status"]} | variants={len(row["variants"])}')
-          print("Adaptive audit summary:", json.dumps(counts, ensure_ascii=False))
+              print(f'{row["result"]}: {row["channel"]} | variants={row["variants"]} | playable={row["playable_variants"]}')
+          failed = [x for x in results if x["result"] != "adaptive_and_segments_playable"]
+          print(f"Verified {len(results)-len(failed)}/{len(results)} domestic channels: multi-quality master + at least two playable variant segments")
+          if failed:
+              raise SystemExit("Domestic stream quality gate failed: " + ", ".join(x["channel"] for x in failed))
           PY
 
       - name: Upload Iranian domestic adaptive audit
