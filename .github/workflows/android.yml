@@ -291,8 +291,8 @@ jobs:
               raise SystemExit(f"Unexpected playlist size: expected at least 280 entries, found {len(entries)}")
           if len(urls) != len(set(urls)):
               raise SystemExit("Duplicate stream URLs found in bundled playlist")
-          if len(provincial) != 32:
-              raise SystemExit(f"Expected 32 provincial IRIB channels, found {len(provincial)}")
+          if len(provincial) != 34:
+              raise SystemExit(f"Expected 34 provincial IRIB channels (including Sahand and West Azerbaijan), found {len(provincial)}")
           if len(logos) < 150:
               raise SystemExit(f"Expected at least 150 channel logos, found {len(logos)}")
           print(f"Playlist OK: {len(entries)} unique streams, {len(provincial)} provincial channels, {len(logos)} logos")
