@@ -659,7 +659,8 @@ jobs:
               if line.startswith("#EXTINF"):
                   meta=line
               elif line.startswith(("http://","https://")) and meta:
-                  group=(re.search(r'group-title="([^"]*)"',meta,re.I) or [None,""])[1]
+                  gm=re.search(r'group-title="([^"]*)"',meta,re.I)
+                  group=gm.group(1) if gm else ""
                   name=meta.split(",",1)[-1].strip()
                   if ("فارسی‌زبان خارج از ایران" in group or "ماهواره‌ای" in group or "Satellite" in group):
                       entries.append({"name":name,"group":group,"url":line})
