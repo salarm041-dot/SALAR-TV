@@ -670,8 +670,8 @@ jobs:
           # Keep candidate alternatives separate until a live segment is verified.
           candidates={
             "Tapesh | تپش":[
-              "https://iptv.tapesh.tv/tapeshiran/playlist.m3u8",
-              "https://iptv.tapesh.tv/tapesh/playlist.m3u8"
+              "https://iptv.tapesh.tv/tapesh/playlist.m3u8",
+              "https://iptv.tapesh.tv/tapeshiran/playlist.m3u8"
             ],
             "Tapesh Iran | تپش ایران":[
               "https://iptv.tapesh.tv/tapeshiran/playlist.m3u8",
@@ -681,13 +681,31 @@ jobs:
               "https://itnhls.wns.live/hls/stream.m3u8"
             ]
           }
+          # Additional public GEM CDN candidates. These are not trusted until
+          # the manifest AND at least one media segment pass below.
+          gem_paths={
+            "جم ۲۴ بی":"24b", "جم 24b":"24b",
+            "جم بالیوود":"gem_bollywood", "جم کلاسیک":"gem_classic",
+            "جم کمدی":"gem_comedy", "جم دراما پلاس":"gem_drama_plus",
+            "جم دراما":"gem_drama", "جم فیلم":"gem_film", "جم فیت":"gem_fit",
+            "جم غذا":"gem_food", "جم جونیور":"gem_junior", "جم کودک":"gem_kids",
+            "جم لایف":"gem_life", "جم میفا پلاس":"mifa_plus", "جم میفا":"mifa",
+            "جم طبیعت":"gem_nature", "جم اونیکس":"onyx", "جم پیکسل":"gem_pixel",
+            "جم ریور پلاس":"river_plus", "جم ریور":"river",
+            "جم روبیکس پلاس":"rubix_plus", "جم روبیکس":"rubix",
+            "جم سریال پلاس":"gem_series_plus", "جم سریال":"gem_series",
+            "جم تی‌وی پلاس":"gem_tv_plus"
+          }
           for item in entries:
+              name=item["name"].lower()
+              extra=[]
               for key, urls in candidates.items():
-                  if key.lower() in item["name"].lower():
-                      item["candidates"]=list(dict.fromkeys([item["url"]]+urls))
-                      break
-              else:
-                  item["candidates"]=[item["url"]]
+                  if key.lower() in name:
+                      extra.extend(urls)
+              for label,path in gem_paths.items():
+                  if label in name:
+                      extra.append("https://d2e40kvaojifd6.cloudfront.net/stream/"+path+"/playlist.m3u8")
+              item["candidates"]=list(dict.fromkeys([item["url"]]+extra))
 
           headers={"User-Agent":"Mozilla/5.0 (Linux; Android 11) SALAR-TV/1.1",
                    "Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*",
