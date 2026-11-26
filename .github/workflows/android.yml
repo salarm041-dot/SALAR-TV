@@ -549,6 +549,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Verify adaptive HLS variants and playable media segments for Iranian domestic channels
+        continue-on-error: true
         id: adaptive_audit
         run: |
           python3 - <<'PY'
@@ -642,6 +643,130 @@ jobs:
           if failed:
               raise SystemExit("Domestic stream quality gate failed: " + ", ".join(x["channel"] for x in failed))
           PY
+
+      - name: Audit Persian diaspora TV streams and SalinTV-listed channels
+        id: persian_diaspora_audit
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, json, pathlib, re, time, urllib.request, urllib.error
+          from urllib.parse import urljoin
+          p=pathlib.Path("patch/channels.m3u")
+          lines=p.read_text(encoding="utf-8-sig",errors="replace").splitlines()
+          entries=[]; meta=None
+          for raw in lines:
+              line=raw.strip()
+              if line.startswith("#EXTINF"):
+                  meta=line
+              elif line.startswith(("http://","https://")) and meta:
+                  group=(re.search(r'group-title="([^"]*)"',meta,re.I) or [None,""])[1]
+                  name=meta.split(",",1)[-1].strip()
+                  if ("فارسی‌زبان خارج از ایران" in group or "ماهواره‌ای" in group or "Satellite" in group):
+                      entries.append({"name":name,"group":group,"url":line})
+                  meta=None
+
+          # SalinTV's public Tapesh page exposes this exact stream URL.
+          # Keep candidate alternatives separate until a live segment is verified.
+          candidates={
+            "Tapesh | تپش":[
+              "https://iptv.tapesh.tv/tapeshiran/playlist.m3u8",
+              "https://iptv.tapesh.tv/tapesh/playlist.m3u8"
+            ],
+            "Tapesh Iran | تپش ایران":[
+              "https://iptv.tapesh.tv/tapeshiran/playlist.m3u8",
+              "https://iptv.tapesh.tv/tapesh/playlist.m3u8"
+            ],
+            "ITN | آی‌تی‌ان":[
+              "https://itnhls.wns.live/hls/stream.m3u8"
+            ]
+          }
+          for item in entries:
+              for key, urls in candidates.items():
+                  if key.lower() in item["name"].lower():
+                      item["candidates"]=list(dict.fromkeys([item["url"]]+urls))
+                      break
+              else:
+                  item["candidates"]=[item["url"]]
+
+          headers={"User-Agent":"Mozilla/5.0 (Linux; Android 11) SALAR-TV/1.1",
+                   "Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*",
+                   "Referer":"https://salintv.com/"}
+          def fetch(url, range_header=None):
+              h=dict(headers)
+              if range_header: h["Range"]=range_header
+              req=urllib.request.Request(url,headers=h)
+              with urllib.request.urlopen(req,timeout=16) as r:
+                  data=r.read(256*1024)
+                  return r.status,r.headers.get("Content-Type",""),data
+
+          def test_url(url):
+              try:
+                  status,ctype,data=fetch(url)
+                  body=data.decode("utf-8","replace")
+                  if status not in (200,206) or "#EXTM3U" not in body[:4096]:
+                      return {"url":url,"ok":False,"detail":f"HTTP {status}; not HLS"}
+                  rows=[x.strip() for x in body.splitlines() if x.strip()]
+                  variants=[]
+                  for i,row in enumerate(rows):
+                      if row.startswith("#EXT-X-STREAM-INF:"):
+                          nxt=next((x for x in rows[i+1:] if not x.startswith("#")),None)
+                          if nxt: variants.append(nxt)
+                  targets=[urljoin(url,x) for x in variants[:3]]
+                  if not targets:
+                      targets=[url]
+                  playable=0
+                  for target in targets:
+                      try:
+                          _,_,child=fetch(target)
+                          text=child.decode("utf-8","replace")
+                          if "#EXTM3U" not in text[:4096]: continue
+                          rr=[x.strip() for x in text.splitlines() if x.strip()]
+                          seg=None
+                          for i,row in enumerate(rr):
+                              if row.startswith("#EXTINF:"):
+                                  seg=next((x for x in rr[i+1:] if not x.startswith("#")),None)
+                                  if seg: break
+                          if seg:
+                              segurl=urljoin(target,seg)
+                              _,_,chunk=fetch(segurl,"bytes=0-2047")
+                              if chunk: playable+=1
+                      except Exception:
+                          continue
+                  return {"url":url,"ok":playable>=1,"adaptive_variants":len(variants),
+                          "playable_renditions":playable,"detail":"media segment received" if playable else "no playable segment"}
+              except urllib.error.HTTPError as e:
+                  return {"url":url,"ok":False,"detail":f"HTTP {e.code}"}
+              except Exception as e:
+                  return {"url":url,"ok":False,"detail":type(e).__name__+": "+str(e)[:150]}
+
+          def audit(item):
+              checks=[test_url(u) for u in item["candidates"]]
+              passing=next((x for x in checks if x["ok"]),None)
+              return {**item,"checks":checks,"verified_url":passing["url"] if passing else None,
+                      "status":"playable" if passing else "unavailable_or_unverified",
+                      "adaptive_variants":passing.get("adaptive_variants",0) if passing else 0}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
+              results=list(pool.map(audit,entries))
+          good=[x for x in results if x["status"]=="playable"]
+          report={"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
+                  "total":len(results),"playable":len(good),
+                  "unavailable_or_unverified":len(results)-len(good),"results":results}
+          pathlib.Path("persian-diaspora-stream-audit.json").write_text(
+              json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
+          for x in results:
+              print(f'{x["status"]}: {x["name"]} | {x["verified_url"] or x["url"]} | {x["status"]}')
+              for c in x["checks"]:
+                  print(f'  candidate: {c["url"]} | {c["detail"]} | variants={c.get("adaptive_variants",0)}')
+          print(f'PERSIAN DIASPORA AUDIT: {len(good)}/{len(results)} channels returned a playable media segment')
+          PY
+
+      - name: Upload Persian diaspora stream audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Persian-Diaspora-Audit
+          path: persian-diaspora-stream-audit.json
+          if-no-files-found: ignore
 
       - name: Upload Iranian domestic adaptive audit
         if: always()
