@@ -702,9 +702,12 @@ jobs:
               for key, urls in candidates.items():
                   if key.lower() in name:
                       extra.extend(urls)
+              # The existing workers.dev playlist URLs proxy ca-rt.onetv.app.
+              # Probe that same public upstream directly instead of guessing a
+              # different CloudFront hostname/path.
               for label,path in gem_paths.items():
                   if label in name:
-                      extra.append("https://d2e40kvaojifd6.cloudfront.net/stream/"+path+"/playlist.m3u8")
+                      extra.append("https://ca-rt.onetv.app/"+path+"/index-0.m3u8")
               item["candidates"]=list(dict.fromkeys([item["url"]]+extra))
 
           headers={"User-Agent":"Mozilla/5.0 (Linux; Android 11) SALAR-TV/1.1",
@@ -751,8 +754,10 @@ jobs:
                               if chunk: playable+=1
                       except Exception:
                           continue
-                  return {"url":url,"ok":playable>=1,"adaptive_variants":len(variants),
-                          "playable_renditions":playable,"detail":"media segment received" if playable else "no playable segment"}
+                  adaptive_ok = len(variants) >= 2 and playable >= 2
+                  return {"url":url,"ok":adaptive_ok,"adaptive_variants":len(variants),
+                          "playable_renditions":playable,
+                          "detail":"at least two adaptive renditions and segments received" if adaptive_ok else "requires at least two playable adaptive renditions"}
               except urllib.error.HTTPError as e:
                   return {"url":url,"ok":False,"detail":f"HTTP {e.code}"}
               except Exception as e:
