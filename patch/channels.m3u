@@ -1031,3 +1031,49 @@ https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.a
 
 #EXTINF:-1 tvg-language="fas" tvg-id="GEMTVPlus.tr@SD" tvg-logo="https://gemgroup.tv/assets/images/channels/icon_17.png" group-title="ماهواره‌ای · فیلم و سریال",جم تی‌وی پلاس
 http://66.102.120.18:8000/play/a045/index.m3u8
+
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو ایران اینترنشنال
+https://stream.radiojar.com/iintl_c
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو فردا
+http://rfe21.akacast.akamaistream.net/7/751/437779/v1/ibb.akacast.akamaistream.net/rfe21
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",ایران آن ایر
+http://ice41.securenetsystems.net/KIRN
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو سرچشمه
+http://sarcheshmeh.icdndhcp.com:18452/stream
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو همسفر
+http://n0a.radiojar.com/pyea7q9h5ehvv
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو مژده
+https://ic2326.c1261.fastserv.com/rm128
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو مجاهد
+https://s2.radio.co/s830691c74/listen
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو زن زندگی آزادی
+https://listen.radioking.com/radio/526993/stream/585379
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",پرشین وایب
+https://radio.aydayazdani.com/stream
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو همراه
+https://stream.zenolive.com/gxdq0awu30duv.aac
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",ترجمه فارسی قرآن
+https://serverkw.quran-uni.com:8144/;
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",امید برای فردا
+https://radio.truth.fm:8000/pipfa
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",پرستنده فارسی
+https://streamer.radio.co/sa75a4bb19/listen
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو شادی
+https://ice9.securenetsystems.net/SHADI
+
+#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو فارسی RFI
+http://live02.rfi.fr/rfienpersan-64k.mp3
