@@ -717,6 +717,7 @@ jobs:
               child_url = urljoin(master_url, variant_url)
               body = get_text(child_url, req_headers)
               rows = body.splitlines()
+              nested = []
               for idx, line in enumerate(rows):
                   if line.startswith("#EXT-X-STREAM-INF:"):
                       nxt = next((x.strip() for x in rows[idx+1:] if x.strip() and not x.startswith("#")), None)
