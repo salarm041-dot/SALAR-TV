@@ -62,3 +62,9 @@ https://rtmp.baku.tv/hls/bakutv_1080p.m3u8
 http://live.khazartv.az/khazar/live/playlist.m3u8
 #EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",ATV Azərbaycan legacy host candidate
 http://live.atv.az/atv/live/playlist.m3u8
+
+# İdman TV Azerbaijan — candidate endpoints only; require adaptive variants and real segment validation
+#EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",İdman TV Azerbaijan (Operativ relay candidate)
+https://operativmm.az/tvs/idman/stream4/stream.m3u8
+#EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",İdman TV Azerbaijan (AzTV official-domain candidate)
+https://live.aztv.az/hls/idmantv/index.m3u8
