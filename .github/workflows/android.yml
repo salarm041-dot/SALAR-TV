@@ -553,7 +553,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import concurrent.futures, json, pathlib, re, time, urllib.request, urllib.error
-          from urllib.parse import urljoin
+          from urllib.parse import urljoin, urlparse
 
           items=[]
           for source in ("patch/channels.m3u","patch/turkey-candidates.m3u"):
@@ -568,9 +568,26 @@ jobs:
                           items.append({"source":source,"name":meta.split(",",1)[-1].strip(),"group":re.search(r'group-title="([^"]+)',meta).group(1) if 'group-title="' in meta else "unknown","url":line})
                       meta=None
 
-          headers={"User-Agent":"Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36","Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"}
+          base_headers={"User-Agent":"Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36","Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"}
+          def headers_for(url):
+              parsed=urlparse(url); host=(parsed.hostname or "").lower(); path=(parsed.path or "").lower()
+              referer=None
+              if host == "tvstream.az" or host.endswith(".tvstream.az"): referer="https://tvstream.az/"
+              elif host == "connect.az" or host.endswith(".connect.az"): referer="https://itv.az/"
+              elif host == "atv.az" or host.endswith(".atv.az"): referer="https://atv.az/"
+              elif host == "operativmm.az" or host.endswith(".operativmm.az"): referer="https://operativmm.az/"
+              elif host.endswith(".daioncdn.net") and "kanald" in path: referer="https://www.kanald.com.tr/"
+              elif host.endswith(".daioncdn.net") and "startv" in path: referer="https://www.startv.com.tr/"
+              elif host.endswith(".daioncdn.net") and "showtv" in path: referer="https://www.showtv.com.tr/"
+              elif host.endswith(".daioncdn.net") and "kanal7" in path: referer="https://www.kanal7.com/"
+              elif host.endswith(".turknet.ercdn.net") and "/nowtv/" in path: referer="https://www.nowtv.com.tr/"
+              elif host.endswith(".turknet.ercdn.net") and "/atv/" in path: referer="https://www.atv.com.tr/"
+              elif host == "turkmedya-live.ercdn.net": referer="https://www.tv360.com.tr/"
+              if referer:
+                  return {**base_headers,"Referer":referer,"Origin":referer.rstrip("/")}
+              return base_headers
           def fetch(url, byte_limit=262144):
-              req=urllib.request.Request(url,headers=headers)
+              req=urllib.request.Request(url,headers=headers_for(url))
               with urllib.request.urlopen(req,timeout=18) as r:
                   data=r.read(byte_limit)
                   return r.status, r.geturl(), r.headers.get("Content-Type",""), data
@@ -601,7 +618,7 @@ jobs:
                           seg_ok=False
                           if seg:
                               su=urljoin(vbase,seg)
-                              req=urllib.request.Request(su,headers={**headers,"Range":"bytes=0-2047"})
+                              req=urllib.request.Request(su,headers={**headers_for(su),"Range":"bytes=0-2047"})
                               with urllib.request.urlopen(req,timeout=18) as sr:
                                   chunk=sr.read(2048); seg_ok=sr.status in (200,206) and len(chunk)>0
                           out["variants"].append({"resolution":v["resolution"],"manifest_ok":True,"segment_ok":seg_ok})
