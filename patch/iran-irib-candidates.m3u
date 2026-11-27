@@ -1,0 +1,41 @@
+#EXTM3U
+# Candidate IRIB national channels sourced from shayanline/iptv-iran; NOT part of the app playlist until each stream is independently tested and approved.
+
+#EXTINF:-1 tvg-id="IRIB1.ir" tvg-name="IRIB TV1" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRIB TV1 | شبکه یک
+https://live-aburayhan1108.telewebion.ir/ek/tv1/live/1080p/index.m3u8
+
+#EXTINF:-1 tvg-id="IRIB2.ir" tvg-name="IRIB TV2" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB2.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRIB TV2 | شبکه دو
+https://live-aburayhan1111.telewebion.ir/ek/tv2/live/1080p/index.m3u8
+
+#EXTINF:-1 tvg-id="IRIB3.ir" tvg-name="IRIB TV3" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB3.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRIB TV3 | شبکه سه
+https://live-aburayhan1112.telewebion.ir/ek/tv3/live/108050p/index.m3u8
+
+#EXTINF:-1 tvg-id="IRIB4.ir" tvg-name="IRIB TV4" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB4.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="SD",IRIB TV4 | شبکه چهار
+https://live-aburayhan1109.telewebion.ir/ek/tv4/live/576p/index.m3u8
+
+#EXTINF:-1 tvg-id="GolkhaneTv.ir" tvg-name="Golkhane" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/GolkhaneTv.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="HD",Golkhane | شبکه گلخانه
+https://live-aburayhan1102.telewebion.ir/ek/golkhane/live/720p/index.m3u8
+
+#EXTINF:-1 tvg-id="AmouzeshTV.ir" tvg-name="IRIB Amoozesh" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AmouzeshTV.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="SD",IRIB Amoozesh | شبکه آموزش
+https://live-aburayhan1103.telewebion.ir/ek/amouzesh/live/576p/index.m3u8
+
+#EXTINF:-1 tvg-id="QuranTV.ir" tvg-name="IRIB Quran" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QuranTV.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRIB Quran | شبکه قرآن و معارف سیما
+https://live-aburayhan1110.telewebion.ir/ek/quran/live/1080p/index.m3u8
+
+#EXTINF:-1 tvg-id="SalamatTV.ir" tvg-name="IRIB Salamat" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SalamatTV.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="SD",IRIB Salamat | شبکه سلامت
+https://live-aburayhan1107.telewebion.ir/ek/salamat/live/576p/index.m3u8
+
+#EXTINF:-1 tvg-id="Tamasha.ir" tvg-name="IRIB Tamasha" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/Tamasha.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRIB Tamasha | شبکه تماشا
+https://live-aburayhan1105.telewebion.ir/ek/hdtest/live/1080p/index.m3u8
+
+#EXTINF:-1 tvg-id="IRIB1Plus.ir" tvg-name="IRIB TV1 +" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1Plus.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRIB TV1 + | شبکه یک پلاس
+https://live-aburayhan1113.telewebion.ir/ek/tv1plus/live/1080p/index.m3u8
+
+#EXTINF:-1 tvg-id="VarzeshTV.ir" tvg-name="IRIB Varzesh" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/VarzeshTV.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRIB Varzesh | شبکه ورزش
+https://live-aburayhan1110.telewebion.ir/ek/varzesh/live/108050p/index.m3u8
+
+#EXTINF:-1 tvg-id="IRINN.ir" tvg-name="IRINN" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRINN.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="FHD",IRINN | شبکه خبر
+https://live-aburayhan1111.telewebion.ir/ek/irinn/live/1080p/index.m3u8
+
+#EXTINF:-1 tvg-id="RoyaTV.ir" tvg-name="Roya" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/RoyaTV.ir.png" group-title="ایران / شبکه‌های سراسری پیشنهادی - نیازمند آزمایش" tvg-language="fas" tvg-quality="HD",Roya | شبکه رویا
+https://live-aburayhan1102.telewebion.ir/na/iribu/live/720p/index.m3u8
