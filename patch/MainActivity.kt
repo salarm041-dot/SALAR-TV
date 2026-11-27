@@ -538,6 +538,15 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 existingIdentities.add(identity)
                         }
                         channels.addAll(fresh)
+                        // If a channel was opened while the auth playlist was still loading,
+                        // replace the selected snapshot too. Otherwise the player keeps the
+                        // old header-less Channel object even after the directory is refreshed.
+                        selected?.let { active ->
+                            val refreshedSelection = channels.firstOrNull {
+                                it.url.trim().equals(active.url.trim(), ignoreCase = true)
+                            } ?: channels.firstOrNull { channelIdentity(it) == channelIdentity(active) }
+                            if (refreshedSelection != null) selected = refreshedSelection
+                        }
                         saveChannels()
                         val refreshedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))
                         lastChannelRefresh = refreshedAt
@@ -2895,7 +2904,7 @@ private fun MultiViewSlot(
             )
         }
     }
-    LaunchedEffect(selected?.url) {
+    LaunchedEffect(selected?.url, selected?.httpHeaders) {
         if (selected == null) {
             player.stop()
             player.clearMediaItems()
