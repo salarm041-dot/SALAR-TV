@@ -555,16 +555,18 @@ jobs:
           import concurrent.futures, json, pathlib, re, time, urllib.request, urllib.error
           from urllib.parse import urljoin
 
-          lines=pathlib.Path("patch/channels.m3u").read_text(encoding="utf-8-sig").splitlines()
-          items=[]; meta=None
-          for line in lines:
-              line=line.strip()
-              if line.startswith("#EXTINF"): meta=line
-              elif line.startswith(("http://","https://")) and meta:
-                  low=meta.lower()
-                  if any(k in low for k in ("ترکیه","آذربایجان","azerbaijan","turkey","فیلم و سریال","جم دراما","جم فیلم","جم سریال")):
-                      items.append({"name":meta.split(",",1)[-1].strip(),"group":re.search(r'group-title="([^"]+)',meta).group(1) if 'group-title="' in meta else "unknown","url":line})
-                  meta=None
+          items=[]
+          for source in ("patch/channels.m3u","patch/turkey-candidates.m3u"):
+              lines=pathlib.Path(source).read_text(encoding="utf-8-sig").splitlines()
+              meta=None
+              for line in lines:
+                  line=line.strip()
+                  if line.startswith("#EXTINF"): meta=line
+                  elif line.startswith(("http://","https://")) and meta:
+                      low=meta.lower()
+                      if any(k in low for k in ("ترکیه","آذربایجان","azerbaijan","turkey","فیلم و سریال","جم دراما","جم فیلم","جم سریال")):
+                          items.append({"source":source,"name":meta.split(",",1)[-1].strip(),"group":re.search(r'group-title="([^"]+)',meta).group(1) if 'group-title="' in meta else "unknown","url":line})
+                      meta=None
 
           headers={"User-Agent":"Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36","Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"}
           def fetch(url, byte_limit=262144):
