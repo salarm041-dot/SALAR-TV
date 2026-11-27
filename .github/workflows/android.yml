@@ -736,6 +736,8 @@ jobs:
               row = dict(item, variants=0, playable_variants=0, variant_errors=[], result="unverified")
               try:
                   req_headers = request_headers(item["url"])
+                  row["auth_header_attached"] = bool(req_headers.get("Authorization"))
+                  row["request_header_names"] = sorted(req_headers.keys())
                   body = get_text(item["url"], req_headers)
                   rows = body.splitlines()
                   variants = []
@@ -751,13 +753,19 @@ jobs:
                           if variant_playable(item["url"], variant, req_headers):
                               row["playable_variants"] += 1
                       except Exception as error:
-                          row["variant_errors"].append(type(error).__name__ + ": " + str(error)[:160])
+                          detail = type(error).__name__ + ": " + str(error)[:160]
+                          if isinstance(error, urllib.error.HTTPError):
+                              try: detail += " | body=" + error.read(512).decode("utf-8", "replace")[:180]
+                              except Exception: pass
+                          row["variant_errors"].append(detail)
                   if row["playable_variants"] >= 2:
                       row["result"] = "adaptive_and_segments_playable"
                   else:
                       row["result"] = "not_enough_playable_variants"
               except urllib.error.HTTPError as e:
                   row["result"] = "http_error_" + str(e.code)
+                  try: row["http_error_detail"] = e.read(512).decode("utf-8", "replace")[:240]
+                  except Exception: row["http_error_detail"] = ""
               except Exception as e:
                   row["result"] = type(e).__name__ + ": " + str(e)[:120]
               return row
