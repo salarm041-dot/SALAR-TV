@@ -111,8 +111,7 @@ class HlsRecorderService : Service() {
                     recordingFlags.isEmpty()
                 }
                 if (noMoreRecordings) {
-                    stopForeground(STOP_FOREGROUND_DETACH)
-                    stopSelf()
+                    if (stopSelfResult(startId)) stopForeground(STOP_FOREGROUND_DETACH)
                 } else {
                     updateNotification("ضبط‌های دیگر همچنان در حال اجرا هستند: " + recordingFlags.size)
                 }
