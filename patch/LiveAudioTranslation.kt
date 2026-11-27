@@ -58,6 +58,9 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
     val queue = remember { LinkedBlockingQueue<ByteArray>(2) }
     val running = remember { AtomicBoolean(false) }
     val droppedAudioChunks = remember { AtomicInteger(0) }
+    val translationGeneration = remember { AtomicInteger(0) }
+    val pendingTranslations = remember { ArrayDeque<String>() }
+    var translationInFlight by remember { mutableStateOf(false) }
     var droppedAudioChunksUi by remember { mutableStateOf(0) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var ttsReady by remember { mutableStateOf(false) }
@@ -101,6 +104,9 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
 
     fun stopCapture() {
         running.set(false)
+        translationGeneration.incrementAndGet()
+        pendingTranslations.clear()
+        translationInFlight = false
         runCatching { tts?.stop() }; ttsPending = 0
         val audio = recorder; recorder = null
         runCatching { audio?.stop() }; runCatching { audio?.release() }
@@ -142,33 +148,88 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
         else ttsPending += 1
     }
 
-    fun translateText(text: String) {
-        val clean = text.trim().replace(Regex("\\s+"), " ")
-        if (clean.length < 2) return
+    fun processNextTranslation() {
+        if (translationInFlight || pendingTranslations.isEmpty()) return
+        val clean = pendingTranslations.removeFirst()
+        val generation = translationGeneration.get()
+        translationInFlight = true
+        fun finish() {
+            if (generation == translationGeneration.get()) {
+                translationInFlight = false
+                processNextTranslation()
+            }
+        }
         identifier.identifyLanguage(clean.take(200)).addOnSuccessListener { tag ->
-            if (tag == "und") { status = "زبان گفتار با اطمینان کافی تشخیص داده نشد."; return@addOnSuccessListener }
+            if (generation != translationGeneration.get()) return@addOnSuccessListener
+            if (tag == "und") {
+                status = "زبان گفتار با اطمینان کافی تشخیص داده نشد."
+                finish()
+                return@addOnSuccessListener
+            }
             val source = TranslateLanguage.fromLanguageTag(tag)
-            if (source == null) { status = "زبان " + tag + " تشخیص داده شد، اما ترجمه آن پشتیبانی نمی‌شود."; return@addOnSuccessListener }
+            if (source == null) {
+                status = "زبان " + tag + " تشخیص داده شد، اما ترجمه آن پشتیبانی نمی‌شود."
+                finish()
+                return@addOnSuccessListener
+            }
             if (source == TranslateLanguage.PERSIAN) {
                 translated = clean
                 onTranslation(clean)
                 status = "گفتار فارسی تشخیص داده شد."
                 speakPersian(clean)
+                finish()
                 return@addOnSuccessListener
             }
             status = "زبان گفتار: " + tag + "؛ در حال ترجمه فارسی…"
             val translator = Translation.getClient(TranslatorOptions.Builder()
                 .setSourceLanguage(source).setTargetLanguage(TranslateLanguage.PERSIAN).build())
             translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).addOnSuccessListener {
-                translator.translate(clean).addOnSuccessListener { result ->
-                    translated = result
-                    onTranslation(result)
-                    status = "ترجمه فارسی زنده فعال است؛ زبان تشخیص‌داده‌شده: " + tag
-                    speakPersian(result)
+                if (generation != translationGeneration.get()) {
                     translator.close()
-                }.addOnFailureListener { translator.close(); status = "ترجمه ناموفق بود: " + (it.localizedMessage ?: "خطا") }
-            }.addOnFailureListener { translator.close(); status = "دریافت مدل ترجمه ناموفق بود؛ اینترنت را بررسی کنید." }
-        }.addOnFailureListener { status = "تشخیص زبان ناموفق بود: " + (it.localizedMessage ?: "خطا") }
+                    return@addOnSuccessListener
+                }
+                translator.translate(clean).addOnSuccessListener { result ->
+                    translator.close()
+                    if (generation == translationGeneration.get()) {
+                        translated = result
+                        onTranslation(result)
+                        status = "ترجمه فارسی زنده فعال است؛ زبان تشخیص‌داده‌شده: " + tag
+                        speakPersian(result)
+                        finish()
+                    }
+                }.addOnFailureListener {
+                    translator.close()
+                    if (generation == translationGeneration.get()) {
+                        status = "ترجمه ناموفق بود: " + (it.localizedMessage ?: "خطا")
+                        finish()
+                    }
+                }
+            }.addOnFailureListener {
+                translator.close()
+                if (generation == translationGeneration.get()) {
+                    status = "دریافت مدل ترجمه ناموفق بود؛ اینترنت را بررسی کنید."
+                    finish()
+                }
+            }
+        }.addOnFailureListener {
+            if (generation == translationGeneration.get()) {
+                status = "تشخیص زبان ناموفق بود: " + (it.localizedMessage ?: "خطا")
+                finish()
+            }
+        }
+    }
+
+    fun translateText(text: String) {
+        val clean = text.trim().replace(Regex("\\s+"), " ")
+        if (clean.length < 2) return
+        // ML Kit callbacks are asynchronous. Serialize chunks so a slower earlier
+        // translation can never be overtaken by a later sentence.
+        if (pendingTranslations.size >= 3) {
+            pendingTranslations.removeFirst()
+            status = "صف ترجمه عقب افتاد؛ قدیمی‌ترین جمله حذف شد تا زیرنویس از پخش خیلی عقب نماند."
+        }
+        pendingTranslations.addLast(clean)
+        processNextTranslation()
     }
 
     val projectionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
