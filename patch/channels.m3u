@@ -25,11 +25,9 @@ https://live.itv.az/itv.m3u8
 #EXTINF:-1 tvg-logo="https://atv.az/assets/images/logo_white.png" group-title="آذربایجان / تلویزیون",ATV Azərbaycan
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
 
-#EXTINF:-1 tvg-logo="https://www.oonternet.com/_panel/upload/content/oonternet-8883943415280.jpeg" group-title="صدا و سیما / رادیو",رادیو ایران
+#EXTINF:-1 tvg-logo="https://www.oonternet.com/_panel/upload/content/oonternet-8883943415280.jpeg" group-title="ایران / رادیو",رادیو ایران
 http://s1.cdn1.iranseda.ir:1935/liveedge/radio-iran/playlist.m3u8
 
-#EXTINF:-1 tvg-logo="https://radiospinner.com/media/logos/180/83710/logo_ZTropL1kFU.png" group-title="صدا و سیما / رادیو",رادیو انگلیسی ایران
-http://s1.cdn1.iranseda.ir:1935/liveedge/radio-english/playlist.m3u8
 
 #EXTINF:-1 tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1.ir.png" group-title="ایران / تلویزیون",شبکه یک
 https://ncdn.telewebion.ir/tv1/live/playlist.m3u8
@@ -493,13 +491,13 @@ https://ncdn.telewebion.ir/taban/live/playlist.m3u8
 https://ncdn.telewebion.ir/zagros/live/playlist.m3u8
 
 
-#EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو نواهنگ
+#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو نواهنگ
 https://navairan.com/;stream.nsv
 
-#EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو سیمرغ
+#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو سیمرغ
 https://stream.zeno.fm/9svfnobkrxrvv
 
-#EXTINF:-1 group-title="خارج از ایران / رادیو",رادیو فاز
+#EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو فاز
 https://free.rcast.net/230792
 
 #EXTINF:-1 group-title="ترکیه / عمومی",Kanal D
@@ -1033,49 +1031,49 @@ https://still-mud-3642.nqanzvyuupxwcahtfq.workers.dev/?url=https://ca-rt.onetv.a
 http://66.102.120.18:8000/play/a045/index.m3u8
 
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو ایران اینترنشنال
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو ایران اینترنشنال
 https://stream.radiojar.com/iintl_c
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو فردا
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو فردا
 http://rfe21.akacast.akamaistream.net/7/751/437779/v1/ibb.akacast.akamaistream.net/rfe21
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",ایران آن ایر
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",ایران آن ایر
 http://ice41.securenetsystems.net/KIRN
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو سرچشمه
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو سرچشمه
 http://sarcheshmeh.icdndhcp.com:18452/stream
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو همسفر
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو همسفر
 http://n0a.radiojar.com/pyea7q9h5ehvv
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو مژده
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو مژده
 https://ic2326.c1261.fastserv.com/rm128
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو مجاهد
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو مجاهد
 https://s2.radio.co/s830691c74/listen
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو زن زندگی آزادی
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو زن زندگی آزادی
 https://listen.radioking.com/radio/526993/stream/585379
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",پرشین وایب
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",پرشین وایب
 https://radio.aydayazdani.com/stream
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو همراه
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو همراه
 https://stream.zenolive.com/gxdq0awu30duv.aac
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",ترجمه فارسی قرآن
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",ترجمه فارسی قرآن
 https://serverkw.quran-uni.com:8144/;
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",امید برای فردا
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",امید برای فردا
 https://radio.truth.fm:8000/pipfa
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",پرستنده فارسی
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",پرستنده فارسی
 https://streamer.radio.co/sa75a4bb19/listen
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو شادی
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو شادی
 https://ice9.securenetsystems.net/SHADI
 
-#EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو فارسی RFI
+#EXTINF:-1 tvg-language="fas" group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو فارسی RFI
 http://live02.rfi.fr/rfienpersan-64k.mp3
 #EXTINF:-1 tvg-id="DunyaTV.az" group-title="آذربایجان / عمومی",Dünya TV
 https://stream.dunyatv.az/live/dunyatv.m3u8
