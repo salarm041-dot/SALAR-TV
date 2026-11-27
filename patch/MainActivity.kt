@@ -963,7 +963,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var playerLandscape by remember(selected!!.url) { mutableStateOf(false) }
                         var showLiveSpeechTranslation by remember { mutableStateOf(prefs.getBoolean("live_speech_translation_enabled", true)) }
                         var liveSpeechSubtitle by remember(selected!!.url) { mutableStateOf("") }
-                        var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
+                        var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showQualityDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var qualityChoices by remember(selected!!.url) { mutableStateOf(emptyList<VideoQualityChoice>()) }
@@ -997,7 +997,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 update = { view ->
                                     if (view.player !== player) view.player = player
                                     view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-                                    view.subtitleView?.visibility = android.view.View.INVISIBLE
+                                    view.subtitleView?.visibility = android.view.View.VISIBLE
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )
@@ -1175,6 +1175,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             }
                             PlayerTool(Icons.Default.Subtitles, "ترجمه زیرنویس", showSubtitleTranslation) {
                                 showSubtitleTranslation = !showSubtitleTranslation
+                                prefs.edit().putBoolean("live_subtitle_enabled", showSubtitleTranslation).apply()
                             }
                             PlayerTool(Icons.Default.RecordVoiceOver, "ترجمه گفتار", showLiveSpeechTranslation) {
                                 showLiveSpeechTranslation = !showLiveSpeechTranslation
@@ -1431,6 +1432,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                             Text("زیرنویس هوشمند فارسی", modifier = Modifier.weight(1f))
                                             Switch(checked = menuSubtitleEnabled, onCheckedChange = {
                                                 menuSubtitleEnabled = it
+                                                showSubtitleTranslation = it
                                                 prefs.edit().putBoolean("live_subtitle_enabled", it).apply()
                                             })
                                         }
