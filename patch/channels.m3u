@@ -1077,3 +1077,5 @@ https://ice9.securenetsystems.net/SHADI
 
 #EXTINF:-1 tvg-language="fas" group-title="خارج از ایران / رادیو",رادیو فارسی RFI
 http://live02.rfi.fr/rfienpersan-64k.mp3
+#EXTINF:-1 tvg-id="DunyaTV.az" group-title="آذربایجان / عمومی",Dünya TV
+https://stream.dunyatv.az/live/dunyatv.m3u8
