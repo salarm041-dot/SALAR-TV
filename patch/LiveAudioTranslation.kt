@@ -47,6 +47,7 @@ import java.util.Locale
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 @Composable
 internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTranslation: (String) -> Unit = {}) {
@@ -56,6 +57,8 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
     val identifier = remember { LanguageIdentification.getClient() }
     val queue = remember { LinkedBlockingQueue<ByteArray>(2) }
     val running = remember { AtomicBoolean(false) }
+    val droppedAudioChunks = remember { AtomicInteger(0) }
+    var droppedAudioChunksUi by remember { mutableStateOf(0) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var ttsReady by remember { mutableStateOf(false) }
     var ttsPending by remember { mutableStateOf(0) }
@@ -186,7 +189,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
                     .setBufferSizeInBytes(minBuffer.coerceAtLeast(8192) * 2).setAudioPlaybackCaptureConfig(config).build()
                 if (audio.state != AudioRecord.STATE_INITIALIZED) { audio.release(); error("راه‌اندازی دریافت صدای داخلی ناموفق بود.") }
                 val activeModel = model ?: error("مدل چندزبانه بارگذاری نشده است.")
-                queue.clear(); running.set(true); audio.startRecording()
+                queue.clear(); droppedAudioChunks.set(0); droppedAudioChunksUi = 0; running.set(true); audio.startRecording()
                 if (audio.recordingState != AudioRecord.RECORDSTATE_RECORDING) { audio.release(); error("ضبط صدای خروجی شروع نشد.") }
                 recorder = audio; active = true; status = "در حال شنیدن صدای شبکه و تشخیص خودکار زبان…"
 
@@ -199,7 +202,15 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
                                 chunk.write(buffer, 0, count)
                                 if (chunk.size() >= required) {
                                     val bytes = chunk.toByteArray(); chunk.reset()
-                                    if (!queue.offer(bytes)) { queue.poll(); queue.offer(bytes) }
+                                    if (!queue.offer(bytes)) {
+                                        // Prefer recent live audio over stale backlog, but expose every gap.
+                                        queue.poll()
+                                        queue.offer(bytes)
+                                        val dropped = droppedAudioChunks.incrementAndGet()
+                                        if (dropped == 1 || dropped % 3 == 0) {
+                                            handler.post { droppedAudioChunksUi = dropped }
+                                        }
+                                    }
                                 }
                             } else if (count < 0 && running.get()) error("خواندن صدای پخش با کد " + count + " متوقف شد.")
                         }
@@ -291,6 +302,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
         }
         if (translated.isNotBlank()) Text(translated, color = Color.White, fontSize = 13.sp)
         Text(status, color = Color(0xFFE0E0E0), fontSize = 10.sp)
+        if (droppedAudioChunksUi > 0) {
+            Text("هشدار: به‌دلیل کندی تشخیص، " + droppedAudioChunksUi + " قطعه صوتی جا افتاده است؛ ممکن است بخشی از گفتار زیرنویس نشود.",
+                color = Color(0xFFFF8A65), fontSize = 10.sp)
+        }
         Text("ترجمه از صدای گفتار ساخته می‌شود، نه زیرنویس شبکه. بعضی منابع اجازه ضبط صدای داخلی نمی‌دهند. دوبله به وجود صدای فارسی در گوشی وابسته است.",
             color = Color(0xFFFFCC80), fontSize = 9.sp)
     }
