@@ -1,0 +1,4 @@
+#EXTM3U
+# Candidate quarantined: channel label and stream provider do not match; requires a verified Azerbaijan Music source.
+#EXTINF:-1 group-title="آذربایجان / موسیقی",Music Azerbaijan
+https://cdn-sinematv.yayin.com.tr/sinematv/sinematv/playlist.m3u8
