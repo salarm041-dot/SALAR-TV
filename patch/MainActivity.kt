@@ -99,6 +99,7 @@ private var MutedText by mutableStateOf(Color.Gray)
 private const val REMOTE_TV_PLAYLIST = "https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/channels.m3u"
 private const val REMOTE_RADIO_PLAYLIST = "https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/radio-candidates.m3u"
 private const val REMOTE_TELEWEBION_AUTH_PLAYLIST = "https://raw.githubusercontent.com/kgkaku/IRIB-Live-Channels-Playlist/main/irib-extvlcopt.m3u"
+// Per-channel Telewebion auth headers are refreshed from the public VLC-compatible playlist.
 
 data class Channel(
     val name: String,
