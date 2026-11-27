@@ -2775,7 +2775,21 @@ fun MultiViewPage(channels: List<Channel>, themeMode: String) {
             repeat(9) { index -> add(channels.getOrNull(index)) }
         }
     }
-    val players = remember { List(9) { ExoPlayer.Builder(context).build() } }
+    val players = remember {
+        List(9) {
+            ExoPlayer.Builder(context)
+                // Apply the same MEDIA usage as the primary player so Android's
+                // playback-capture path can also hear whichever multiview slot is audible.
+                .setAudioAttributes(
+                    androidx.media3.common.AudioAttributes.Builder()
+                        .setUsage(C.USAGE_MEDIA)
+                        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                        .build(),
+                    true
+                )
+                .build()
+        }
+    }
     var audioMixMode by remember { mutableStateOf(false) }
     var primaryAudioSlot by remember { mutableIntStateOf(0) }
     val slotVolumes = remember { mutableStateListOf<Float>().apply { repeat(9) { add(1f) } } }
