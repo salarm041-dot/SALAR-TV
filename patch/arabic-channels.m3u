@@ -1,137 +1,137 @@
 #EXTM3U
-#EXTINF:-1 group-title="عربستان / خبری",الإخبارية السعودية
+#EXTINF:-1 tvg-id="AlEkhbariya.sa" tvg-logo="https://i.imgur.com/WcRlHQm.png" group-title="عربستان / خبری",الإخبارية السعودية
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-ekhbaria/297b3ef1cd0633ad9cfba7473a686a06/index.m3u8
-#EXTINF:-1 group-title="عربستان / خبری",الحدث
+#EXTINF:-1 tvg-id="AlHadath.sa" tvg-logo="https://i.imgur.com/De4SEWE.png" group-title="عربستان / خبری",الحدث
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-hadath/2ff87ec4c2f3ede35295a20637d9f8fd/index.m3u8
-#EXTINF:-1 group-title="عربستان / عمومی",السعودية
+#EXTINF:-1 tvg-id="AlSaudiya.sa" tvg-logo="https://i.imgur.com/GRQTndk.png" group-title="عربستان / عمومی",السعودية
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-saudi-tv/2ad66056b51fd8c1b624854623112e43/index.m3u8
-#EXTINF:-1 group-title="عربستان / قرآن",قناة القرآن الكريم
+#EXTINF:-1 tvg-id="AlQuranAlKareemTV.sa" tvg-logo="https://aloula.faulio.com/storage/mediagallery/da/6c/fullhd_7eaf7e165c4cad5b3a45eff65d2011e18be5d670.png" group-title="عربستان / قرآن",قناة القرآن الكريم
 https://cdn-globecast.akamaized.net/live/eds/saudi_quran/hls_roku/index.m3u8
-#EXTINF:-1 group-title="عربستان / قرآن",قناة السنة النبوية
+#EXTINF:-1 tvg-id="AlSunnahAlNabawiyahTV.sa" tvg-logo="https://aloula.faulio.com/storage/mediagallery/33/92/fullhd_879e557011826f507a045b4e0b4c3b57ba93edae.png" group-title="عربستان / قرآن",قناة السنة النبوية
 https://cdn-globecast.akamaized.net/live/eds/saudi_sunnah/hls_roku/index.m3u8
-#EXTINF:-1 group-title="عربستان / خبری",الشرق للأخبار
+#EXTINF:-1 tvg-id="AsharqNews.sa" tvg-logo="https://i.imgur.com/bqRC3sl.png" group-title="عربستان / خبری",الشرق للأخبار
 https://live-news.asharq.com/asharq.m3u8
-#EXTINF:-1 group-title="امارات / خبری",العربية
+#EXTINF:-1 tvg-id="Alarabiya.ae" tvg-logo="https://i.imgur.com/NXFkYFj.png" group-title="امارات / خبری",العربية
 https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8
 #EXTINF:-1 group-title="امارات / خبری",العربية الحدث
 https://av.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8
-#EXTINF:-1 group-title="امارات / اقتصادی",CNBC عربية
+#EXTINF:-1 tvg-id="CNBCArabiya.ae" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/CNBC_Arabia_2025.svg/960px-CNBC_Arabia_2025.svg.png" group-title="امارات / اقتصادی",CNBC عربية
 https://cnbc-live.akamaized.net/cnbc/master.m3u8
-#EXTINF:-1 group-title="امارات / عمومی",عجمان
+#EXTINF:-1 tvg-id="AjmanTV.ae" tvg-logo="https://i.imgur.com/hVNIwgE.png" group-title="امارات / عمومی",عجمان
 https://cdn1.logichost.in/ajmantv/live/playlist.m3u8
-#EXTINF:-1 group-title="امارات / عمومی",الشارقة
+#EXTINF:-1 tvg-id="SharjahTV.ae" tvg-logo="https://i.imgur.com/Oz2bPOt.png" group-title="امارات / عمومی",الشارقة
 https://live.kwikmotion.com/smc1live/smc1tv.smil/playlist.m3u8
-#EXTINF:-1 group-title="امارات / عمومی",الوسطى
+#EXTINF:-1 tvg-id="AlWoustaTV.ae" tvg-logo="https://i.imgur.com/zgMqQPQ.png" group-title="امارات / عمومی",الوسطى
 https://svs.itworkscdn.net/alwoustalive/alwoustatv.smil/playlist.m3u8
-#EXTINF:-1 group-title="قطر / خبری",الجزيرة
+#EXTINF:-1 tvg-id="AlJazeera.qa" tvg-logo="https://dtil.tmsimg.com/assets/s159135_ld_h15_aa.png?lock=720x540" group-title="قطر / خبری",الجزيرة
 https://live-hls-apps-aja-fa.getaj.net/AJA/index.m3u8
-#EXTINF:-1 group-title="قطر / خبری",الجزيرة مباشر
+#EXTINF:-1 tvg-id="AlJazeeraMubasher.qa" tvg-logo="https://i.imgur.com/DfJI4t5.png" group-title="قطر / خبری",الجزيرة مباشر
 https://live-hls-apps-ajm-fa.getaj.net/AJM/index.m3u8
-#EXTINF:-1 group-title="قطر / خبری",العربي
+#EXTINF:-1 tvg-id="AlArabyTV.qa" tvg-logo="https://i.imgur.com/YMqWEe4.png" group-title="قطر / خبری",العربي
 https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8
-#EXTINF:-1 group-title="قطر / عمومی",العربي 2
+#EXTINF:-1 tvg-id="AlArabyTV2.qa" tvg-logo="https://i.imgur.com/Gp5mNea.png" group-title="قطر / عمومی",العربي 2
 https://live.kwikmotion.com/alaraby2live/alaraby2.smil/playlist.m3u8
-#EXTINF:-1 group-title="قطر / عمومی",تلفزيون قطر
+#EXTINF:-1 tvg-id="QatarTelevision.qa" tvg-logo="https://i.imgur.com/N5RB4sp.png" group-title="قطر / عمومی",تلفزيون قطر
 https://live.kwikmotion.com/qtv1live/qtv1.smil/playlist.m3u8
-#EXTINF:-1 group-title="قطر / عمومی",الريان
+#EXTINF:-1 tvg-id="AlRayyanTV.qa" tvg-logo="https://i.imgur.com/Ts3RjTV.png" group-title="قطر / عمومی",الريان
 https://alrayyancdn.vidgyor.com/pub-noalrayy3pwz0l/liveabr/playlist_dvr.m3u8
-#EXTINF:-1 group-title="کویت / عمومی",الكويت الأولى
+#EXTINF:-1 tvg-id="KTV1.kw" tvg-logo="https://i.imgur.com/kG0d8Ay.png" group-title="کویت / عمومی",الكويت الأولى
 https://kwtktv1ta.cdn.mangomolo.com/ktv1/smil:ktv1.stream.smil/chunklist.m3u8
-#EXTINF:-1 group-title="کویت / عمومی",الكويت الثانية
+#EXTINF:-1 tvg-id="KTV2.kw" tvg-logo="https://i.imgur.com/hB57mNh.png" group-title="کویت / عمومی",الكويت الثانية
 https://kwtktv2ta.cdn.mangomolo.com/ktv2/smil:ktv2.stream.smil/chunklist.m3u8
-#EXTINF:-1 group-title="کویت / فرهنگی",القرين
+#EXTINF:-1 tvg-id="KTVAlQurain.kw" tvg-logo="https://i.imgur.com/naVEZtj.png" group-title="کویت / فرهنگی",القرين
 https://kwtktvaqta.cdn.mangomolo.com/ktvaq/smil:tktvaq.stream.smil/chunklist.m3u8
-#EXTINF:-1 group-title="کویت / عمومی",الكويت العربي
+#EXTINF:-1 tvg-id="KTVArabe.kw" tvg-logo="https://i.imgur.com/jg3VAxO.png" group-title="کویت / عمومی",الكويت العربي
 https://kwtktvata.cdn.mangomolo.com/ktva/smil:tktva.stream.smil/chunklist.m3u8
-#EXTINF:-1 group-title="بحرین / عمومی",تلفزيون البحرين
+#EXTINF:-1 tvg-id="BahrainTV.bh" tvg-logo="https://i.imgur.com/LTD0jIm.png" group-title="بحرین / عمومی",تلفزيون البحرين
 https://5c7b683162943.streamlock.net/live/ngrp:bahraintvmain_all/playlist.m3u8
-#EXTINF:-1 group-title="بحرین / عمومی",البحرين الدولية
+#EXTINF:-1 tvg-id="BahrainInternational.bh" tvg-logo="https://i.imgur.com/t6Lmntr.png" group-title="بحرین / عمومی",البحرين الدولية
 https://5c7b683162943.streamlock.net/live/ngrp:bahraininternational_all/playlist.m3u8
-#EXTINF:-1 group-title="بحرین / ورزشی",البحرين الرياضية 1
+#EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="بحرین / ورزشی",البحرين الرياضية 1
 https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8
-#EXTINF:-1 group-title="عمان / عمومی",تلفزيون عُمان
+#EXTINF:-1 tvg-id="OmanTV.om" tvg-logo="https://i.imgur.com/rBftT9x.png" group-title="عمان / عمومی",تلفزيون عُمان
 https://partneta.cdn.mgmlcdn.com/omantv/smil:omantv.stream.smil/chunklist.m3u8
-#EXTINF:-1 group-title="عمان / عمومی",عُمان مباشر
+#EXTINF:-1 tvg-id="OmanTVMubashir.om" tvg-logo="https://i.imgur.com/UkQTR5b.png" group-title="عمان / عمومی",عُمان مباشر
 https://partwota.cdn.mgmlcdn.com/omlive/smil:omlive.stream.smil/chunklist.m3u8
-#EXTINF:-1 group-title="عمان / فرهنگی",عُمان الثقافية
+#EXTINF:-1 tvg-id="OmanTVCultural.om" tvg-logo="https://i.imgur.com/b38wNPK.png" group-title="عمان / فرهنگی",عُمان الثقافية
 https://partwota.cdn.mgmlcdn.com/omcultural/smil:omcultural.stream.smil/chunklist.m3u8
-#EXTINF:-1 group-title="عراق / عمومی",العراقية العامة
+#EXTINF:-1 tvg-id="AlIraqia.iq" tvg-logo="https://i.imgur.com/8qQouTW.jpg" group-title="عراق / عمومی",العراقية العامة
 https://imn-live.esite-lab.com/hls/iraqia-general.m3u8
-#EXTINF:-1 group-title="عراق / خبری",العراقية الإخبارية
+#EXTINF:-1 tvg-id="AlIraqiaNews.iq" tvg-logo="https://i.imgur.com/feQTXeZ.jpg" group-title="عراق / خبری",العراقية الإخبارية
 https://imn-live.esite-lab.com/hls/iraqia-news.m3u8
-#EXTINF:-1 group-title="عراق / ورزشی",العراقية الرياضية
+#EXTINF:-1 tvg-id="AlIraqiaSport.iq" tvg-logo="https://i.imgur.com/DrrlxTO.png" group-title="عراق / ورزشی",العراقية الرياضية
 https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8
-#EXTINF:-1 group-title="عراق / عمومی",آفاق
+#EXTINF:-1 tvg-id="AfaqTV.iq" tvg-logo="https://i.imgur.com/t7CaTu3.png" group-title="عراق / عمومی",آفاق
 https://stream.afaq.iq/live/channel/afaqtv/playlist.m3u8
-#EXTINF:-1 group-title="اردن / عمومی",رؤيا
+#EXTINF:-1 tvg-id="RoyaTV.jo" tvg-logo="https://i.imgur.com/WX80rty.png" group-title="اردن / عمومی",رؤيا
 https://live.kwikmotion.com/royatvpublic/royatv.smil/playlist.m3u8
-#EXTINF:-1 group-title="اردن / عمومی",عمّان
+#EXTINF:-1 tvg-id="AmmanTV.jo" tvg-logo="https://i.imgur.com/5l7kw0b.png" group-title="اردن / عمومی",عمّان
 https://ammantv-live.ercdn.net/ammantvhd/ammantvhd.m3u8
 #EXTINF:-1 group-title="اردن / خبری",التغيير
 https://jmc-live.ercdn.net/altaghier/altaghier.m3u8
-#EXTINF:-1 group-title="لبنان / خبری",الجديد
+#EXTINF:-1 tvg-id="AlJadeed.lb" tvg-logo="https://i.imgur.com/CfxR8o3.png" group-title="لبنان / خبری",الجديد
 http://185.9.2.18/chid_391/mono.m3u8
-#EXTINF:-1 group-title="لبنان / خبری",الميادين
+#EXTINF:-1 tvg-id="AlMayadeenTV.lb" tvg-logo="https://i.imgur.com/GtQOKeW.png" group-title="لبنان / خبری",الميادين
 https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8
-#EXTINF:-1 group-title="لبنان / عمومی",MTV لبنان
+#EXTINF:-1 tvg-id="MTVLebanon.lb" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/7/75/Murr_tv.png" group-title="لبنان / عمومی",MTV لبنان
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mtv-lebanon/b8ebb2a5affb812f1541712adde10e26/index.m3u8
-#EXTINF:-1 group-title="لبنان / عمومی",OTV لبنان
+#EXTINF:-1 tvg-id="OTV.lb" tvg-logo="https://i.imgur.com/toxFMeY.png" group-title="لبنان / عمومی",OTV لبنان
 https://otv.hibridcdn.net/otv/tv_abr/playlist.m3u8
-#EXTINF:-1 group-title="لبنان / دینی",نورسات
+#EXTINF:-1 tvg-id="Noursat.lb" tvg-logo="https://i.imgur.com/6Zs5rx4.png" group-title="لبنان / دینی",نورسات
 https://svs.itworkscdn.net/nour4satlive/livestream/playlist.m3u8
-#EXTINF:-1 group-title="سوریه / عمومی",السورية
+#EXTINF:-1 tvg-id="AlSouriyaTV.sy" tvg-logo="https://i.imgur.com/8FILgXT.jpeg" group-title="سوریه / عمومی",السورية
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-souriya-tv/e3150760fa5fd62776225433b8c3d406/index.m3u8
-#EXTINF:-1 group-title="سوریه / عمومی",سوريا
+#EXTINF:-1 tvg-id="SyriaTV.sy" tvg-logo="https://i.imgur.com/FjuVuXF.jpeg" group-title="سوریه / عمومی",سوريا
 https://live.kwikmotion.com/syriatvlive/syriatv.smil/playlist_dvr.m3u8
-#EXTINF:-1 group-title="سوریه / عمومی",الثانية السورية
+#EXTINF:-1 tvg-id="Althania.sy" tvg-logo="https://www.althania.tv/themes/custom/althania/assets/images/stv-logo.svg" group-title="سوریه / عمومی",الثانية السورية
 https://live.kwikmotion.com/syriatv02live/syriatv02.smil/playlist.m3u8
-#EXTINF:-1 group-title="فلسطین / عمومی",فلسطين
+#EXTINF:-1 tvg-id="PalestineTV.ps" tvg-logo="https://www.shams-pal.org/eng/wp-content/uploads/2021/06/1_1532424687_5903.jpg" group-title="فلسطین / عمومی",فلسطين
 https://pbc.furrera.ps/palestinehd/index.m3u8
-#EXTINF:-1 group-title="فلسطین / خبری",فلسطين مباشر
+#EXTINF:-1 tvg-id="PalestineMubasher.ps" tvg-logo="https://i.imgur.com/68llVTZ.png" group-title="فلسطین / خبری",فلسطين مباشر
 https://pbc.furrera.ps/palestinelivehd/index.m3u8
-#EXTINF:-1 group-title="فلسطین / کودک",أجيال
+#EXTINF:-1 tvg-id="AjyalTV.ps" tvg-logo="https://i.imgur.com/i6Y7beR.jpg" group-title="فلسطین / کودک",أجيال
 http://htvajyal.mada.ps:8888/ajyal/index.m3u8
-#EXTINF:-1 group-title="فلسطین / خبری",معاً
+#EXTINF:-1 tvg-id="MaanTV.ps" tvg-logo="https://i.imgur.com/hRFa03k.png" group-title="فلسطین / خبری",معاً
 https://htvmada.mada.ps:4443/maannews/index.m3u8
-#EXTINF:-1 group-title="مصر / سرگرمی",MBC مصر
+#EXTINF:-1 tvg-id="MBCMasr.eg" tvg-logo="https://i.imgur.com/o2elx0u.png" group-title="مصر / سرگرمی",MBC مصر
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8
-#EXTINF:-1 group-title="مصر / سرگرمی",MBC مصر 2
+#EXTINF:-1 tvg-id="MBCMasr2.eg" tvg-logo="https://i.imgur.com/KHo7Gtn.png" group-title="مصر / سرگرمی",MBC مصر 2
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8
-#EXTINF:-1 group-title="مصر / خبری",الغد
+#EXTINF:-1 tvg-id="AlGhadTV.eg" tvg-logo="https://i.imgur.com/ga6NXb9.png" group-title="مصر / خبری",الغد
 https://eazyvwqssi.erbvr.com/alghadtv/alghadtv.m3u8
-#EXTINF:-1 group-title="مصر / عمومی",المصرية
+#EXTINF:-1 tvg-id="AlMasriyah.eg" tvg-logo="https://i.imgur.com/wTeOM2J.png" group-title="مصر / عمومی",المصرية
 http://185.9.2.18/chid_247/index.m3u8
-#EXTINF:-1 group-title="مراکش / عمومی",2M
+#EXTINF:-1 tvg-id="2M.ma" tvg-logo="https://i.imgur.com/PJYTfHi.png" group-title="مراکش / عمومی",2M
 http://185.9.2.18/chid_218/index.m3u8
-#EXTINF:-1 group-title="مراکش / عمومی",المغربية
+#EXTINF:-1 tvg-id="AlMaghribia.ma" tvg-logo="https://i.imgur.com/7GaahYh.png" group-title="مراکش / عمومی",المغربية
 http://185.9.2.18/chid_205/index.m3u8
-#EXTINF:-1 group-title="مراکش / ورزشی",الرياضية المغربية
+#EXTINF:-1 tvg-id="Arryadia.ma" tvg-logo="https://i.imgur.com/XjzK3gZ.png" group-title="مراکش / ورزشی",الرياضية المغربية
 http://149.100.11.252:8000/play/a065/index.m3u8
-#EXTINF:-1 group-title="مراکش / خبری",Medi 1 TV العربية
+#EXTINF:-1 tvg-id="Medi1TVArabic.ma" tvg-logo="https://i.imgur.com/3YsZPY6.jpeg" group-title="مراکش / خبری",Medi 1 TV العربية
 https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-arabic_g90v4ec/playlist.m3u8
-#EXTINF:-1 group-title="الجزایر / خبری",AL24 News
+#EXTINF:-1 tvg-id="AL24News.dz" tvg-logo="https://i.imgur.com/vyVEXYL.png" group-title="الجزایر / خبری",AL24 News
 https://cdn.live.easybroadcast.io/abr_corp/66_al24_u4yga6h/corp/66_al24_u4yga6h_240p/chunks.m3u8
-#EXTINF:-1 group-title="الجزایر / ورزشی",الهداف
+#EXTINF:-1 tvg-id="ElHeddafTV.dz" tvg-logo="https://i.imgur.com/cDkIDIA.png" group-title="الجزایر / ورزشی",الهداف
 https://live.elheddaftv.com:8081/elheddaftv/index.m3u8
-#EXTINF:-1 group-title="الجزایر / عمومی",الوطنية الجزائرية
+#EXTINF:-1 tvg-id="ElwataniaTV.dz" tvg-logo="https://i.imgur.com/NKR8WFq.png" group-title="الجزایر / عمومی",الوطنية الجزائرية
 https://livesstream.work.gd:5443/WebRTCApp/streams/stream.m3u8
-#EXTINF:-1 group-title="تونس / عمومی",الوطنية 1
+#EXTINF:-1 tvg-id="ElWatania1.tn" tvg-logo="https://i.imgur.com/gNr2V14.png" group-title="تونس / عمومی",الوطنية 1
 https://sw1.tanitweb.net/TunisiaTV/_definst_/watania1/playlist.m3u8?DVR
-#EXTINF:-1 group-title="تونس / عمومی",الوطنية 2
+#EXTINF:-1 tvg-id="ElWatania2.tn" tvg-logo="https://i.imgur.com/kgkrD3V.png" group-title="تونس / عمومی",الوطنية 2
 https://sw1.tanitweb.net/TunisiaTV/_definst_/watania2/playlist.m3u8?DVR
-#EXTINF:-1 group-title="تونس / سرگرمی",إليسا TV
+#EXTINF:-1 tvg-id="ElyssaTV.tn" tvg-logo="https://tv.elyssatv.com/logo.png" group-title="تونس / سرگرمی",إليسا TV
 https://tv.elyssatv.com/live/master.m3u8
-#EXTINF:-1 group-title="لیبی / خبری",المسار
+#EXTINF:-1 tvg-id="AlMasarTV.ly" tvg-logo="https://play-lh.googleusercontent.com/FHPrsr391mPFqKfTq6ZdvWPZNVfsZeTAVQ8rjQF-NosnRdNipUy5xa43RWkiF4tGcQU" group-title="لیبی / خبری",المسار
 https://starmenajo.com/hls/almasar/index.m3u8
-#EXTINF:-1 group-title="لیبی / عمومی",ليبيا الوطنية
+#EXTINF:-1 tvg-id="LibyaAlWataniya.ly" tvg-logo="https://i.imgur.com/KSUny9D.jpeg" group-title="لیبی / عمومی",ليبيا الوطنية
 https://cdn-globecast.akamaized.net/live/eds/libya_al_watanya/hls_roku/index.m3u8
-#EXTINF:-1 group-title="لیبی / دینی",التناصح
+#EXTINF:-1 tvg-id="TanasuhTV.ly" tvg-logo="https://i.imgur.com/iBAhM2v.png" group-title="لیبی / دینی",التناصح
 https://tip.stream.tanasuh.tv:4434/live/smil:tanasuhtv.smil/playlist.m3u8
-#EXTINF:-1 group-title="یمن / عمومی",الساحات
+#EXTINF:-1 tvg-id="AlSahatTV.ye" tvg-logo="https://i.imgur.com/UVndAta.png" group-title="یمن / عمومی",الساحات
 https://assahat.b-cdn.net/Assahat/assahatobs/index.m3u8
-#EXTINF:-1 group-title="یمن / خبری",اليمن اليوم
+#EXTINF:-1 tvg-id="YemenTodayTV.ye" tvg-logo="https://i.imgur.com/8TzcJu5.png" group-title="یمن / خبری",اليمن اليوم
 https://video.yementdy.tv/hls/yementoday.m3u8
-#EXTINF:-1 group-title="سودان / عمومی",السودان
+#EXTINF:-1 tvg-id="SudanTV.sd" tvg-logo="https://i.imgur.com/XUPAYAA.png" group-title="سودان / عمومی",السودان
 https://cdn-globecast.akamaized.net/live/eds/sudan_tv/hls_roku/index.m3u8
-#EXTINF:-1 group-title="سودان / خبری",دبنقا
+#EXTINF:-1 tvg-id="DabangaTV.sd" tvg-logo="https://i.imgur.com/BH1N6TA.png" group-title="سودان / خبری",دبنقا
 https://hls.dabangasudan.org/hls/stream.m3u8
