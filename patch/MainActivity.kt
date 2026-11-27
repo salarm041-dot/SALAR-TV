@@ -421,6 +421,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         "ruby" -> listOf(Color(0xFFFF718B), Color(0xFF200D15), Color(0xFF351923), Color(0xFFFFF0F2), Color(0xFFE6BEC6), Color(0xFFAD8992))
         "sunset" -> listOf(Color(0xFFFFA45B), Color(0xFF21130D), Color(0xFF382216), Color(0xFFFFF4E9), Color(0xFFE7CBB2), Color(0xFFB3957C))
         "graphite" -> listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832), Color(0xFFF1F5F9), Color(0xFFC4CDD7), Color(0xFF8D99A8))
+        "rainbow" -> listOf(Color(0xFF64D8FF), Color(0xFF090D18), Color(0xFF151B2B), Color(0xFFF5F7FF), Color(0xFFC8D1E8), Color(0xFF8995B5))
         "light" -> listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
         "system" -> if (systemDark) listOf(Color(0xFFD6AD62), Color(0xFF0B0D13), Color(0xFF171B26), Color(0xFFF5F1E8), Color.LightGray, Color.Gray)
                     else listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
@@ -2892,7 +2893,9 @@ private fun MultiViewSlot(
         colors = CardDefaults.cardColors(containerColor = Panel),
         modifier = modifier,
         shape = RoundedCornerShape(if (fullScreen) 0.dp else if (compact) 7.dp else 12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.42f))
+        border = androidx.compose.foundation.BorderStroke(1.dp,
+            if (themeMode == "rainbow" && !fullScreen) listOf(Color(0xFFFF647C), Color(0xFFFFB45C), Color(0xFFFFE36E), Color(0xFF62D99B), Color(0xFF58C9FF), Color(0xFF9B83FF), Color(0xFFE783D5), Color(0xFF70D6D0), Color(0xFFB6C5FF))[slotIndex % 9].copy(alpha = 0.82f)
+            else Gold.copy(alpha = 0.42f))
     ) {
         Column(Modifier.fillMaxSize().padding(
             if (fullScreen) 0.dp else if (compact) 3.dp else 6.dp
@@ -3322,7 +3325,8 @@ fun SettingsPage(weakInternetMode: Boolean, onWeakInternetModeChange: (Boolean) 
             ThemeChoice("purple", "بنفش کهکشانی", listOf(Color(0xFFB99AFF), Color(0xFF130D22), Color(0xFF251936))),
             ThemeChoice("ruby", "یاقوتی", listOf(Color(0xFFFF718B), Color(0xFF200D15), Color(0xFF351923))),
             ThemeChoice("sunset", "غروب آفتاب", listOf(Color(0xFFFFA45B), Color(0xFF21130D), Color(0xFF382216))),
-            ThemeChoice("graphite", "گرافیتی", listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832)))
+            ThemeChoice("graphite", "گرافیتی", listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832))),
+            ThemeChoice("rainbow", "رنگین‌کمان", listOf(Color(0xFF64D8FF), Color(0xFF090D18), Color(0xFF151B2B)))
         )
         colorThemes.chunked(2).forEach { rowThemes ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
