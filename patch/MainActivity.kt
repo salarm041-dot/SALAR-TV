@@ -98,6 +98,7 @@ private var MutedText by mutableStateOf(Color.Gray)
 
 private const val REMOTE_TV_PLAYLIST = "https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/channels.m3u"
 private const val REMOTE_RADIO_PLAYLIST = "https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/radio-candidates.m3u"
+private const val REMOTE_TELEWEBION_AUTH_PLAYLIST = "https://raw.githubusercontent.com/kgkaku/IRIB-Live-Channels-Playlist/main/irib-extvlcopt.m3u"
 
 data class Channel(
     val name: String,
@@ -107,7 +108,8 @@ data class Channel(
     val favorite: Boolean = false,
     val logoUrl: String = "",
     val groupTitle: String = "",
-    val vpnRequired: Boolean = false
+    val vpnRequired: Boolean = false,
+    val httpHeaders: Map<String, String> = emptyMap()
 )
 
 data class SubtitleChoice(val groupIndex: Int, val trackIndex: Int, val label: String)
@@ -252,7 +254,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     val o = arr.getJSONObject(i)
                     add(Channel(o.optString("name"), o.optString("url"), o.optString("country"),
                         o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"),
-                        o.optBoolean("vpnRequired", false)))
+                        o.optBoolean("vpnRequired", false),
+                        buildMap {
+                            val storedHeaders = o.optJSONObject("httpHeaders") ?: JSONObject()
+                            val keys = storedHeaders.keys()
+                            while (keys.hasNext()) { val key = keys.next(); put(key, storedHeaders.optString(key)) }
+                        }))
                 }
             }
         }
@@ -263,7 +270,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
             arr.put(JSONObject().put("name", c.name).put("url", c.url)
                 .put("country", c.country).put("kind", c.kind).put("favorite", c.favorite)
                 .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle)
-                .put("vpnRequired", c.vpnRequired))
+                .put("vpnRequired", c.vpnRequired).put("httpHeaders", JSONObject(c.httpHeaders)))
         }
         prefs.edit().putString("channels", arr.toString()).apply()
     }
@@ -452,7 +459,29 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             if (code !in 200..299) error("دریافت فهرست ناموفق بود؛ HTTP $code")
                             val body = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
                             require(body.trimStart().startsWith("#EXTM3U", ignoreCase = true)) { "پاسخ سرور، فهرست معتبر M3U نیست." }
-                            val parsed = parseM3u(body).filter { it.kind == requestedKind && (it.url.startsWith("https://") || it.url.startsWith("http://")) }
+                            var parsed = parseM3u(body).filter { it.kind == requestedKind && (it.url.startsWith("https://") || it.url.startsWith("http://")) }
+                            if (requestedKind == "تلویزیون") {
+                                // Telewebion requires a per-channel Bearer token and Referer
+                                // for the master, variant playlists and media segments.
+                                runCatching {
+                                    val authConnection = (URL(REMOTE_TELEWEBION_AUTH_PLAYLIST).openConnection() as HttpURLConnection)
+                                    authConnection.connectTimeout = 15000
+                                    authConnection.readTimeout = 30000
+                                    authConnection.setRequestProperty("User-Agent", "Mozilla/5.0 SALAR-TV-Android/1.4")
+                                    authConnection.setRequestProperty("Cache-Control", "no-cache")
+                                    try {
+                                        val authCode = authConnection.responseCode
+                                        if (authCode !in 200..299) error("Telewebion auth playlist HTTP $authCode")
+                                        val authBody = authConnection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                                        val authByUrl = parseM3u(authBody).filter { it.httpHeaders.isNotEmpty() }
+                                            .associate { it.url.trim().lowercase(Locale.ROOT) to it.httpHeaders }
+                                        parsed = parsed.map { channel ->
+                                            val headers = authByUrl[channel.url.trim().lowercase(Locale.ROOT)]
+                                            if (headers.isNullOrEmpty()) channel else channel.copy(httpHeaders = headers)
+                                        }
+                                    } finally { authConnection.disconnect() }
+                                }
+                            }
                             require(parsed.isNotEmpty()) { "هیچ شبکه معتبری در فهرست دریافتی پیدا نشد." }
                             parsed
                         } finally { connection.disconnect() }
@@ -490,7 +519,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         logoUrl = latest.logoUrl,
                                         groupTitle = latest.groupTitle,
                                         favorite = current.favorite,
-                                        vpnRequired = latest.vpnRequired
+                                        vpnRequired = latest.vpnRequired,
+                                        httpHeaders = latest.httpHeaders.ifEmpty { current.httpHeaders }
                                     )
                                     updated++
                                 }
@@ -557,12 +587,14 @@ fun SalarTvApp(isInPip: Boolean = false) {
         val baseFactory = DefaultDataSource.Factory(context, httpFactory)
         val resolvingFactory = ResolvingDataSource.Factory(baseFactory) { dataSpec ->
             val host = dataSpec.uri.host?.lowercase().orEmpty()
+            val channelHeaders = selected?.httpHeaders.orEmpty()
             val path = dataSpec.uri.path.orEmpty().lowercase()
             val referer = when {
                 host == "tvstream.az" || host.endsWith(".tvstream.az") -> "https://tvstream.az/"
                 host == "atv.az" || host.endsWith(".atv.az") -> "https://atv.az/"
                 host == "itv.az" || host.endsWith(".itv.az") || host.endsWith(".connect.az") -> "https://itv.az/"
                 host == "operativmm.az" || host.endsWith(".operativmm.az") -> "https://operativmm.az/"
+                host == "ncdn.telewebion.ir" || host.endsWith(".telewebion.ir") -> "https://telewebion.ir/"
                 // Turkish broadcaster CDNs may reject non-browser media requests
                 // unless the channel's own website is supplied as Referer/Origin.
                 host.contains("demiroren") && host.endsWith(".daioncdn.net") -> "https://www.kanald.com.tr/"
@@ -577,10 +609,13 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 host == "turkmedya-live.ercdn.net" -> "https://www.tv360.com.tr/"
                 else -> null
             }
-            if (referer == null) dataSpec else {
+            if (referer == null && channelHeaders.isEmpty()) dataSpec else {
                 val headers = dataSpec.httpRequestHeaders.toMutableMap()
-                headers["Referer"] = referer
-                headers["Origin"] = referer.trimEnd('/')
+                headers.putAll(channelHeaders)
+                if (referer != null) {
+                    headers.putIfAbsent("Referer", referer)
+                    headers.putIfAbsent("Origin", referer.trimEnd('/'))
+                }
                 dataSpec.buildUpon().setHttpRequestHeaders(headers).build()
             }
         }
@@ -3483,6 +3518,7 @@ private fun parseM3u(text: String): List<Channel> {
     var logoUrl = ""
     var groupTitle = ""
     var vpnRequired = false
+    var httpHeaders = mutableMapOf<String, String>()
     text.lineSequence().forEach { raw ->
         val line = raw.trim()
         if (line.startsWith("#EXTINF", true)) {
@@ -3496,6 +3532,7 @@ private fun parseM3u(text: String): List<Channel> {
             val meta = "$lower $group"
             vpnRequired = Regex("""vpn-required\s*=\s*["']?(true|1|yes)["']?""", RegexOption.IGNORE_CASE)
                 .containsMatchIn(line)
+            httpHeaders = mutableMapOf()
             country = when {
                 "زبان کردی" in group -> "زبان کردی"
                 "زبان روسی" in group -> "زبان روسی"
@@ -3536,10 +3573,23 @@ private fun parseM3u(text: String): List<Channel> {
                 else -> "سایر"
             }
             kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
+        } else if (line.startsWith("#EXTVLCOPT:", true)) {
+            val option = line.substringAfter(":", "")
+            val optionName = option.substringBefore("=").trim().lowercase(Locale.ROOT)
+            val optionValue = option.substringAfter("=", "").trim()
+            when (optionName) {
+                "http-referrer" -> httpHeaders["Referer"] = optionValue
+                "http-user-agent" -> httpHeaders["User-Agent"] = optionValue
+                "http-header" -> {
+                    val headerName = optionValue.substringBefore(":").trim()
+                    val headerValue = optionValue.substringAfter(":", "").trim()
+                    if (headerName.isNotBlank() && headerValue.isNotBlank()) httpHeaders[headerName] = headerValue
+                }
+            }
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
             result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle,
-                vpnRequired = vpnRequired))
-            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""; vpnRequired = false
+                vpnRequired = vpnRequired, httpHeaders = httpHeaders.toMap()))
+            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""; vpnRequired = false; httpHeaders = mutableMapOf()
         }
     }
     return result.distinctBy { it.url }
