@@ -1,0 +1,169 @@
+#EXTM3U
+# Persian-language candidate channels sourced from the public shayanline/iptv-iran catalogue.
+# Candidate entries are NOT considered verified until a media segment is received by the SALAR-TV audit.
+#EXTINF:-1 tvg-id="TehranTV.ir" tvg-name="IRIB TV5 (Tehran)" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TehranTV.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه پنج (تهران)
+https://live-aburayhan1108.telewebion.ir/ek/tehran/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="GolkhaneTv.ir" tvg-name="Golkhane" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/GolkhaneTv.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="HD",شبکه گلخانه
+https://live-aburayhan1102.telewebion.ir/ek/golkhane/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="iFilmPersian.ir" tvg-name="iFilm" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/iFilmPersian.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",آی‌فیلم
+https://live-aburayhan1113.telewebion.ir/ek/ifilm/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="AmouzeshTV.ir" tvg-name="IRIB Amoozesh" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AmouzeshTV.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="SD",شبکه آموزش
+https://live-aburayhan1103.telewebion.ir/ek/amouzesh/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="IRIBMostanad.ir" tvg-name="IRIB Mostanad" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBMostanad.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه مستند
+https://live-aburayhan1104.telewebion.ir/ek/mostanad/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="Nasim.ir" tvg-name="IRIB Nasim" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/Nasim.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه نسیم
+https://live-aburayhan1110.telewebion.ir/ek/nasim/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="QuranTV.ir" tvg-name="IRIB Quran" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QuranTV.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه قرآن و معارف سیما
+https://live-aburayhan1110.telewebion.ir/ek/quran/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IRIB1Plus.ir" tvg-name="IRIB TV1 +" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIB1Plus.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="FHD",شبکه یک پلاس
+https://live-aburayhan1113.telewebion.ir/ek/tv1plus/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IRIBUHD.ir" tvg-name="IRIB UHD" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IRIBUHD.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="4K",شبکه فراگیر (UHD)
+https://live-aburayhan1111.telewebion.ir/ek/faratar/live/1440p/index.m3u8
+#EXTINF:-1 tvg-id="RoyaTV.ir" tvg-name="Roya" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/RoyaTV.ir.png" group-title="شبکه‌های سراسری سیما" tvg-language="fas" tvg-quality="HD",شبکه رویا
+https://live-aburayhan1102.telewebion.ir/na/iribu/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="AbadanTV.ir" tvg-name="Abadan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AbadanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه آبادان
+https://live-aburayhan1104.telewebion.ir/ek/abadan/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="AflakTV.ir" tvg-name="Aflak" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AflakTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه افلاک
+https://live-aburayhan1101.telewebion.ir/ek/aflak/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="AftabTV.ir" tvg-name="Aftab" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AftabTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه آفتاب
+https://live-aburayhan1101.telewebion.ir/ek/aftab/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="AlborzTV.ir" tvg-name="Alborz" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AlborzTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه البرز
+https://live-aburayhan1106.telewebion.ir/ek/alborz/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="AtrakTV.ir" tvg-name="Atrak" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AtrakTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas;kmz;kur" tvg-quality="SD",شبکه اترک
+https://live-aburayhan1104.telewebion.ir/ek/atrak/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="BaranTV.ir" tvg-name="Baran" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/BaranTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه باران
+https://live-aburayhan1106.telewebion.ir/ek/baran/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="BoushehrTV.ir" tvg-name="Bushehr" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/BoushehrTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه بوشهر
+https://live-aburayhan1111.telewebion.ir/ek/bushehr/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="DenaTV.ir" tvg-name="Dena" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/DenaTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه دنا
+https://live-aburayhan1109.telewebion.ir/ek/dena/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="EshraghNetwork.ir" tvg-name="Eshragh" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/EshraghNetwork.ir.jpg" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه اشراق
+https://live-aburayhan1112.telewebion.ir/ek/eshragh/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="FarsTV.ir" tvg-name="Fars" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/FarsTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه فارس
+https://live-aburayhan1111.telewebion.ir/ek/fars/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="HamedanTV.ir" tvg-name="Hamedan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HamedanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه همدان
+https://live-aburayhan1113.telewebion.ir/ek/sina/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="HamoonTV.ir" tvg-name="Hamoon" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HamoonTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه هامون
+https://live-aburayhan1112.telewebion.ir/ek/hamoon/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="IlamTV.ir" tvg-name="Ilam" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IlamTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه ایلام
+https://live-aburayhan1103.telewebion.ir/ek/ilam/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="IsfahanTV.ir" tvg-name="Isfahan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IsfahanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه اصفهان
+https://live-aburayhan1103.telewebion.ir/ek/esfahan/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="JahanbinTV.ir" tvg-name="Jahanbin" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/JahanbinTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه جهان‌بین
+https://live-aburayhan1104.telewebion.ir/ek/jahanbin/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="KermanTV.ir" tvg-name="Kerman" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KermanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه کرمان
+https://live-aburayhan1103.telewebion.ir/ek/kerman/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="KhalijeFarsTV.ir" tvg-name="Khalij-e Fars" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhalijeFarsTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه خلیج فارس
+https://live-aburayhan1104.telewebion.ir/ek/khalijefars/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="KhavaranTV.ir" tvg-name="Khavaran" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhavaranTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه خاوران
+https://live-aburayhan1112.telewebion.ir/ek/khavaran/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="KhorasanRazaviTV.ir" tvg-name="Khorasan Razavi" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhorasanRazaviTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه خراسان رضوی
+https://live-aburayhan1108.telewebion.ir/ek/khorasanrazavi/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="KhozestanTV.ir" tvg-name="Khuzestan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KhozestanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه خوزستان
+https://live-aburayhan1104.telewebion.ir/ek/khoozestan/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="KishTV.ir" tvg-name="Kish" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KishTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه کیش
+https://live-aburayhan1106.telewebion.ir/ek/kish/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="KordestanTV.ir" tvg-name="Kordestan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/KordestanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه کردستان
+https://live-aburayhan1104.telewebion.ir/ek/kordestan/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="MahabadTV.ir" tvg-name="Mahabad" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MahabadTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه مهاباد
+https://live-aburayhan1109.telewebion.ir/ek/mahabad/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="MakranTV.ir" tvg-name="Makran" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MakranTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="FHD",شبکه مکران
+https://live-aburayhan1102.telewebion.ir/ek/makran/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="NoorTV.ir" tvg-name="Noor" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NoorTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه نور
+https://live-aburayhan1103.telewebion.ir/ek/noor/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="QazvinTV.ir" tvg-name="Qazvin" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/QazvinTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه قزوین
+https://live-aburayhan1106.telewebion.ir/ek/qazvin/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="SabalanTV.ir" tvg-name="Sabalan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabalanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه سبلان
+https://live-aburayhan1111.telewebion.ir/ek/sabalan/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="SabzTV.ir" tvg-name="Sabz" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SabzTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه سبز
+https://live-aburayhan1111.telewebion.ir/ek/sabz/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="SemnanTV.ir" tvg-name="Semnan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SemnanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه سمنان
+https://live-aburayhan1106.telewebion.ir/ek/semnan/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="TabarestanTV.ir" tvg-name="Tabarestan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TabarestanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه تبرستان
+https://live-aburayhan1105.telewebion.ir/ek/tabarestan/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="WestAzerbaijanTV.ir" tvg-name="West Azerbaijan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/WestAzerbaijanTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas;aze;tur;kur;fas" tvg-quality="SD",شبکه آذربایجان غربی
+https://live-aburayhan1107.telewebion.ir/ek/azarbayjangharbi/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="YazdTV.ir" tvg-name="Yazd" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/YazdTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه تابان یزد
+https://live-aburayhan1113.telewebion.ir/ek/taban/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="ZagrosTV.ir" tvg-name="Zagros" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ZagrosTV.ir.png" group-title="شبکه‌های استانی" tvg-language="fas" tvg-quality="SD",شبکه زاگرس
+https://live-aburayhan1109.telewebion.ir/ek/zagros/live/576p/index.m3u8
+#EXTINF:-1 tvg-id="AlKawtharTV.ir" tvg-name="Al-Kawthar TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AlKawtharTV.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="ara" tvg-quality="FHD",شبکه الکوثر
+https://live-aburayhan1111.telewebion.ir/ek/kawthar/live/1080p/index.m3u8
+#EXTINF:-1 tvg-id="HispanTV.ir" tvg-name="HispanTV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HispanTV.ir.jpg" group-title="شبکه‌های برون‌مرزی" tvg-language="spa" tvg-quality="SD",هیسپان تی‌وی
+https://live.presstv.co.uk/hls/hispantv.m3u8
+#EXTINF:-1 tvg-id="iFilm2.ir" tvg-name="iFilm 2" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/iFilm2.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="fas" tvg-quality="SD",آی‌فیلم ۲
+https://live.presstv.co.uk/hls/ifilm2_4_482/index.m3u8
+#EXTINF:-1 tvg-id="iFilmArabic.ir" tvg-name="iFilm Arabic" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/iFilmArabic.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="ara" tvg-quality="SD",آی‌فیلم عربی
+https://live.presstv.co.uk/hls/ifilmar_4_482/index.m3u8
+#EXTINF:-1 tvg-id="iFilmEnglish.ir" tvg-name="iFilm English" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/iFilmEnglish.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="eng" tvg-quality="SD",آی‌فیلم انگلیسی
+https://live.presstv.co.uk/hls/ifilmen_4_482/index.m3u8
+#EXTINF:-1 tvg-id="IranPress.ir" tvg-name="Iran Press" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranPress.ir.jpg" group-title="شبکه‌های برون‌مرزی" tvg-language="fas;eng" tvg-quality="SD",ایران پرس
+https://ip2stream.iranpress.com/hls/ip2.m3u8
+#EXTINF:-1 tvg-id="Palestinetv.ir" tvg-name="Palestine TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/Palestinetv.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="ara;fas" tvg-quality="HD",شبکه فلسطین
+https://live-aburayhan1102.telewebion.ir/na/palestine/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="PressTV.ir" tvg-name="Press TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PressTV.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="eng" tvg-quality="FHD",پرس تی‌وی
+https://live.presstv.co.uk/hls/presstv.m3u8
+#EXTINF:-1 tvg-id="PressTVFrench.ir" tvg-name="Press TV French" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PressTVFrench.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="fra" tvg-quality="FHD",پرس تی‌وی فرانسه
+https://live4.presstv.ir/live/mp4:presstvfr/playlist.m3u8
+#EXTINF:-1 tvg-id="SaharAzeri.ir" tvg-name="Sahar TV Azeri" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SaharAzeri.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="aze" tvg-quality="SD",سحر آذری [IR]
+https://s1-cloud.irib.ir/securelive3/saharazarsd/saharazarsd.m3u8
+#EXTINF:-1 tvg-id="SaharBalkan.ir" tvg-name="Sahar TV Balkan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SaharBalkan.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="bos" tvg-quality="SD",سحر بالکان [IR]
+https://s1-cloud.irib.ir/securelive3/saharbalksd/saharbalksd.m3u8
+#EXTINF:-1 tvg-id="SaharKurdi.ir" tvg-name="Sahar TV Kurdish" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SaharKurdi.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="kur" tvg-quality="SD",سحر کردی [IR]
+https://s1-cloud.irib.ir/securelive3/saharkurdsd/saharkurdsd.m3u8
+#EXTINF:-1 tvg-id="SaharUrdu.ir" tvg-name="Sahar TV Urdu" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/SaharUrdu.ir.png" group-title="شبکه‌های برون‌مرزی" tvg-language="urd" tvg-quality="SD",سحر اردو [IR]
+https://s1-cloud.irib.ir/securelive3/saharurdusd/saharurdusd.m3u8
+#EXTINF:-1 tvg-id="TelewebionSport1.ir" tvg-name="Telewebion Sport 1" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TelewebionSport1.ir.png" group-title="ماهواره‌ای · ورزش" tvg-language="fas" tvg-quality="FHD",تلوبیون ورزشی ۱
+https://live-aburayhan1101.telewebion.ir/ek/sport1/live/108050p/index.m3u8
+#EXTINF:-1 tvg-id="TelewebionSport2.ir" tvg-name="Telewebion Sport 2" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TelewebionSport2.ir.png" group-title="ماهواره‌ای · ورزش" tvg-language="fas" tvg-quality="FHD",تلوبیون ورزشی ۲
+https://live-aburayhan1105.telewebion.ir/ek/sport2/live/108050p/index.m3u8
+#EXTINF:-1 tvg-id="TelewebionSport3.ir" tvg-name="Telewebion Sport 3" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/TelewebionSport3.ir.png" group-title="ماهواره‌ای · ورزش" tvg-language="fas" tvg-quality="FHD",تلوبیون ورزشی ۳
+https://live-aburayhan1102.telewebion.ir/ek/sport3/live/108050p/index.m3u8
+#EXTINF:-1 tvg-id="AlWilayah.ir" tvg-name="Al Wilayah" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AlWilayah.ir.png" group-title="مذهبی · اسلامی" tvg-language="ara" tvg-quality="SD",شبکه الولایه
+https://nl.livekadeh.com/hls2/alwilayah_tv.m3u8
+#EXTINF:-1 tvg-id="AlMahdiTV.us" tvg-name="Al-Mahdi TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AlMahdiTV.us.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="FHD",شبکه المهدی
+https://iptv.almahditv.com/almahditv/playlist.m3u8
+#EXTINF:-1 tvg-id="AsilTV.ir" tvg-name="Asil TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AsilTV.ir.png" group-title="مذهبی · اسلامی" tvg-language="ara" tvg-quality="SD",اصیل
+https://live.asil.tv/asiltv/index.m3u8
+#EXTINF:-1 tvg-id="AssiratTV.ir" tvg-name="Assirat TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/AssiratTV.ir.png" group-title="مذهبی · اسلامی" tvg-language="ara" tvg-quality="FHD",شبکه الصراط
+https://softverse.b-cdn.net/Assirat/assiratobs/playlist.m3u8
+#EXTINF:-1 tvg-id="HabibTV.ir" tvg-name="Habib TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HabibTV.ir.png" group-title="مذهبی · اسلامی" tvg-language="ara;fas" tvg-quality="HD",شبکه حبیب
+https://live-aburayhan1108.telewebion.ir/na/habib/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="HadiTV.uk" tvg-name="Hadi TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/HadiTV.uk.png" group-title="مذهبی · اسلامی" tvg-language="ara" tvg-quality="HD",شبکه هادی
+https://bucharest.zeuscdn724.com/lb0/H1/index.m3u8
+#EXTINF:-1 tvg-id="ImamHusseinTV1.iq" tvg-name="Imam Hussein TV 1" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ImamHusseinTV1.iq.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="FHD",امام حسین ۱
+https://live.imamhossaintv.com/live/ih1.m3u8
+#EXTINF:-1 tvg-id="ImamHusseinTV6.iq" tvg-name="Imam Hussein TV 6" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ImamHusseinTV6.iq.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="FHD",امام حسین ۶
+https://live.imamhossaintv.com/live/ih6.m3u8
+#EXTINF:-1 tvg-id="LabbaykTV.ir" tvg-name="Labbayk TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/LabbaykTV.ir.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="HD",شبکه لبیک
+https://live-aburayhan1108.telewebion.ir/ek/labbayk/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="NourTV.ae" tvg-name="Nour TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/NourTV.ae.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="SD",شبکه نور (امارات)
+https://cdn.bestream.io:19360/elfaro4/elfaro4.m3u8
+#EXTINF:-1 tvg-id="PayvandTV.ir" tvg-name="Payvand TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/PayvandTV.ir.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="HD",شبکه پیوند
+https://uni6rtmp.tulix.tv/ucur1/Payvand/playlist.m3u8
+#EXTINF:-1 tvg-id="RasoulallahTv.ir" tvg-name="Rasoulallah TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/RasoulallahTv.ir.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="FHD",شبکه رسول‌الله
+https://avr.host247.net/live/rasoulallahtv/playlist.m3u8
+#EXTINF:-1 tvg-id="RazaviTV.ir" tvg-name="Razavi TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/RazaviTV.ir.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="HD",شبکه رضوی
+https://live-aburayhan1112.telewebion.ir/ek/razavi/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="VelayatTV.ir" tvg-name="Velayat TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/VelayatTV.ir.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="HD",شبکه ولایت
+https://live-aburayhan1110.telewebion.ir/ek/velayat/live/720p/index.m3u8
+#EXTINF:-1 tvg-id="VelayatTVNetwork.us" tvg-name="Velayat TV Network" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/VelayatTVNetwork.us.png" group-title="مذهبی · اسلامی" tvg-language="fas" tvg-quality="SD",شبکه ولایت (آمریکا)
+https://nl.livekadeh.com/hls2/velayattv.m3u8
+#EXTINF:-1 tvg-id="DerakhteZendegiTV.us" tvg-name="Derakhte Zendegi TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/DerakhteZendegiTV.us.png" group-title="مذهبی · مسیحی" tvg-language="fas;heb" tvg-quality="SD",درخت زندگی
+https://derakhtzhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="LoveWorldPersia.ng" tvg-name="LoveWorld Persia" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/LoveWorldPersia.ng.png" group-title="مذهبی · مسیحی" tvg-language="fas" tvg-quality="HD",لاو ورلد پرشیا
+https://cdn3.wowza.com/5/aVJETlF0UFdmYTFu/LWPP/ngrp:persia.stream_all/playlist.m3u8
+#EXTINF:-1 tvg-id="MohabatTV.us" tvg-name="Mohabat TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/MohabatTV.us.png" group-title="مذهبی · مسیحی" tvg-language="fas" tvg-quality="SD",شبکه محبت
+https://mohabathls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="OmidJavedan.us" tvg-name="Omid Javedan" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/OmidJavedan.us.png" group-title="مذهبی · مسیحی" tvg-language="fas;eng" tvg-quality="HD",امید جاودان
+https://livestream.5centscdn.com/pwocchurchweb1/cebac1e921182acff008ab1222f0c916.sdp/playlist.m3u8
+#EXTINF:-1 tvg-id="Shabakeh7.us" tvg-name="Shabakeh 7" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/Shabakeh7.us.png" group-title="مذهبی · مسیحی" tvg-language="fas" tvg-quality="SD",شبکه ۷
+https://sh7hls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="ErfanHalghehTV.ca" tvg-name="Erfan Halgheh TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/ErfanHalghehTV.ca.png" group-title="مذهبی · سایر ادیان و معنوی" tvg-language="fas" tvg-quality="SD",عرفان حلقه
+https://hls.erfanhalgheh.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="GanjeHozourTV.us" tvg-name="Ganj-e Hozour" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/GanjeHozourTV.us.png" group-title="مذهبی · سایر ادیان و معنوی" tvg-language="fas" tvg-quality="FHD",گنج حضور
+https://media.parvizshahbazi.com/ganjehozour/Main_tv/playlist.m3u8
+#EXTINF:-1 tvg-id="IranJewishTV.ir" tvg-name="Iran Jewish TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/IranJewishTV.ir.png" group-title="مذهبی · سایر ادیان و معنوی" tvg-language="fas" tvg-quality="HD",یهودیان ایرانی
+http://iran620.com:1935/live/IranJewishTv/playlist.m3u8
+#EXTINF:-1 tvg-id="WiseHumanTv.ir" tvg-name="Wise Human TV" tvg-logo="https://raw.githubusercontent.com/shayanline/iptv-iran/main/assets/logos/WiseHumanTv.ir.png" group-title="مذهبی · سایر ادیان و معنوی" tvg-language="far" tvg-quality="FHD",انسان عاقل
+https://avr.host247.net/live/WiseHumanTv/playlist.m3u8
