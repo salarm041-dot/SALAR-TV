@@ -1,25 +1,25 @@
-#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trt1.png" group-title="ترکیه / تلویزیون",TRT 1
+#EXTINF:-1 tvg-id="TRT1.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/TRT_1_logo_%282021-%29.svg/960px-TRT_1_logo_%282021-%29.svg.png" group-title="ترکیه / تلویزیون",TRT 1
 https://tv-trt1.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trthaber.png" group-title="ترکیه / تلویزیون",TRT Haber
+#EXTINF:-1 tvg-id="TRTHaber.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/TRT_Haber_Eyl%C3%BCl_2020_Logo.svg/960px-TRT_Haber_Eyl%C3%BCl_2020_Logo.svg.png" group-title="ترکیه / تلویزیون",TRT Haber
 https://tv-trthaber.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtworld.png" group-title="ترکیه / تلویزیون",TRT World
+#EXTINF:-1 tvg-id="TRTWorld.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/TRT_World.svg/960px-TRT_World.svg.png" group-title="ترکیه / تلویزیون",TRT World
 https://tv-trtworld.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtbelgesel.png" group-title="ترکیه / تلویزیون",TRT Belgesel
+#EXTINF:-1 tvg-id="TRTBelgesel.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/TRT_Belgesel_logo_%282019-%29.svg/960px-TRT_Belgesel_logo_%282019-%29.svg.png" group-title="ترکیه / تلویزیون",TRT Belgesel
 https://tv-trtbelgesel.live.trt.com.tr/master.m3u8
 
-#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtcocuk.png" group-title="ترکیه / تلویزیون",TRT Çocuk
+#EXTINF:-1 tvg-id="TRTCocuk.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/TRT_%C3%87ocuk_logo_%282021%29.svg/960px-TRT_%C3%87ocuk_logo_%282021%29.svg.png" group-title="ترکیه / تلویزیون",TRT Çocuk
 https://tv-trtcocuk.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtmuzik.png" group-title="ترکیه / تلویزیون",TRT Müzik
+#EXTINF:-1 tvg-id="TRTMuzik.tr" tvg-logo="https://i.imgur.com/JgUzRH8.png" group-title="ترکیه / تلویزیون",TRT Müzik
 https://tv-trtmuzik.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 tvg-logo="https://www.trt.com.tr/Content/Images/Channel/trtavaz.png" group-title="ترکیه / تلویزیون",TRT Avaz
+#EXTINF:-1 tvg-id="TRTAvaz.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/TRT_Avaz_logo.svg/960px-TRT_Avaz_logo.svg.png" group-title="ترکیه / تلویزیون",TRT Avaz
 https://tv-trtavaz.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 tvg-logo="https://static.epg.best/az/IctimaiTV.az.png" group-title="آذربایجان / تلویزیون",İctimai TV
+#EXTINF:-1 tvg-id="IctimaiTV.az" tvg-logo="https://i.imgur.com/HzY4VMo.png" group-title="آذربایجان / تلویزیون",İctimai TV
 https://live.itv.az/itv.m3u8
 
 #EXTINF:-1 tvg-logo="https://atv.az/assets/images/logo_white.png" group-title="آذربایجان / تلویزیون",ATV Azərbaycan
@@ -498,22 +498,22 @@ https://stream.zeno.fm/9svfnobkrxrvv
 #EXTINF:-1 group-title="فارسی‌زبان خارج از ایران / رادیو",رادیو فاز
 https://free.rcast.net/230792
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Kanal D
+#EXTINF:-1 tvg-id="KanalD.tr" tvg-logo="https://i.imgur.com/9o1atM6.png" group-title="ترکیه / عمومی",Kanal D
 https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web&ce=3
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Star TV
+#EXTINF:-1 tvg-id="StarTV.tr" tvg-logo="https://i.imgur.com/9O3DHRB.png" group-title="ترکیه / عمومی",Star TV
 https://dogus.daioncdn.net/startv/startv_720p.m3u8?app=a20ac41e-bdc3-4aa1-934d-26b484480ac9&ce=3&sid=8l4w3lst4co5
 
-#EXTINF:-1 group-title="ترکیه / عمومی",ATV
+#EXTINF:-1 tvg-id="ATV.tr" tvg-logo="https://i.imgur.com/HyVUwFC.png" group-title="ترکیه / عمومی",ATV
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/atv/atv.m3u8
 
-#EXTINF:-1 group-title="ترکیه / خبری",A Haber
+#EXTINF:-1 tvg-id="AHaber.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/7/7c/Ahaber_Logo.png" group-title="ترکیه / خبری",A Haber
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/ahaber/ahaber.m3u8
 
-#EXTINF:-1 group-title="ترکیه / ورزشی",A Spor
+#EXTINF:-1 tvg-id="ASpor.tr" tvg-logo="https://i.imgur.com/ZhkZzLf.png" group-title="ترکیه / ورزشی",A Spor
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/aspor/aspor.m3u8
 
-#EXTINF:-1 group-title="ترکیه / خبری",NTV
+#EXTINF:-1 tvg-id="NTV.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/NTV_%28Turkey%29_logo.svg/960px-NTV_%28Turkey%29_logo.svg.png" group-title="ترکیه / خبری",NTV
 https://dogus.daioncdn.net/ntv/ntv.m3u8?app=ntv_web
 
 #EXTINF:-1 group-title="ترکیه / خبری",Habertürk
@@ -522,22 +522,22 @@ https://tv.ensonhaber.com/haberturk/haberturk.m3u8
 #EXTINF:-1 group-title="ترکیه / عمومی",NOW TV
 https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Kanal 7
+#EXTINF:-1 tvg-id="Kanal7.tr" tvg-logo="https://i.imgur.com/0gq9xOm.png" group-title="ترکیه / عمومی",Kanal 7
 https://kanal7.blutv.com/blutv_kanal7_live/live.m3u8
 
-#EXTINF:-1 group-title="ترکیه / خبری",Halk TV
+#EXTINF:-1 tvg-id="HalkTV.tr" tvg-logo="https://i.imgur.com/xM0HA30.png" group-title="ترکیه / خبری",Halk TV
 https://halktv-live.daioncdn.net/halktv/halktv.m3u8
 
-#EXTINF:-1 group-title="ترکیه / ورزشی",HT Spor
+#EXTINF:-1 tvg-id="HTSporTV.tr" tvg-logo="https://www.htspor.com/images/manifest/social-share-logo.png" group-title="ترکیه / ورزشی",HT Spor
 https://ciner.daioncdn.net/ht-spor/ht-spor.m3u8?app=web
 
-#EXTINF:-1 group-title="ترکیه / اقتصادی",Ekotürk
+#EXTINF:-1 tvg-id="Ekoturk.tr" tvg-logo="https://www.dsmart.com.tr/epg/images/0x60/5ffc18c6cfef0b15933a8b65" group-title="ترکیه / اقتصادی",Ekotürk
 https://cdn.ekoturk.net/hls/master.m3u8
 
-#EXTINF:-1 group-title="ترکیه / اقتصادی",CNBC-e
+#EXTINF:-1 tvg-id="CNBCe.tr" tvg-logo="https://s.cnbce.com/dist/images/logo-nav.png" group-title="ترکیه / اقتصادی",CNBC-e
 https://hnpsechtsc.turknet.ercdn.net/xpnvudnlsv/cnbc-e/cnbc-e.m3u8
 
-#EXTINF:-1 group-title="ترکیه / دینی و فرهنگی",Diyanet TV
+#EXTINF:-1 tvg-id="DiyanetTV.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Diyanet_TV_logo.svg/960px-Diyanet_TV_logo.svg.png" group-title="ترکیه / دینی و فرهنگی",Diyanet TV
 https://eustr73.mediatriple.net/videoonlylive/mtikoimxnztxlive/broadcast_5e3bf95a47e07.smil/playlist.m3u8
 
 #EXTINF:-1 group-title="ترکیه / عمومی",360 TV
@@ -546,16 +546,16 @@ https://turkmedya-live.ercdn.net/tv360/tv360.m3u8
 #EXTINF:-1 group-title="ترکیه / خبری",Flash Haber TV
 https://b01c02nl.mediatriple.net/videoonlylive/mtyycglqauzjhlive/broadcast_67c053c48829f.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",AzTV
+#EXTINF:-1 tvg-id="AzTV.az" tvg-logo="https://i.imgur.com/snBMMeH.png" group-title="آذربایجان / عمومی",AzTV
 https://az.tvstream.az/hls/stream9/index.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / خبری",Baku TV
+#EXTINF:-1 tvg-id="BakuTV.az" tvg-logo="https://i.imgur.com/r4FzxSg.png" group-title="آذربایجان / خبری",Baku TV
 https://rtmp.baku.tv/hls/bakutv.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / خبری",ARB 24
+#EXTINF:-1 tvg-id="ARB24.az" tvg-logo="https://i.imgur.com/mtvIFyq.png" group-title="آذربایجان / خبری",ARB 24
 https://operativmm.az/tvs/arb24/stream/index.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",Space TV
+#EXTINF:-1 tvg-id="SpaceTV.az" tvg-logo="https://i.imgur.com/ufvVQJH.png" group-title="آذربایجان / عمومی",Space TV
 https://operativmm.az/tvs/space/stream8/index.m3u8
 
 #EXTINF:-1 group-title="آذربایجان / عمومی",FTV
@@ -564,294 +564,294 @@ https://stream.ftv.az/live/ftv.m3u8
 #EXTINF:-1 group-title="آذربایجان / عمومی",GunAz TV
 https://tv.gunaz.tv/hls/live.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",Kanal S
+#EXTINF:-1 tvg-id="KanalS.az" tvg-logo="https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/Kanal%20S.png" group-title="آذربایجان / عمومی",Kanal S
 https://lives.atv.az:5443/KANAL-S/streams/kanals.m3u8
 
 #EXTINF:-1 group-title="آذربایجان / موسیقی",Music Azerbaijan
 https://cdn-sinematv.yayin.com.tr/sinematv/sinematv/playlist.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",Vilayət TV
+#EXTINF:-1 tvg-id="VilayetTV.az" tvg-logo="https://vilayet.tv/wp-content/uploads/elementor/thumbs/logo-q3w2md1u47q39x7d0004wqzz74xdv1glw356ex6ph0.png" group-title="آذربایجان / عمومی",Vilayət TV
 https://nl.livekadeh.com/hls2/vilayet.m3u8
 
 #EXTINF:-1 group-title="آذربایجان / خبری",Xəzər TV
 https://xezer.tvstream.az/hls/stream/main_stream.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / موسیقی",KN Music TV
+#EXTINF:-1 tvg-id="KNMusicTV.az" tvg-logo="https://www.knmusictv.com/wp-content/uploads/2026/01/LOGO2112.png" group-title="آذربایجان / موسیقی",KN Music TV
 https://cdn4.yayin.com.tr/kntv/video.m3u8
 
 #EXTINF:-1 group-title="آذربایجان / کودک",Balacan TV
 https://v2.catcast.tv/content/50634/seg-25745099-v1-a1/index.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",A2TV
+#EXTINF:-1 tvg-id="A2TV.tr" tvg-logo="https://iatv.tmgrup.com.tr/site/v2/a2tv/i/a2tv-logo.png" group-title="ترکیه / عمومی",A2TV
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/a2tv/a2tv.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Afroturk TV
+#EXTINF:-1 tvg-id="AfroturkTV.tr" tvg-logo="https://i.imgur.com/fWlLvRA.png" group-title="ترکیه / عمومی",Afroturk TV
 https://edge.socialsmart.tv/naturaltv/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Aksu TV
+#EXTINF:-1 tvg-id="AksuTV.tr" tvg-logo="https://i.imgur.com/mgDCKiy.png" group-title="ترکیه / عمومی",Aksu TV
 https://live.artidijitalmedya.com/artidijital_aksutv/aksutv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Alanya Posta TV
+#EXTINF:-1 tvg-id="AlanyaPostaTV.tr" tvg-logo="https://i.imgur.com/a3w9eFe.png" group-title="ترکیه / عمومی",Alanya Posta TV
 https://api-tv3.yayin.com.tr/postatv/postatv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Almahriah TV
+#EXTINF:-1 tvg-id="AlmahriahTV.tr" tvg-logo="https://i.imgur.com/GgEeTNr.png" group-title="ترکیه / عمومی",Almahriah TV
 https://starmenajo.com/hls/almahriah/index.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Altas TV
+#EXTINF:-1 tvg-id="AltasTV.tr" tvg-logo="https://i.imgur.com/XaJ7fp6.png" group-title="ترکیه / عمومی",Altas TV
 https://edge1.socialsmart.tv/altastv/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Anadolu Net TV
+#EXTINF:-1 tvg-id="AnadoluNetTV.tr" tvg-logo="https://www.anadolunettv.com/d/r/logo.png" group-title="ترکیه / عمومی",Anadolu Net TV
 https://live.artidijitalmedya.com/artidijital_anadolunet/anadolunet/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",ATV Alanya
+#EXTINF:-1 tvg-id="ATVAlanya.tr" tvg-logo="https://i.imgur.com/bUwarR0.png" group-title="ترکیه / عمومی",ATV Alanya
 https://cdn-alanyatv.yayin.com.tr/alanyatv/alanyatv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",ATV Avrupa
+#EXTINF:-1 tvg-id="ATVAvrupa.tr" tvg-logo="https://i.tmgrup.com.tr/aav/site/v1/i/atv-avrupa-logo.png" group-title="ترکیه / عمومی",ATV Avrupa
 https://flask-api-hls-atvavrupahdtrkvz-live.onrender.com/hls_stream/master.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Bir TV
+#EXTINF:-1 tvg-id="BirTV.tr" tvg-logo="https://birtv.tv/assets/upload/637f83951df60.png" group-title="ترکیه / عمومی",Bir TV
 https://edge.taksimbilisim.com/birtv/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / اقتصادی",Bloomberg HT
+#EXTINF:-1 tvg-id="BloombergHT.tr" tvg-logo="https://i.imgur.com/bmkXfIE.png" group-title="ترکیه / اقتصادی",Bloomberg HT
 https://mumbai-edge.smartplaytv.in/BloombergHT/index.m3u8
 
-#EXTINF:-1 group-title="ترکیه / اقتصادی",BloombergHT
+#EXTINF:-1 tvg-id="BloombergHT.tr" tvg-logo="https://i.imgur.com/bmkXfIE.png" group-title="ترکیه / اقتصادی",BloombergHT
 https://ciner-live.daioncdn.net/bloomberght/bloomberght.m3u8
 
 #EXTINF:-1 group-title="ترکیه / عمومی",Bursa AS TV
 https://live.artidijitalmedya.com/artidijital_astv/astv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Cay TV
+#EXTINF:-1 tvg-id="CayTV.tr" tvg-logo="https://i.imgur.com/ndupxwu.png" group-title="ترکیه / عمومی",Cay TV
 https://edge1.socialsmart.tv/caytv/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Cekmeköy TV
+#EXTINF:-1 tvg-id="CekmekoyTV.tr" tvg-logo="https://i.imgur.com/sjAGFWu.png" group-title="ترکیه / عمومی",Cekmeköy TV
 https://cdn-cekmekoybeltv.yayin.com.tr/cekmekoybeltv/cekmekoybeltv_1080p/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Diyar TV
+#EXTINF:-1 tvg-id="DiyarTV.tr" tvg-logo="https://i.imgur.com/qWkHjRA.png" group-title="ترکیه / عمومی",Diyar TV
 https://live.artidijitalmedya.com/artidijital_diyartv/diyartv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / دینی",Dost TV
+#EXTINF:-1 tvg-id="DostTV.tr" tvg-logo="https://dosttv.com/wp-content/uploads/2022/02/dost_logo.png" group-title="ترکیه / دینی",Dost TV
 https://dost.stream.emsal.im/tv/live.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",Dream Türk
+#EXTINF:-1 tvg-id="DreamTurk.tr" tvg-logo="https://i.imgur.com/vJ8VaZi.png" group-title="ترکیه / موسیقی",Dream Türk
 https://live.duhnet.tv/S2/HLS_LIVE/dreamturknp/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Edessa TV
+#EXTINF:-1 tvg-id="EdessaTV.tr" tvg-logo="https://i.imgur.com/rhU6j9I.png" group-title="ترکیه / عمومی",Edessa TV
 https://canli.edessatv.com/hls/stream.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Erzurum Web TV
+#EXTINF:-1 tvg-id="ErzurumWebTV.tr" tvg-logo="https://i.imgur.com/HF7N4Li.png" group-title="ترکیه / عمومی",Erzurum Web TV
 https://win29.yayin.com.tr/erzurumwebtv/erzurumwebtv/iptvdelisi.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",ES TV
+#EXTINF:-1 tvg-id="ESTV.tr" tvg-logo="https://i.imgur.com/epAEBrp.png" group-title="ترکیه / عمومی",ES TV
 https://live.artidijitalmedya.com/artidijital_estv/estv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",ETV Kayseri
+#EXTINF:-1 tvg-id="ETVKayseri.tr" tvg-logo="https://yt3.googleusercontent.com/ytc/AIdro_msPtG6zfPKIJIIdvG4dehXLoVoXcHM2-2HL9YxsNYzGQ=s512-c-k-c0x00ffffff-no-rj" group-title="ترکیه / عمومی",ETV Kayseri
 https://live.artidijitalmedya.com/artidijital_etv/etv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Euro D
+#EXTINF:-1 tvg-id="EuroD.tr" tvg-logo="https://i.imgur.com/x9kHsXo.png" group-title="ترکیه / عمومی",Euro D
 https://live.duhnet.tv/S2/HLS_LIVE/eurodnp/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / اقتصادی",Finans Turk TV
+#EXTINF:-1 tvg-id="FinansTurkTV.tr" tvg-logo="https://i.ibb.co/wBwmB1T/iY0osc7.png" group-title="ترکیه / اقتصادی",Finans Turk TV
 https://yayin30.haber100.com/live/finansturk/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Fortuna TV
+#EXTINF:-1 tvg-id="FortunaTV.tr" tvg-logo="https://i.imgur.com/ZbUSlOC.png" group-title="ترکیه / عمومی",Fortuna TV
 https://edge.taksimbilisim.com/ftvturk/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Guneydogu TV
+#EXTINF:-1 tvg-id="GuneydoguTV.tr" tvg-logo="https://i.imgur.com/JT5pp3Y.png" group-title="ترکیه / عمومی",Guneydogu TV
 https://edge1.socialsmart.tv/gtv/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / خبری",GZT
+#EXTINF:-1 tvg-id="GZT.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/GZT_logo.svg/960px-GZT_logo.svg.png" group-title="ترکیه / خبری",GZT
 https://gzttv-live.lg.mncdn.com/gzttv/gzttv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Ilke TV
+#EXTINF:-1 tvg-id="IlkeTV.tr" tvg-logo="https://ilketv.com.tr/wp-content/uploads/2024/06/logo.png" group-title="ترکیه / عمومی",Ilke TV
 https://stream.ilketv.com.tr/hls/ilkecanli.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Kanal 12
+#EXTINF:-1 tvg-id="Kanal12.tr" tvg-logo="https://i.imgur.com/51xCkXG.png" group-title="ترکیه / عمومی",Kanal 12
 https://live.artidijitalmedya.com/artidijital_kanal12/kanal12/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Kanal 23
+#EXTINF:-1 tvg-id="Kanal23.tr" tvg-logo="https://i.imgur.com/3br8RCq.png" group-title="ترکیه / عمومی",Kanal 23
 https://cdn-kanal23.yayin.com.tr/kanal23/index.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Kanal D Drama
+#EXTINF:-1 tvg-id="KanalDDrama.tr" tvg-logo="https://i.imgur.com/WIeZMKT.png" group-title="ترکیه / عمومی",Kanal D Drama
 https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01602-themahqfrance-vivekanald-samsungspain/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Kanal Hayat
+#EXTINF:-1 tvg-id="KanalHayat.tr" tvg-logo="https://i.imgur.com/eikZj19.png" group-title="ترکیه / عمومی",Kanal Hayat
 https://tbn02a.ltnschedule.com/hls/nx21i.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Kocaeli TV
+#EXTINF:-1 tvg-id="KocaeliTV.tr" tvg-logo="https://i.imgur.com/LeTP4zq.png" group-title="ترکیه / عمومی",Kocaeli TV
 https://edge.taksimbilisim.com/kocaelitv/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Konya Olay TV
+#EXTINF:-1 tvg-id="KonyaOlayTV.tr" tvg-logo="https://www.konyaolaytv.com/upload/tema/20230307__5154687762.jpg" group-title="ترکیه / عمومی",Konya Olay TV
 https://live.artidijitalmedya.com/artidijital_konyaolaytv/konyaolaytv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",KRAL Pop TV
+#EXTINF:-1 tvg-id="KralPopTV.tr" tvg-logo="https://i.imgur.com/ch365lh.png" group-title="ترکیه / عمومی",KRAL Pop TV
 https://dogus-live.daioncdn.net/kralpoptv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",KRT
+#EXTINF:-1 tvg-id="KRT.tr" tvg-logo="https://i.imgur.com/9ZKqdQJ.png" group-title="ترکیه / عمومی",KRT
 https://raw.githubusercontent.com/yaskar661-lgtm/stream/refs/heads/main/filbox/krthd.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Lalegul TV
+#EXTINF:-1 tvg-id="LalegulTV.tr" tvg-logo="https://i.imgur.com/wwCysFs.png" group-title="ترکیه / عمومی",Lalegul TV
 https://lbl.netmedya.net/hls/lalegultv.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Luys TV
+#EXTINF:-1 tvg-id="LuysTV.tr" tvg-logo="https://i.imgur.com/9EruWIQ.png" group-title="ترکیه / عمومی",Luys TV
 https://b01c02nl.mediatriple.net/videoonlylive/mtpayqrfkgirxelive/broadcast_5e91c5ac96898.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Mekameleen TV
+#EXTINF:-1 tvg-id="MekameleenTV.tr" tvg-logo="https://i.imgur.com/q7iVchl.png" group-title="ترکیه / عمومی",Mekameleen TV
 https://mn-nl.mncdn.com/mekameleen/smil:mekameleentv.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Meltem TV
+#EXTINF:-1 tvg-id="MeltemTV.tr" tvg-logo="https://i.imgur.com/C3m6w5S.png" group-title="ترکیه / عمومی",Meltem TV
 https://vhxyrsly.rocketcdn.com/meltemtv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Minika Cocuk
+#EXTINF:-1 tvg-id="MinikaCocuk.tr" tvg-logo="https://i.imgur.com/VCywMTv.png" group-title="ترکیه / عمومی",Minika Cocuk
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago_cocuk/minikago_cocuk.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Minika Go
+#EXTINF:-1 tvg-id="MinikaGo.tr" tvg-logo="https://i.imgur.com/qIoipDq.png" group-title="ترکیه / عمومی",Minika Go
 https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/minikago/minikago.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",MTürk TV
+#EXTINF:-1 tvg-id="MTurkTV.tr" tvg-logo="https://i.imgur.com/xj1gvrq.png" group-title="ترکیه / موسیقی",MTürk TV
 https://edge1.socialsmart.tv/muglaturk/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",National Geographic
+#EXTINF:-1 tvg-id="NationalGeographic.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Natgeologo.svg/960px-Natgeologo.svg.png" group-title="ترکیه / عمومی",National Geographic
 https://nord.ayakkabiparti.lol/natgeo/index.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",National Geographic Wild
+#EXTINF:-1 tvg-id="NationalGeographicWild.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/National_Geographic_Wild_logo.svg/960px-National_Geographic_Wild_logo.svg.png" group-title="ترکیه / عمومی",National Geographic Wild
 https://nord.ayakkabiparti.lol/natgeowild/index.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",NOW
+#EXTINF:-1 tvg-id="NOW.tr" tvg-logo="https://i.imgur.com/5EYjWK7.png" group-title="ترکیه / عمومی",NOW
 https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv_720p.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Number 1 Ask
+#EXTINF:-1 tvg-id="Number1Ask.tr" tvg-logo="https://i.imgur.com/slwbux7.png" group-title="ترکیه / عمومی",Number 1 Ask
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/u_stream_5c9e18f9cea15_1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Number 1 Damar
+#EXTINF:-1 tvg-id="Number1Damar.tr" tvg-logo="https://i.imgur.com/rYtbAGZ.png" group-title="ترکیه / عمومی",Number 1 Damar
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/u_stream_5c9e198784bdc_1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Number 1 Dance
+#EXTINF:-1 tvg-id="Number1Dance.tr" tvg-logo="https://i.imgur.com/ZM4PSyq.png" group-title="ترکیه / عمومی",Number 1 Dance
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/u_stream_5c9e2aa8acf44_1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Number 1 TV
+#EXTINF:-1 tvg-id="Number1TV.tr" tvg-logo="https://i.imgur.com/02cDIBi.png" group-title="ترکیه / عمومی",Number 1 TV
 https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e17cd59e8b.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",On4 TV
+#EXTINF:-1 tvg-id="On4TV.tr" tvg-logo="https://i.imgur.com/qGRa1KI.png" group-title="ترکیه / عمومی",On4 TV
 https://edge1.socialsmart.tv/on4/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",Power Dance
+#EXTINF:-1 tvg-id="PowerDance.tr" tvg-logo="https://i.imgur.com/QpPteBO.png" group-title="ترکیه / موسیقی",Power Dance
 https://livetv.powerapp.com.tr/dance/dance.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",Power Love
+#EXTINF:-1 tvg-id="PowerLove.tr" tvg-logo="https://i.imgur.com/0RzUswR.png" group-title="ترکیه / موسیقی",Power Love
 https://livetv.powerapp.com.tr/plove/love.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",Power Türk Akustik
+#EXTINF:-1 tvg-id="PowerTurkAkustik.tr" tvg-logo="https://i.imgur.com/driabBO.png" group-title="ترکیه / موسیقی",Power Türk Akustik
 https://livetv.powerapp.com.tr/pturkakustik/akustik.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",Power Türk Slow
+#EXTINF:-1 tvg-id="PowerTurkSlow.tr" tvg-logo="https://i.imgur.com/tQSoQXW.png" group-title="ترکیه / موسیقی",Power Türk Slow
 https://livetv.powerapp.com.tr/pturkslow/slow.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",Power Türk Taptaze
+#EXTINF:-1 tvg-id="PowerTurkTaptaze.tr" tvg-logo="https://i.imgur.com/a5nW3HU.png" group-title="ترکیه / موسیقی",Power Türk Taptaze
 https://livetv.powerapp.com.tr/pturktaptaze/taptaze.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",Power TV
+#EXTINF:-1 tvg-id="PowerTV.tr" tvg-logo="https://i.imgur.com/XSL1gd7.png" group-title="ترکیه / موسیقی",Power TV
 https://livetv.powerapp.com.tr/powerTV/powerhd.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",PowerTurk TV
+#EXTINF:-1 tvg-id="PowerTurkTV.tr" tvg-logo="https://i.imgur.com/9OPoXQG.png" group-title="ترکیه / موسیقی",PowerTurk TV
 https://powerturk.blutv.com/blutv_powerturk/powerturk_sd.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",PowerTürk TV
+#EXTINF:-1 tvg-id="PowerTurkTV.tr" tvg-logo="https://i.imgur.com/9OPoXQG.png" group-title="ترکیه / موسیقی",PowerTürk TV
 https://live.artidijitalmedya.com/artidijital_powerturktv/powerturktv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Qaf TV
+#EXTINF:-1 tvg-id="QafTV.tr" tvg-logo="https://i.imgur.com/hrk7Uce.png" group-title="ترکیه / عمومی",Qaf TV
 https://customer-9vqui33qma2rownb.cloudflarestream.com/7792e558fe54e23bdd4b462ec275cdba/manifest/video.m3u8
 
-#EXTINF:-1 group-title="ترکیه / ورزشی",S Sport 2
+#EXTINF:-1 tvg-id="SSport2.tr" tvg-logo="https://i.imgur.com/2jIItAy.png" group-title="ترکیه / ورزشی",S Sport 2
 https://bcovlive-a.akamaihd.net/29c60f23ea4840ba8726925a77fcfd0b/eu-central-1/6415845530001/profile_0/chunklist.m3u8
 
 #EXTINF:-1 group-title="ترکیه / موسیقی",Sat7 Türk
 https://live.artidijitalmedya.com/artidijital_sat7turk/sat7turk/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / دینی",Sercem TV
+#EXTINF:-1 tvg-id="SercemTV.tr" tvg-logo="https://sercemtv.com.tr/sercemlogo.jpg" group-title="ترکیه / دینی",Sercem TV
 https://canli.sercemtv.com.tr/hls/0/stream.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Show TV
+#EXTINF:-1 tvg-id="ShowTV.tr" tvg-logo="https://i.imgur.com/1l7SCCu.png" group-title="ترکیه / عمومی",Show TV
 https://ciner.daioncdn.net/showtv/showtv.m3u8?app=showtv_web
-#EXTINF:-1 group-title="ترکیه / عمومی",Show Turk
+#EXTINF:-1 tvg-id="ShowTurk.tr" tvg-logo="https://i.imgur.com/fdZpGDj.png" group-title="ترکیه / عمومی",Show Turk
 https://raw.githubusercontent.com/bnyusuf67-crypto/streams/refs/heads/main/streams/shturk.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Sozcu TV
+#EXTINF:-1 tvg-id="SozcuTV.tr" tvg-logo="https://i.imgur.com/BxpdvsG.png" group-title="ترکیه / عمومی",Sozcu TV
 https://raw.githubusercontent.com/yaskar661-lgtm/stream/refs/heads/main/filbox/szchd.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TBMM TV
+#EXTINF:-1 tvg-id="TBMMTV.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TBMM_TV_logo.svg/960px-TBMM_TV_logo.svg.png" group-title="ترکیه / عمومی",TBMM TV
 https://meclistv-live.ercdn.net/meclistv/meclistv.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Tele 1
+#EXTINF:-1 tvg-id="Tele1.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/tr/4/43/Tele1_logosu.png" group-title="ترکیه / عمومی",Tele 1
 https://tele1-live.ercdn.net/tele1/tele1.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Tempo TV
+#EXTINF:-1 tvg-id="TempoTV.tr" tvg-logo="https://i.imgur.com/tZpx32y.png" group-title="ترکیه / عمومی",Tempo TV
 https://live.artidijitalmedya.com/artidijital_tempotv/tempotv/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / خبری",TGRT Haber
+#EXTINF:-1 tvg-id="TGRTHaber.tr" tvg-logo="https://i.imgur.com/PrxwKDw.png" group-title="ترکیه / خبری",TGRT Haber
 https://canli.tgrthaber.com/tgrt.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",Tivi 6
+#EXTINF:-1 tvg-id="Tivi6.tr" tvg-logo="https://i.imgur.com/Mbi0jbz.png" group-title="ترکیه / عمومی",Tivi 6
 https://live.artidijitalmedya.com/artidijital_tivi6/tivi6/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TJK TV
+#EXTINF:-1 tvg-id="TJKTV.tr" tvg-logo="https://i.imgur.com/3zHdkYG.png" group-title="ترکیه / عمومی",TJK TV
 https://tjktv-live.tjk.org/tjktv.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TRT 3
+#EXTINF:-1 tvg-id="TRT3.tr" tvg-logo="https://i.imgur.com/JrWFwBd.png" group-title="ترکیه / عمومی",TRT 3
 https://vuvuu-geil-m3u8.yaskar661.workers.dev/?url=https%3A%2F%2Fvavoo.to%2Fvavoo-iptv%2Fplay%2F418740351278f04c94b243
 
-#EXTINF:-1 group-title="ترکیه / کودک",TRT Diyanet Çocuk
+#EXTINF:-1 tvg-id="TRTDiyanetCocuk.tr" tvg-logo="https://i.imgur.com/8PmXz9t.png" group-title="ترکیه / کودک",TRT Diyanet Çocuk
 https://tv-trtdiyanetcocuk.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TRT EBA Ilkokul
+#EXTINF:-1 tvg-id="TRTEBAIlkokul.tr" tvg-logo="https://i.imgur.com/CRBfZi4.png" group-title="ترکیه / عمومی",TRT EBA Ilkokul
 https://tv-e-okul00.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TRT EBA Lise
+#EXTINF:-1 tvg-id="TRTEBALise.tr" tvg-logo="https://i.imgur.com/vj2L2L2.png" group-title="ترکیه / عمومی",TRT EBA Lise
 https://tv-e-okul02.medya.trt.com.tr/master.m3u8
 
 #EXTINF:-1 group-title="ترکیه / عمومی",TRT EBA Ortaokul
 https://tv-e-okul01.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TRT Kurdî
+#EXTINF:-1 tvg-id="TRTKurdi.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/TRT_Kurd%C3%AE_logo.svg/960px-TRT_Kurd%C3%AE_logo.svg.png" group-title="ترکیه / عمومی",TRT Kurdî
 https://tv-trtkurdi.medya.trt.com.tr/master.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",TRT Muzik
+#EXTINF:-1 tvg-id="TRTMuzik.tr" tvg-logo="https://i.imgur.com/JgUzRH8.png" group-title="ترکیه / موسیقی",TRT Muzik
 https://stream8.cinerama.uz/1208/tracks-v1a1/mono.m3u8
 
-#EXTINF:-1 group-title="ترکیه / ورزشی",TRT Spor
+#EXTINF:-1 tvg-id="TRTSpor.tr" tvg-logo="https://i.imgur.com/6tv0zxh.png" group-title="ترکیه / ورزشی",TRT Spor
 https://corestream.siteyaptim.live/trt-spor/index.m3u8
 
-#EXTINF:-1 group-title="ترکیه / موسیقی",TRT Türk
+#EXTINF:-1 tvg-id="TRTTurk.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/TRT_T%C3%BCrk_logo.svg/960px-TRT_T%C3%BCrk_logo.svg.png" group-title="ترکیه / موسیقی",TRT Türk
 https://tv-trtturk.medya.trt.com.tr/master.m3u8
 
 #EXTINF:-1 group-title="ترکیه / خبری",TürkHaber
 https://edge1.socialsmart.tv/turkhaber/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TV 1
+#EXTINF:-1 tvg-id="TV1.tr" tvg-logo="https://i.imgur.com/8CtrYVb.png" group-title="ترکیه / عمومی",TV 1
 https://edge1.socialsmart.tv/tv1/bant1/playlist.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TV4
+#EXTINF:-1 tvg-id="TV4.tr" tvg-logo="https://i.imgur.com/UpsQsbd.png" group-title="ترکیه / عمومی",TV4
 https://turkmedya-live.ercdn.net/tv4/tv4.m3u8
 
-#EXTINF:-1 group-title="ترکیه / عمومی",TV 8
+#EXTINF:-1 tvg-id="TV8.tr" tvg-logo="https://upload.wikimedia.org/wikipedia/tr/thumb/6/68/Tv8_Yeni_Logo.png/960px-Tv8_Yeni_Logo.png" group-title="ترکیه / عمومی",TV 8
 https://tv8.daioncdn.net/tv8/tv8.m3u8?app=7ddc255a-ef47-4e81-ab14-c0e5f2949788&ce=3
 
 #EXTINF:-1 group-title="ترکیه / عمومی",TV 24
 https://turkmedya-live.ercdn.net/tv24/tv24.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",AnewZ TV
+#EXTINF:-1 tvg-id="AnewZTV.az" tvg-logo="https://i.imgur.com/Lwgdbuu.png" group-title="آذربایجان / عمومی",AnewZ TV
 https://edge-rs-01.maksnet.tv/cubesanewz-secure/smil:cubesanewz-secure.smil/playlist.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",Ayaz TV
+#EXTINF:-1 tvg-id="AyazTV.az" tvg-logo="https://www.ayaztv.com/storage/assets/site_logo.png" group-title="آذربایجان / عمومی",Ayaz TV
 https://janya-ayaztv.vgcdn.net/ptnr-WebApp/title-Ayaz_TV/v1/vglive-sk-934820/main.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",Az TV
+#EXTINF:-1 tvg-id="AzTV.az" tvg-logo="https://i.imgur.com/snBMMeH.png" group-title="آذربایجان / عمومی",Az TV
 https://operativmm.az/tvs/az/stream9/index.m3u8
 
 #EXTINF:-1 group-title="آذربایجان / عمومی",Azstar TV
 https://live.livestreamtv.ca/azstar/amlst:azstar/playlist.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",EL TV
+#EXTINF:-1 tvg-id="ELTV.az" tvg-logo="https://i.imgur.com/tTlokZ2.png" group-title="آذربایجان / عمومی",EL TV
 https://live.eltv.az/live/eltv/playlist.m3u8
 
 #EXTINF:-1 group-title="آذربایجان / موسیقی",Kanal 65 Music
@@ -863,7 +863,7 @@ https://v2.catcast.tv/content/48694/seg-25410024-v1-a1/index.m3u8
 #EXTINF:-1 group-title="آذربایجان / عمومی",Shirvan TV
 https://a8.radyotelekom.com.tr/p/3326/hybrid/play.m3u8
 
-#EXTINF:-1 group-title="آذربایجان / عمومی",Show Plus TV
+#EXTINF:-1 tvg-id="ShowPlusTV.az" tvg-logo="https://i.imgur.com/Je2DGSG.jpg" group-title="آذربایجان / عمومی",Show Plus TV
 https://rtmp.showplus.tv/hls/myshow.m3u8
 
 #EXTINF:-1 group-title="آذربایجان / عمومی",Son Umid TV
