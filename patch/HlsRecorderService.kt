@@ -12,10 +12,13 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 
 class HlsRecorderService : Service() {
-    @Volatile private var running = false
-    private var worker: Thread? = null
+    private val lock = Any()
+    private val recordingFlags = ConcurrentHashMap<Int, AtomicBoolean>()
+    private val workers = ConcurrentHashMap<Int, Thread>()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val name = intent?.getStringExtra("name") ?: "SALAR TV"
@@ -23,8 +26,9 @@ class HlsRecorderService : Service() {
         val durationMinutes = intent.getIntExtra("duration", 60).coerceIn(1, 360)
         createChannel()
         startForeground(4102, notification("در حال آماده‌سازی ضبط: $name"))
-        running = true
-        worker = Thread {
+        val recording = AtomicBoolean(true)
+        synchronized(lock) { recordingFlags[startId] = recording }
+        val worker = Thread {
             val folder = getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: filesDir
             val safeName = name.replace(Regex("[^\\p{L}\\p{N}_-]"), "_").take(40)
             val deadline = System.currentTimeMillis() + durationMinutes * 60_000L
@@ -41,7 +45,7 @@ class HlsRecorderService : Service() {
                     val target = File(folder, "SALAR_" + safeName + "_" + System.currentTimeMillis() + ".ts")
                     output = target
                     val seen = HashSet<String>()
-                    while (running && System.currentTimeMillis() < deadline) {
+                    while (recording.get() && System.currentTimeMillis() < deadline) {
                         val playlistText = downloadText(streamUrl)
                         val playlistUrl = URL(streamUrl)
                         val lines = playlistText.lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.toList()
@@ -59,7 +63,7 @@ class HlsRecorderService : Service() {
                             .filter { it.isNotEmpty() && !it.startsWith("#") }
                             .map { URL(base, it).toString() }.toList()
                         for (segment in segments) {
-                            if (!running || System.currentTimeMillis() >= deadline) break
+                            if (!recording.get() || System.currentTimeMillis() >= deadline) break
                             if (seen.add(segment)) {
                                 val bytes = downloadBytes(segment)
                                 target.appendBytes(bytes)
@@ -81,7 +85,7 @@ class HlsRecorderService : Service() {
                         target.outputStream().use { out ->
                             val buffer = ByteArray(64 * 1024)
                             var lastNotice = 0L
-                            while (running && System.currentTimeMillis() < deadline) {
+                            while (recording.get() && System.currentTimeMillis() < deadline) {
                                 val count = input.read(buffer)
                                 if (count < 0) break
                                 if (count == 0) continue
@@ -100,17 +104,34 @@ class HlsRecorderService : Service() {
             } catch (e: Exception) {
                 updateNotification("خطا در ضبط $name: " + (e.message ?: "اتصال ناموفق"))
             } finally {
-                running = false
-                stopForeground(STOP_FOREGROUND_DETACH)
-                stopSelf()
+                recording.set(false)
+                workers.remove(startId)
+                val noMoreRecordings = synchronized(lock) {
+                    recordingFlags.remove(startId)
+                    recordingFlags.isEmpty()
+                }
+                if (noMoreRecordings) {
+                    stopForeground(STOP_FOREGROUND_DETACH)
+                    stopSelf()
+                } else {
+                    updateNotification("ضبط‌های دیگر همچنان در حال اجرا هستند: " + recordingFlags.size)
+                }
             }
-        }.also { it.name = "SalarTvRecorder"; it.start() }
+        }.also {
+            it.name = "SalarTvRecorder-$startId"
+            synchronized(lock) { workers[startId] = it }
+            it.start()
+        }
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
-        running = false
-        worker?.interrupt()
+        synchronized(lock) {
+            recordingFlags.values.forEach { it.set(false) }
+            workers.values.forEach { it.interrupt() }
+            workers.clear()
+            recordingFlags.clear()
+        }
         super.onDestroy()
     }
 
