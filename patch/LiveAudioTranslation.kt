@@ -99,6 +99,24 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
         }, "SalarTvWhisperCleanup").apply { isDaemon = true; start() }
     }
 
+    // Keep speech synthesis in one place so already-Persian broadcasts are dubbed too.
+    fun speakPersian(text: String) {
+        if (!prefs.getBoolean("live_dubbing_enabled", true) || text.isBlank()) return
+        val engine = tts
+        if (!ttsReady || engine == null) {
+            status = "زیرنویس فارسی آماده شد؛ موتور گفتار فارسی گوشی در دسترس نیست."
+            return
+        }
+        val preset = prefs.getString("live_dubbing_voice", "زیر")
+        engine.setPitch(if (preset == "بم" || preset == "مرد") 0.88f else 1.08f)
+        val params = Bundle().apply {
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f))
+        }
+        // QUEUE_ADD prevents every newly recognized chunk from cutting off the previous sentence.
+        val result = engine.speak(text, TextToSpeech.QUEUE_ADD, params, "salar-live-" + System.currentTimeMillis())
+        if (result == TextToSpeech.ERROR) status = "تولید صدای دوبله ناموفق بود؛ موتور گفتار گوشی را بررسی کنید."
+    }
+
     fun translateText(text: String) {
         val clean = text.trim().replace(Regex("\\s+"), " ")
         if (clean.length < 2) return
@@ -107,7 +125,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
             val source = TranslateLanguage.fromLanguageTag(tag)
             if (source == null) { status = "زبان " + tag + " تشخیص داده شد، اما ترجمه آن پشتیبانی نمی‌شود."; return@addOnSuccessListener }
             if (source == TranslateLanguage.PERSIAN) {
-                translated = clean; onTranslation(clean); status = "گفتار فارسی تشخیص داده شد."
+                translated = clean
+                onTranslation(clean)
+                status = "گفتار فارسی تشخیص داده شد."
+                speakPersian(clean)
                 return@addOnSuccessListener
             }
             status = "زبان گفتار: " + tag + "؛ در حال ترجمه فارسی…"
@@ -115,19 +136,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
                 .setSourceLanguage(source).setTargetLanguage(TranslateLanguage.PERSIAN).build())
             translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).addOnSuccessListener {
                 translator.translate(clean).addOnSuccessListener { result ->
-                    translated = result; onTranslation(result)
-                    if (prefs.getBoolean("live_dubbing_enabled", true)) {
-                        val engine = tts
-                        if (ttsReady && engine != null && result.isNotBlank()) {
-                            val preset = prefs.getString("live_dubbing_voice", "زیر")
-                            engine.setPitch(if (preset == "بم" || preset == "مرد") 0.88f else 1.08f)
-                            val params = Bundle().apply {
-                                putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f))
-                            }
-                            engine.speak(result, TextToSpeech.QUEUE_FLUSH, params, "salar-live-" + System.currentTimeMillis())
-                        } else if (!ttsReady) status = "زیرنویس آماده شد؛ صدای فارسی در موتور گفتار گوشی موجود نیست."
-                    }
+                    translated = result
+                    onTranslation(result)
                     status = "ترجمه فارسی زنده فعال است؛ زبان تشخیص‌داده‌شده: " + tag
+                    speakPersian(result)
                     translator.close()
                 }.addOnFailureListener { translator.close(); status = "ترجمه ناموفق بود: " + (it.localizedMessage ?: "خطا") }
             }.addOnFailureListener { translator.close(); status = "دریافت مدل ترجمه ناموفق بود؛ اینترنت را بررسی کنید." }
