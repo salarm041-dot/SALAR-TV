@@ -678,7 +678,9 @@ jobs:
               "https://iptv.tapesh.tv/tapesh/playlist.m3u8"
             ],
             "ITN | آی‌تی‌ان":[
-              "https://itnhls.wns.live/hls/stream.m3u8"
+              "https://itnhls.wns.live/hls/stream.m3u8",
+              "https://oitnhls.wns.live/hls/stream.m3u8",
+              "http://63.237.48.28/ios/ITN/ITN.m3u8"
             ]
           }
           # Additional public GEM CDN candidates. These are not trusted until
@@ -708,6 +710,9 @@ jobs:
               for label,path in gem_paths.items():
                   if label in name:
                       extra.append("https://ca-rt.onetv.app/"+path+"/index-0.m3u8")
+                      # Publicly indexed GEM playlist publishes these CloudFront
+                      # paths. They remain candidates until HLS media is verified.
+                      extra.append("https://d2e40kvaojifd6.cloudfront.net/stream/"+path+"/playlist.m3u8")
               item["candidates"]=list(dict.fromkeys([item["url"]]+extra))
 
           headers={"User-Agent":"Mozilla/5.0 (Linux; Android 11) SALAR-TV/1.1",
@@ -755,9 +760,20 @@ jobs:
                       except Exception:
                           continue
                   adaptive_ok = len(variants) >= 2 and playable >= 2
-                  return {"url":url,"ok":adaptive_ok,"adaptive_variants":len(variants),
-                          "playable_renditions":playable,
-                          "detail":"at least two adaptive renditions and segments received" if adaptive_ok else "requires at least two playable adaptive renditions"}
+                  # A single-quality HLS media playlist is still a valid live
+                  # stream. Do not mark it broken merely because it has no
+                  # adaptive master variants; report its quality separately.
+                  stream_ok = playable >= 1
+                  if adaptive_ok:
+                      detail="adaptive_playable: at least two renditions and media segments received"
+                  elif stream_ok:
+                      detail="single_quality_playable: media segment received; no multi-quality master confirmed"
+                  else:
+                      detail="no playable media segment received"
+                  return {"url":url,"ok":stream_ok,"adaptive_playable":adaptive_ok,
+                          "single_quality_playable":stream_ok and not adaptive_ok,
+                          "adaptive_variants":len(variants),
+                          "playable_renditions":playable,"detail":detail}
               except urllib.error.HTTPError as e:
                   return {"url":url,"ok":False,"detail":f"HTTP {e.code}"}
               except Exception as e:
@@ -767,13 +783,17 @@ jobs:
               checks=[test_url(u) for u in item["candidates"]]
               passing=next((x for x in checks if x["ok"]),None)
               return {**item,"checks":checks,"verified_url":passing["url"] if passing else None,
-                      "status":"playable" if passing else "unavailable_or_unverified",
+                      "status":("adaptive_playable" if passing and passing.get("adaptive_playable")
+                                else "single_quality_playable" if passing else "unavailable_or_unverified"),
                       "adaptive_variants":passing.get("adaptive_variants",0) if passing else 0}
           with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
               results=list(pool.map(audit,entries))
           good=[x for x in results if x["status"]=="playable"]
+          adaptive=[x for x in good if x.get("adaptive_variants",0)>=2]
           report={"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
                   "total":len(results),"playable":len(good),
+                  "adaptive_playable":len(adaptive),
+                  "single_quality_playable":len(good)-len(adaptive),
                   "unavailable_or_unverified":len(results)-len(good),"results":results}
           pathlib.Path("persian-diaspora-stream-audit.json").write_text(
               json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
