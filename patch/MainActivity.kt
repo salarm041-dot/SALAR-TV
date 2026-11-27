@@ -78,6 +78,8 @@ import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONArray
@@ -235,6 +237,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var appFontScale by remember { mutableFloatStateOf(prefs.getFloat("font_scale", 1f).coerceIn(0.85f, 1.3f)) }
+    var weakInternetMode by remember { mutableStateOf(prefs.getBoolean("weak_internet_mode", false)) }
     val channels = remember {
         mutableStateListOf<Channel>().apply {
             val raw = prefs.getString("channels", "[]") ?: "[]"
@@ -535,7 +538,27 @@ fun SalarTvApp(isInPip: Boolean = false) {
         }
     }
 
-    val player = remember { ExoPlayer.Builder(context).build() }
+    val trackSelector = remember { DefaultTrackSelector(context) }
+    val player = remember {
+        ExoPlayer.Builder(context)
+            .setTrackSelector(trackSelector)
+            // Keep a useful reserve of media data for brief drops in bandwidth.
+            .setLoadControl(
+                DefaultLoadControl.Builder()
+                    .setBufferDurationsMs(60_000, 120_000, 2_500, 5_000)
+                    .build()
+            )
+            .build()
+    }
+    LaunchedEffect(trackSelector, weakInternetMode) {
+        // Cap adaptive HLS selection in weak-network mode. This only helps when
+        // the stream actually publishes multiple renditions; it cannot invent one.
+        trackSelector.setParameters(
+            trackSelector.buildUponParameters()
+                .setMaxVideoBitrate(if (weakInternetMode) 700_000 else Int.MAX_VALUE)
+                .build()
+        )
+    }
     LaunchedEffect(player, liveDubbingEnabled, keepOriginalAudio) {
         // Preserve speech-recognition input while lowering the original track
         // when the user wants Persian TTS dubbing to stand out.
@@ -1364,6 +1387,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     )
                     "دوبله هوشمند زنده" -> LiveDubbingPage()
                     "تنظیمات" -> SettingsPage(
+                        weakInternetMode = weakInternetMode,
+                        onWeakInternetModeChange = { enabled ->
+                            weakInternetMode = enabled
+                            prefs.edit().putBoolean("weak_internet_mode", enabled).apply()
+                        },
                         themeMode = themeMode,
                         onThemeModeChange = { mode ->
                             themeMode = mode
@@ -3007,12 +3035,27 @@ fun ChildLockPage(
 }
 
 @Composable
-fun SettingsPage(themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit,
+fun SettingsPage(weakInternetMode: Boolean, onWeakInternetModeChange: (Boolean) -> Unit,
+                 themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit,
                  fontScale: Float, onFontScaleChange: (Float) -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var confirmDelete by remember { mutableStateOf(prefs.getBoolean("confirm_before_delete", true)) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("اتصال اینترنت", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
+            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("اتصال اینترنت ضعیف", color = TextMain, fontWeight = FontWeight.SemiBold)
+                        Text("برای اینترنت ناپایدار روشن کنید؛ پلیر کیفیت تطبیقی را به حداکثر حدود ۷۰۰ کیلوبیت‌برثانیه محدود می‌کند و بافر ذخیره‌شدهٔ بیشتری نگه می‌دارد.", color = SecondaryText, fontSize = 11.sp)
+                    }
+                    Switch(checked = weakInternetMode, onCheckedChange = onWeakInternetModeChange)
+                }
+                Text("این گزینه فقط در شبکه‌هایی که چند کیفیت واقعی ارائه می‌کنند می‌تواند کیفیت را پایین‌تر انتخاب کند؛ لینک تک‌کیفیتی را به چندکیفیتی تبدیل نمی‌کند.", color = MutedText, fontSize = 10.sp)
+            }
+        }
+        Divider(color = Gold.copy(alpha = 0.3f))
         Text("ظاهر و شخصی‌سازی", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text("حالت نمایش", color = TextMain, fontWeight = FontWeight.SemiBold)
         listOf("dark" to "مشکی و طلایی براق", "light" to "روشن", "system" to "هماهنگ با دستگاه").forEach { (value, label) ->
