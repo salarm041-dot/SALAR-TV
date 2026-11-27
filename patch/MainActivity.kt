@@ -888,6 +888,19 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var qualityChoices by remember(selected!!.url) { mutableStateOf(emptyList<VideoQualityChoice>()) }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerHelp by remember(selected!!.url) { mutableStateOf(false) }
+                        var playbackError by remember(selected!!.url) { mutableStateOf("") }
+                        DisposableEffect(player, selected!!.url) {
+                            val listener = object : Player.Listener {
+                                override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                                    playbackError = "خطای پخش: ${error.errorCodeName} — ${error.message ?: "جزئیات موجود نیست"}"
+                                }
+                                override fun onPlaybackStateChanged(playbackState: Int) {
+                                    if (playbackState == Player.STATE_READY) playbackError = ""
+                                }
+                            }
+                            player.addListener(listener)
+                            onDispose { player.removeListener(listener) }
+                        }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
                         var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
                         var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
@@ -907,6 +920,15 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )
+                            if (playbackError.isNotBlank()) {
+                                Column(
+                                    Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                                        .background(Color(0xDD3A1717)).padding(8.dp)
+                                ) {
+                                    Text(playbackError, color = Color.White, fontSize = 11.sp)
+                                    Text("این پیام را برای بررسی خطای پخش نگه دارید.", color = Color(0xFFFFCC80), fontSize = 10.sp)
+                                }
+                            }
                             if (showLiveSpeechTranslation && liveSpeechSubtitle.isNotBlank()) {
                                 Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                                     .padding(horizontal = 12.dp, vertical = 38.dp)
