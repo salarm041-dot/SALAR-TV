@@ -2747,6 +2747,9 @@ fun MultiViewPage(channels: List<Channel>) {
         }
     }
     val players = remember { List(9) { ExoPlayer.Builder(context).build() } }
+    var audioMixMode by remember { mutableStateOf(false) }
+    var primaryAudioSlot by remember { mutableIntStateOf(0) }
+    val slotVolumes = remember { mutableStateListOf<Float>().apply { repeat(9) { add(1f) } } }
 
     DisposableEffect(activity, players) {
         val previousOrientation = activity?.requestedOrientation
@@ -2794,6 +2797,13 @@ fun MultiViewPage(channels: List<Channel>) {
                     selected = selectedChannels[fullScreenSlot],
                     onSelect = { selectedChannels[fullScreenSlot] = it },
                     player = players[fullScreenSlot],
+                    slotIndex = fullScreenSlot,
+                    audioMixMode = audioMixMode,
+                    primaryAudioSlot = primaryAudioSlot,
+                    slotVolume = slotVolumes[fullScreenSlot],
+                    onVolumeChange = { slotVolumes[fullScreenSlot] = it },
+                    onChoosePrimaryAudio = { primaryAudioSlot = fullScreenSlot; audioMixMode = false },
+                    onEnableAudioMix = { audioMixMode = true },
                     onFullscreen = { fullScreenSlot = -1 },
                     modifier = Modifier.fillMaxSize(),
                     compact = false,
@@ -2827,6 +2837,13 @@ fun MultiViewPage(channels: List<Channel>) {
                                 selected = selectedChannels[slotIndex],
                                 onSelect = { selectedChannels[slotIndex] = it },
                                 player = players[slotIndex],
+                                slotIndex = slotIndex,
+                                audioMixMode = audioMixMode,
+                                primaryAudioSlot = primaryAudioSlot,
+                                slotVolume = slotVolumes[slotIndex],
+                                onVolumeChange = { slotVolumes[slotIndex] = it },
+                                onChoosePrimaryAudio = { primaryAudioSlot = slotIndex; audioMixMode = false },
+                                onEnableAudioMix = { audioMixMode = true },
                                 onFullscreen = { fullScreenSlot = slotIndex },
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
                                 compact = layoutCount == 9
@@ -2846,13 +2863,24 @@ private fun MultiViewSlot(
     selected: Channel?,
     onSelect: (Channel?) -> Unit,
     player: ExoPlayer,
+    slotIndex: Int,
+    audioMixMode: Boolean,
+    primaryAudioSlot: Int,
+    slotVolume: Float,
+    onVolumeChange: (Float) -> Unit,
+    onChoosePrimaryAudio: () -> Unit,
+    onEnableAudioMix: () -> Unit,
     onFullscreen: () -> Unit,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
     fullScreen: Boolean = false
 ) {
     var showPicker by remember { mutableStateOf(false) }
+    var showCardMenu by remember { mutableStateOf(false) }
+    var showQualityMenu by remember { mutableStateOf(false) }
+    var isMuted by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    val context = LocalContext.current
     val filteredChannels = remember(channels, searchQuery) {
         channels.filter {
             it.name.contains(searchQuery.trim(), ignoreCase = true) ||
@@ -2900,9 +2928,71 @@ private fun MultiViewSlot(
                     if (view.player !== player) view.player = player
                     view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
                 },
-                modifier = Modifier.fillMaxSize()
+                modifier = if (fullScreen) Modifier.fillMaxSize() else Modifier.weight(1f).fillMaxWidth()
             )
+            if (!fullScreen) {
+                Row(Modifier.fillMaxWidth().height(if (compact) 30.dp else 38.dp)
+                    .background(Color(0xFF10131B), RoundedCornerShape(8.dp)).padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(if (audioMixMode) "میکس صدا" else if (primaryAudioSlot == slotIndex) "صدای اصلی" else "بی‌صدا",
+                        color = if (audioMixMode || primaryAudioSlot == slotIndex) Gold else SecondaryText,
+                        fontSize = if (compact) 8.sp else 10.sp, modifier = Modifier.weight(1f), maxLines = 1)
+                    IconButton(onClick = { showCardMenu = true }, modifier = Modifier.size(if (compact) 26.dp else 32.dp)) {
+                        Icon(Icons.Default.MoreVert, "امکانات شبکه", tint = Gold,
+                            modifier = Modifier.size(if (compact) 15.dp else 19.dp))
+                    }
+                    DropdownMenu(expanded = showCardMenu, onDismissRequest = { showCardMenu = false }) {
+                        DropdownMenuItem(text = { Text(if (isMuted) "وصل کردن صدای این شبکه" else "قطع صدای این شبکه") },
+                            leadingIcon = { Icon(if (isMuted) Icons.Default.VolumeUp else Icons.Default.VolumeOff, null) },
+                            onClick = { isMuted = !isMuted; showCardMenu = false })
+                        DropdownMenuItem(text = { Text("انتخاب به‌عنوان صدای اصلی") },
+                            leadingIcon = { Icon(Icons.Default.VolumeUp, null) },
+                            onClick = { onChoosePrimaryAudio(); isMuted = false; showCardMenu = false })
+                        DropdownMenuItem(text = { Text("ترکیب صدای چند شبکه") },
+                            leadingIcon = { Icon(Icons.Default.GraphicEq, null) },
+                            onClick = { onEnableAudioMix(); isMuted = false; showCardMenu = false })
+                        DropdownMenuItem(text = { Text("ضبط همین شبکه (۶۰ دقیقه)") },
+                            leadingIcon = { Icon(Icons.Default.FiberManualRecord, null, tint = Color.Red) },
+                            onClick = {
+                                val channel = selected; showCardMenu = false
+                                if (channel == null) android.widget.Toast.makeText(context, "ابتدا یک شبکه انتخاب کنید.", android.widget.Toast.LENGTH_SHORT).show()
+                                else runCatching {
+                                    val intent = Intent(context, HlsRecorderService::class.java)
+                                        .putExtra("name", channel.name).putExtra("url", channel.url).putExtra("duration", 60)
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent) else context.startService(intent)
+                                }.onFailure { android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: ${it.message}", android.widget.Toast.LENGTH_LONG).show() }
+                            })
+                        DropdownMenuItem(text = { Text("کیفیت پخش") },
+                            leadingIcon = { Icon(Icons.Default.HighQuality, null) },
+                            onClick = { showCardMenu = false; showQualityMenu = true })
+                    }
+                    if (audioMixMode) {
+                        Text("صدا", color = SecondaryText, fontSize = if (compact) 8.sp else 10.sp)
+                        Slider(value = slotVolume, onValueChange = onVolumeChange,
+                            modifier = Modifier.width(if (compact) 54.dp else 90.dp), valueRange = 0f..1f)
+                    }
+                }
+            }
         }
+    }
+    LaunchedEffect(audioMixMode, primaryAudioSlot, slotIndex, slotVolume, isMuted) {
+        player.volume = when { isMuted -> 0f; audioMixMode -> slotVolume; primaryAudioSlot == slotIndex -> slotVolume; else -> 0f }
+    }
+    if (showQualityMenu) {
+        AlertDialog(onDismissRequest = { showQualityMenu = false },
+            title = { Text("کیفیت پخش • ${selected?.name ?: title}") },
+            text = {
+                Column {
+                    listOf("خودکار" to Int.MAX_VALUE, "کم (حدود ۴۸۰p)" to 900_000,
+                        "متوسط (حدود ۷۲۰p)" to 2_000_000, "بالا (حدود ۱۰۸۰p)" to 5_000_000).forEach { (label, bitrate) ->
+                        TextButton(onClick = {
+                            runCatching { player.trackSelectionParameters = player.trackSelectionParameters.buildUpon().setMaxVideoBitrate(bitrate).build() }
+                            showQualityMenu = false
+                        }, modifier = Modifier.fillMaxWidth()) { Text(label, modifier = Modifier.fillMaxWidth()) }
+                    }
+                    Text("کیفیت‌های قابل انتخاب به نسخه‌های ارائه‌شده توسط منبع پخش بستگی دارد.", color = SecondaryText, fontSize = 11.sp)
+                }
+            }, confirmButton = { TextButton(onClick = { showQualityMenu = false }) { Text("بستن") } })
     }
     LaunchedEffect(selected?.url, selected?.httpHeaders) {
         if (selected == null) {
