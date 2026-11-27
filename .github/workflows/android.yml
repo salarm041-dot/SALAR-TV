@@ -813,7 +813,7 @@ jobs:
               if x["status"]!="unavailable_or_unverified" and x.get("meta"):
                   verified.extend([x["meta"],x["verified_url"]])
           pathlib.Path("verified-persian-candidates.m3u").write_text(
-              "\\n".join(verified)+"\\n",encoding="utf-8")
+              "\n".join(verified)+"\n",encoding="utf-8")
           for x in results:
               print(f'{x["status"]}: {x["name"]} | {x["verified_url"] or x["url"]} | {x["status"]}')
               for c in x["checks"]:
@@ -826,7 +826,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SALAR-TV-Persian-Diaspora-Audit
-          path: persian-diaspora-stream-audit.json
+          path: |
+            persian-diaspora-stream-audit.json
+            verified-persian-candidates.m3u
           if-no-files-found: ignore
 
       - name: Upload Iranian domestic adaptive audit
