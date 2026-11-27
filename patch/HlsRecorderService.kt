@@ -149,7 +149,7 @@ class HlsRecorderService : Service() {
             persistActiveSessions()
             if (sessions.isEmpty()) {
                 if (Build.VERSION.SDK_INT >= 24) stopForeground(STOP_FOREGROUND_DETACH)
-                else @Suppress("DEPRECATION") stopForeground(false)
+                else { @Suppress("DEPRECATION") stopForeground(false) }
                 stopSelf()
             } else {
                 updateNotification("در حال ضبط \${sessions.size} شبکه: " + sessions.values.joinToString("، ") { it.name })
