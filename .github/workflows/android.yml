@@ -670,45 +670,72 @@ jobs:
                       entries.append({"channel": meta.split(",")[-1], "url": line})
                   meta = None
 
-          headers = {"User-Agent":"Mozilla/5.0 SALAR-TV stream-validator/2.0",
+          headers = {"User-Agent":"Mozilla/5.0 SALAR-TV stream-validator/2.1",
                      "Accept":"application/vnd.apple.mpegurl,application/x-mpegURL,*/*"}
-          def get_text(url):
-              req = urllib.request.Request(url, headers=headers)
+          # Telewebion requires per-channel Bearer authorization and a Referer.
+          auth_url = "https://raw.githubusercontent.com/kgkaku/IRIB-Live-Channels-Playlist/main/irib-extvlcopt.m3u"
+          auth_map = {}
+          auth_req = urllib.request.Request(auth_url, headers=headers)
+          with urllib.request.urlopen(auth_req, timeout=25) as auth_response:
+              auth_body = auth_response.read().decode("utf-8-sig", "replace")
+          pending_headers = {}
+          for raw in auth_body.splitlines():
+              line = raw.strip()
+              if line.upper().startswith("#EXTINF"):
+                  pending_headers = {}
+              elif line.upper().startswith("#EXTVLCOPT:"):
+                  option = line.split(":", 1)[1]
+                  key, _, value = option.partition("=")
+                  key, value = key.strip().lower(), value.strip()
+                  if key == "http-referrer": pending_headers["Referer"] = value
+                  elif key == "http-user-agent": pending_headers["User-Agent"] = value
+                  elif key == "http-header" and ":" in value:
+                      name, val = value.split(":", 1)
+                      pending_headers[name.strip()] = val.strip()
+              elif line.startswith(("http://", "https://")):
+                  auth_map[line.lower()] = dict(pending_headers)
+          def request_headers(master_url):
+              extra = auth_map.get(master_url.lower(), {})
+              result = {**headers, **extra}
+              if "telewebion.ir" in master_url.lower():
+                  result.setdefault("Referer", "https://telewebion.ir/")
+                  result.setdefault("Origin", "https://telewebion.ir")
+              return result
+          def get_text(url, req_headers):
+              req = urllib.request.Request(url, headers=req_headers)
               with urllib.request.urlopen(req, timeout=15) as r:
                   body = r.read(512 * 1024).decode("utf-8", "replace")
                   if r.status != 200 or "#EXTM3U" not in body:
                       raise ValueError("invalid HLS response")
                   return body
-
-          def segment_ok(url):
-              req = urllib.request.Request(url, headers={**headers, "Range":"bytes=0-2047"})
+          def segment_ok(url, req_headers):
+              req = urllib.request.Request(url, headers={**req_headers, "Range":"bytes=0-2047"})
               with urllib.request.urlopen(req, timeout=15) as r:
                   chunk = r.read(2048)
                   return r.status in (200, 206) and len(chunk) > 0
-
-          def variant_playable(master_url, variant_url, depth=0):
+          def variant_playable(master_url, variant_url, req_headers, depth=0):
               child_url = urljoin(master_url, variant_url)
-              body = get_text(child_url)
-              nested = []
+              body = get_text(child_url, req_headers)
               rows = body.splitlines()
               for idx, line in enumerate(rows):
                   if line.startswith("#EXT-X-STREAM-INF:"):
                       nxt = next((x.strip() for x in rows[idx+1:] if x.strip() and not x.startswith("#")), None)
                       if nxt: nested.append(nxt)
               if nested and depth < 2:
-                  return any(variant_playable(child_url, x, depth+1) for x in nested)
+                  return any(variant_playable(child_url, x, req_headers, depth+1) for x in nested)
               rows = [x.strip() for x in rows]
               for idx, line in enumerate(rows):
                   if line.startswith("#EXTINF:"):
                       seg = next((x for x in rows[idx+1:] if x and not x.startswith("#")), None)
                       if seg:
-                          return segment_ok(urljoin(child_url, seg))
+                          return segment_ok(urljoin(child_url, seg), req_headers)
               raise ValueError("media playlist has no segment")
 
           def audit(item):
-              row = dict(item, variants=0, playable_variants=0, result="unverified")
+              row = dict(item, variants=0, playable_variants=0, variant_errors=[], result="unverified")
               try:
-                  body = get_text(item["url"])
+                  req_headers = request_headers(item["url"])
+                  body = get_text(item["url"], req_headers)
                   rows = body.splitlines()
                   variants = []
                   for idx, line in enumerate(rows):
@@ -720,10 +747,10 @@ jobs:
                       raise ValueError("not a multi-variant master playlist")
                   for variant in variants:
                       try:
-                          if variant_playable(item["url"], variant):
+                          if variant_playable(item["url"], variant, req_headers):
                               row["playable_variants"] += 1
-                      except Exception:
-                          pass
+                      except Exception as error:
+                          row["variant_errors"].append(type(error).__name__ + ": " + str(error)[:160])
                   if row["playable_variants"] >= 2:
                       row["result"] = "adaptive_and_segments_playable"
                   else:
@@ -740,7 +767,7 @@ jobs:
           pathlib.Path("iran-domestic-adaptive-audit.json").write_text(
               json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
           for row in results:
-              print(f'{row["result"]}: {row["channel"]} | variants={row["variants"]} | playable={row["playable_variants"]}')
+              print(f'{row["result"]}: {row["channel"]} | variants={row["variants"]} | playable={row["playable_variants"]} | errors={row.get("variant_errors", [])[:2]}')
           failed = [x for x in results if x["result"] != "adaptive_and_segments_playable"]
           print(f"Verified {len(results)-len(failed)}/{len(results)} domestic channels: multi-quality master + at least two playable variant segments")
           if failed:
