@@ -579,6 +579,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
     }
 
     val trackSelector = remember { DefaultTrackSelector(context) }
+    // Keep the resolver's channel headers current; the player itself is remembered.
+    val selectedChannelState = rememberUpdatedState(selected)
     val player = remember {
         // Some Azerbaijani providers require a browser-like User-Agent and a
         // channel-site Referer. Apply these only to the matching hosts so
@@ -589,7 +591,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         val baseFactory = DefaultDataSource.Factory(context, httpFactory)
         val resolvingFactory = ResolvingDataSource.Factory(baseFactory) { dataSpec ->
             val host = dataSpec.uri.host?.lowercase().orEmpty()
-            val channelHeaders = selected?.httpHeaders.orEmpty()
+            val channelHeaders = selectedChannelState.value?.httpHeaders.orEmpty()
             val path = dataSpec.uri.path.orEmpty().lowercase()
             val referer = when {
                 host == "tvstream.az" || host.endsWith(".tvstream.az") -> "https://tvstream.az/"
