@@ -788,7 +788,7 @@ jobs:
                       "adaptive_variants":passing.get("adaptive_variants",0) if passing else 0}
           with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
               results=list(pool.map(audit,entries))
-          good=[x for x in results if x["status"]=="playable"]
+          good=[x for x in results if x["status"]!="unavailable_or_unverified"]
           adaptive=[x for x in good if x.get("adaptive_variants",0)>=2]
           report={"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
                   "total":len(results),"playable":len(good),
