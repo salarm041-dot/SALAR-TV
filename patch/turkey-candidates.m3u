@@ -68,3 +68,15 @@ http://live.atv.az/atv/live/playlist.m3u8
 https://operativmm.az/tvs/idman/stream4/stream.m3u8
 #EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",İdman TV Azerbaijan (AzTV official-domain candidate)
 https://live.aztv.az/hls/idmantv/index.m3u8
+
+#EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",CBC Sport Azerbaijan — mncdn candidate (reported geo-restricted)
+https://mn-nl.mncdn.com/cbcsports_live/cbcsports/playlist.m3u8
+
+#EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",CBC Sport Azerbaijan — official-domain HLS candidate
+https://live.cbcsport.az/hls/cbcsport/index.m3u8
+
+#EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",Kəpəz TV Azerbaijan — legacy HLS candidate
+http://85.132.78.122:8050/hls/stream/index.m3u8
+
+#EXTINF:-1 group-title="آذربایجان / نامزد جایگزین",Naxçıvan TV Azerbaijan — YodaCDN HLS candidate
+https://str2.yodacdn.net/ntv/video.m3u8
