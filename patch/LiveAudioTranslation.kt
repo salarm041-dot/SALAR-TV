@@ -15,6 +15,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Process
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -46,6 +47,7 @@ import java.util.Locale
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 @Composable
 internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTranslation: (String) -> Unit = {}) {
@@ -55,8 +57,14 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
     val identifier = remember { LanguageIdentification.getClient() }
     val queue = remember { LinkedBlockingQueue<ByteArray>(2) }
     val running = remember { AtomicBoolean(false) }
+    val droppedAudioChunks = remember { AtomicInteger(0) }
+    val translationGeneration = remember { AtomicInteger(0) }
+    val pendingTranslations = remember { ArrayDeque<String>() }
+    var translationInFlight by remember { mutableStateOf(false) }
+    var droppedAudioChunksUi by remember { mutableStateOf(0) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var ttsReady by remember { mutableStateOf(false) }
+    var ttsPending by remember { mutableStateOf(0) }
     var status by remember { mutableStateOf("مترجم چندزبانه آماده است.") }
     var translated by remember { mutableStateOf("") }
     var preparing by remember { mutableStateOf(false) }
@@ -78,12 +86,28 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
             }
         }
         tts = engine
-        onDispose { runCatching { engine.stop() }; runCatching { engine.shutdown() }; tts = null; ttsReady = false }
+        engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) = Unit
+            override fun onDone(utteranceId: String?) {
+                handler.post { ttsPending = (ttsPending - 1).coerceAtLeast(0) }
+            }
+            @Deprecated("Deprecated in Java")
+            override fun onError(utteranceId: String?) {
+                handler.post {
+                    ttsPending = (ttsPending - 1).coerceAtLeast(0)
+                    status = "موتور دوبله هنگام تولید صدا خطا داد."
+                }
+            }
+        })
+        onDispose { runCatching { engine.stop() }; runCatching { engine.shutdown() }; tts = null; ttsReady = false; ttsPending = 0 }
     }
 
     fun stopCapture() {
         running.set(false)
-        runCatching { tts?.stop() }
+        translationGeneration.incrementAndGet()
+        pendingTranslations.clear()
+        translationInFlight = false
+        runCatching { tts?.stop() }; ttsPending = 0
         val audio = recorder; recorder = null
         runCatching { audio?.stop() }; runCatching { audio?.release() }
         val screen = projection; projection = null
@@ -99,39 +123,113 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
         }, "SalarTvWhisperCleanup").apply { isDaemon = true; start() }
     }
 
-    fun translateText(text: String) {
-        val clean = text.trim().replace(Regex("\\s+"), " ")
-        if (clean.length < 2) return
+    // Keep speech synthesis in one place so already-Persian broadcasts are dubbed too.
+    fun speakPersian(text: String) {
+        if (!prefs.getBoolean("live_dubbing_enabled", true) || text.isBlank()) return
+        val engine = tts
+        if (!ttsReady || engine == null) {
+            status = "زیرنویس فارسی آماده شد؛ موتور گفتار فارسی گوشی در دسترس نیست."
+            return
+        }
+        val preset = prefs.getString("live_dubbing_voice", "زیر")
+        engine.setPitch(if (preset == "بم" || preset == "مرد") 0.88f else 1.08f)
+        val params = Bundle().apply {
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f))
+        }
+        // Keep a short bounded speech backlog. An unlimited QUEUE_ADD would make
+        // translated dubbing drift farther behind live video when ASR is slower.
+        if (ttsPending >= 3) {
+            engine.stop()
+            ttsPending = 0
+            status = "برای همگام‌ماندن دوبله با پخش زنده، گفتار عقب‌افتاده حذف شد."
+        }
+        val result = engine.speak(text, TextToSpeech.QUEUE_ADD, params, "salar-live-" + System.currentTimeMillis())
+        if (result == TextToSpeech.ERROR) status = "تولید صدای دوبله ناموفق بود؛ موتور گفتار گوشی را بررسی کنید."
+        else ttsPending += 1
+    }
+
+    fun processNextTranslation() {
+        if (translationInFlight || pendingTranslations.isEmpty()) return
+        val clean = pendingTranslations.removeFirst()
+        val generation = translationGeneration.get()
+        translationInFlight = true
+        fun finish() {
+            if (generation == translationGeneration.get()) {
+                translationInFlight = false
+                processNextTranslation()
+            }
+        }
         identifier.identifyLanguage(clean.take(200)).addOnSuccessListener { tag ->
-            if (tag == "und") { status = "زبان گفتار با اطمینان کافی تشخیص داده نشد."; return@addOnSuccessListener }
+            if (generation != translationGeneration.get()) return@addOnSuccessListener
+            if (tag == "und") {
+                status = "زبان گفتار با اطمینان کافی تشخیص داده نشد."
+                finish()
+                return@addOnSuccessListener
+            }
             val source = TranslateLanguage.fromLanguageTag(tag)
-            if (source == null) { status = "زبان " + tag + " تشخیص داده شد، اما ترجمه آن پشتیبانی نمی‌شود."; return@addOnSuccessListener }
+            if (source == null) {
+                status = "زبان " + tag + " تشخیص داده شد، اما ترجمه آن پشتیبانی نمی‌شود."
+                finish()
+                return@addOnSuccessListener
+            }
             if (source == TranslateLanguage.PERSIAN) {
-                translated = clean; onTranslation(clean); status = "گفتار فارسی تشخیص داده شد."
+                translated = clean
+                onTranslation(clean)
+                status = "گفتار فارسی تشخیص داده شد."
+                speakPersian(clean)
+                finish()
                 return@addOnSuccessListener
             }
             status = "زبان گفتار: " + tag + "؛ در حال ترجمه فارسی…"
             val translator = Translation.getClient(TranslatorOptions.Builder()
                 .setSourceLanguage(source).setTargetLanguage(TranslateLanguage.PERSIAN).build())
             translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).addOnSuccessListener {
-                translator.translate(clean).addOnSuccessListener { result ->
-                    translated = result; onTranslation(result)
-                    if (prefs.getBoolean("live_dubbing_enabled", true)) {
-                        val engine = tts
-                        if (ttsReady && engine != null && result.isNotBlank()) {
-                            val preset = prefs.getString("live_dubbing_voice", "زیر")
-                            engine.setPitch(if (preset == "بم" || preset == "مرد") 0.88f else 1.08f)
-                            val params = Bundle().apply {
-                                putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f))
-                            }
-                            engine.speak(result, TextToSpeech.QUEUE_FLUSH, params, "salar-live-" + System.currentTimeMillis())
-                        } else if (!ttsReady) status = "زیرنویس آماده شد؛ صدای فارسی در موتور گفتار گوشی موجود نیست."
-                    }
-                    status = "ترجمه فارسی زنده فعال است؛ زبان تشخیص‌داده‌شده: " + tag
+                if (generation != translationGeneration.get()) {
                     translator.close()
-                }.addOnFailureListener { translator.close(); status = "ترجمه ناموفق بود: " + (it.localizedMessage ?: "خطا") }
-            }.addOnFailureListener { translator.close(); status = "دریافت مدل ترجمه ناموفق بود؛ اینترنت را بررسی کنید." }
-        }.addOnFailureListener { status = "تشخیص زبان ناموفق بود: " + (it.localizedMessage ?: "خطا") }
+                    return@addOnSuccessListener
+                }
+                translator.translate(clean).addOnSuccessListener { result ->
+                    translator.close()
+                    if (generation == translationGeneration.get()) {
+                        translated = result
+                        onTranslation(result)
+                        status = "ترجمه فارسی زنده فعال است؛ زبان تشخیص‌داده‌شده: " + tag
+                        speakPersian(result)
+                        finish()
+                    }
+                }.addOnFailureListener {
+                    translator.close()
+                    if (generation == translationGeneration.get()) {
+                        status = "ترجمه ناموفق بود: " + (it.localizedMessage ?: "خطا")
+                        finish()
+                    }
+                }
+            }.addOnFailureListener {
+                translator.close()
+                if (generation == translationGeneration.get()) {
+                    status = "دریافت مدل ترجمه ناموفق بود؛ اینترنت را بررسی کنید."
+                    finish()
+                }
+            }
+        }.addOnFailureListener {
+            if (generation == translationGeneration.get()) {
+                status = "تشخیص زبان ناموفق بود: " + (it.localizedMessage ?: "خطا")
+                finish()
+            }
+        }
+    }
+
+    fun translateText(text: String) {
+        val clean = text.trim().replace(Regex("\\s+"), " ")
+        if (clean.length < 2) return
+        // ML Kit callbacks are asynchronous. Serialize chunks so a slower earlier
+        // translation can never be overtaken by a later sentence.
+        if (pendingTranslations.size >= 3) {
+            pendingTranslations.removeFirst()
+            status = "صف ترجمه عقب افتاد؛ قدیمی‌ترین جمله حذف شد تا زیرنویس از پخش خیلی عقب نماند."
+        }
+        pendingTranslations.addLast(clean)
+        processNextTranslation()
     }
 
     val projectionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -152,7 +250,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
                     .setBufferSizeInBytes(minBuffer.coerceAtLeast(8192) * 2).setAudioPlaybackCaptureConfig(config).build()
                 if (audio.state != AudioRecord.STATE_INITIALIZED) { audio.release(); error("راه‌اندازی دریافت صدای داخلی ناموفق بود.") }
                 val activeModel = model ?: error("مدل چندزبانه بارگذاری نشده است.")
-                queue.clear(); running.set(true); audio.startRecording()
+                queue.clear(); droppedAudioChunks.set(0); droppedAudioChunksUi = 0; running.set(true); audio.startRecording()
                 if (audio.recordingState != AudioRecord.RECORDSTATE_RECORDING) { audio.release(); error("ضبط صدای خروجی شروع نشد.") }
                 recorder = audio; active = true; status = "در حال شنیدن صدای شبکه و تشخیص خودکار زبان…"
 
@@ -165,7 +263,15 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
                                 chunk.write(buffer, 0, count)
                                 if (chunk.size() >= required) {
                                     val bytes = chunk.toByteArray(); chunk.reset()
-                                    if (!queue.offer(bytes)) { queue.poll(); queue.offer(bytes) }
+                                    if (!queue.offer(bytes)) {
+                                        // Prefer recent live audio over stale backlog, but expose every gap.
+                                        queue.poll()
+                                        queue.offer(bytes)
+                                        val dropped = droppedAudioChunks.incrementAndGet()
+                                        if (dropped == 1 || dropped % 3 == 0) {
+                                            handler.post { droppedAudioChunksUi = dropped }
+                                        }
+                                    }
                                 }
                             } else if (count < 0 && running.get()) error("خواندن صدای پخش با کد " + count + " متوقف شد.")
                         }
@@ -257,6 +363,10 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
         }
         if (translated.isNotBlank()) Text(translated, color = Color.White, fontSize = 13.sp)
         Text(status, color = Color(0xFFE0E0E0), fontSize = 10.sp)
+        if (droppedAudioChunksUi > 0) {
+            Text("هشدار: به‌دلیل کندی تشخیص، " + droppedAudioChunksUi + " قطعه صوتی جا افتاده است؛ ممکن است بخشی از گفتار زیرنویس نشود.",
+                color = Color(0xFFFF8A65), fontSize = 10.sp)
+        }
         Text("ترجمه از صدای گفتار ساخته می‌شود، نه زیرنویس شبکه. بعضی منابع اجازه ضبط صدای داخلی نمی‌دهند. دوبله به وجود صدای فارسی در گوشی وابسته است.",
             color = Color(0xFFFFCC80), fontSize = 9.sp)
     }

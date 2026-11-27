@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - feature/multiview-card-controls
 
 permissions:
   contents: write

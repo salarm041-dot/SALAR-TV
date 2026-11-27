@@ -68,6 +68,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -101,6 +102,17 @@ private const val REMOTE_TV_PLAYLIST = "https://raw.githubusercontent.com/salarm
 private const val REMOTE_RADIO_PLAYLIST = "https://raw.githubusercontent.com/salarm041-dot/SALAR-TV/main/patch/radio-candidates.m3u"
 private const val REMOTE_TELEWEBION_AUTH_PLAYLIST = "https://raw.githubusercontent.com/kgkaku/IRIB-Live-Channels-Playlist/main/irib-extvlcopt.m3u"
 // Per-channel Telewebion auth headers are refreshed from the public VLC-compatible playlist.
+
+private fun navigationLabel(persian: String, language: String): String {
+    val labels = mapOf(
+        "خانه" to mapOf("en" to "Home", "ar" to "الرئيسية", "tr" to "Ana sayfa", "ku" to "ماڵەوە"),
+        "تلویزیون" to mapOf("en" to "TV", "ar" to "التلفزيون", "tr" to "Televizyon", "ku" to "تەلەفزیۆن"),
+        "رادیو" to mapOf("en" to "Radio", "ar" to "الراديو", "tr" to "Radyo", "ku" to "ڕادیۆ"),
+        "علاقه‌مندی‌ها" to mapOf("en" to "Favorites", "ar" to "المفضلة", "tr" to "Favoriler", "ku" to "دڵخوازەکان"),
+        "بیشتر" to mapOf("en" to "More", "ar" to "المزيد", "tr" to "Daha fazla", "ku" to "زیاتر")
+    )
+    return labels[persian]?.get(language) ?: persian
+}
 
 data class Channel(
     val name: String,
@@ -181,16 +193,25 @@ private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
         }
     }
     if (showSplash) {
-        val pulse = rememberInfiniteTransition(label = "salarSplash")
-            .animateFloat(
-                initialValue = 0.96f,
-                targetValue = 1.04f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1050),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "logoPulse"
-            )
+        val splashMotion = rememberInfiniteTransition(label = "salarSplash")
+        val pulse = splashMotion.animateFloat(
+            initialValue = 0.86f,
+            targetValue = 1.12f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 780),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "logoPulse"
+        )
+        val tilt = splashMotion.animateFloat(
+            initialValue = -5f,
+            targetValue = 5f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1500),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "logoTilt"
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -211,6 +232,7 @@ private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
                         .graphicsLayer {
                             scaleX = pulse.value
                             scaleY = pulse.value
+                            rotationZ = tilt.value
                         }
                 )
                 Spacer(modifier = Modifier.height(22.dp))
@@ -398,6 +420,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
     var rememberPlayerChoice by remember { mutableStateOf(false) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
     var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "dark") ?: "dark") }
+    var appLanguage by remember { mutableStateOf(prefs.getString("app_language", "fa") ?: "fa") }
     var liveDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
     var keepOriginalAudio by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
     DisposableEffect(prefs) {
@@ -421,6 +444,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
         "ruby" -> listOf(Color(0xFFFF718B), Color(0xFF200D15), Color(0xFF351923), Color(0xFFFFF0F2), Color(0xFFE6BEC6), Color(0xFFAD8992))
         "sunset" -> listOf(Color(0xFFFFA45B), Color(0xFF21130D), Color(0xFF382216), Color(0xFFFFF4E9), Color(0xFFE7CBB2), Color(0xFFB3957C))
         "graphite" -> listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832), Color(0xFFF1F5F9), Color(0xFFC4CDD7), Color(0xFF8D99A8))
+        "rainbow" -> listOf(Color(0xFF64D8FF), Color(0xFF090D18), Color(0xFF151B2B), Color(0xFFF5F7FF), Color(0xFFC8D1E8), Color(0xFF8995B5))
         "light" -> listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
         "system" -> if (systemDark) listOf(Color(0xFFD6AD62), Color(0xFF0B0D13), Color(0xFF171B26), Color(0xFFF5F1E8), Color.LightGray, Color.Gray)
                     else listOf(Color(0xFF9A6818), Color(0xFFF5F3EE), Color(0xFFFFFFFF), Color(0xFF20232A), Color(0xFF555B66), Color(0xFF707782))
@@ -633,6 +657,14 @@ fun SalarTvApp(isInPip: Boolean = false) {
             }
         }
         ExoPlayer.Builder(context)
+            // Explicit MEDIA usage is required for reliable Android playback-capture matching.
+            .setAudioAttributes(
+                androidx.media3.common.AudioAttributes.Builder()
+                    .setUsage(C.USAGE_MEDIA)
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .build(),
+                true
+            )
             .setTrackSelector(trackSelector)
             .setMediaSourceFactory(DefaultMediaSourceFactory(resolvingFactory))
             // Keep a useful reserve of media data for brief drops in bandwidth.
@@ -790,11 +822,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         listOf("خانه" to Icons.Default.Home, "تلویزیون" to Icons.Default.Tv,
                             "رادیو" to Icons.Default.Radio, "علاقه‌مندی‌ها" to Icons.Default.Favorite,
                             "بیشتر" to Icons.Default.MoreHoriz).forEach { (label, icon) ->
+                            val shownLabel = navigationLabel(label, appLanguage)
                             NavigationBarItem(
                                 selected = page == label,
                                 onClick = { page = label },
-                                icon = { Icon(icon, label) },
-                                label = { Text(label, fontSize = 10.sp) },
+                                icon = { Icon(icon, shownLabel) },
+                                label = { Text(shownLabel, fontSize = 10.sp) },
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor = Gold, selectedTextColor = Gold,
                                     indicatorColor = Color(0xFF343020), unselectedIconColor = MutedText
@@ -930,7 +963,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var playerLandscape by remember(selected!!.url) { mutableStateOf(false) }
                         var showLiveSpeechTranslation by remember { mutableStateOf(prefs.getBoolean("live_speech_translation_enabled", true)) }
                         var liveSpeechSubtitle by remember(selected!!.url) { mutableStateOf("") }
-                        var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(false) }
+                        var showSubtitleTranslation by remember(selected!!.url) { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showQualityDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var qualityChoices by remember(selected!!.url) { mutableStateOf(emptyList<VideoQualityChoice>()) }
@@ -964,7 +997,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 update = { view ->
                                     if (view.player !== player) view.player = player
                                     view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-                                    view.subtitleView?.visibility = android.view.View.INVISIBLE
+                                    view.subtitleView?.visibility = android.view.View.VISIBLE
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )
@@ -1142,6 +1175,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             }
                             PlayerTool(Icons.Default.Subtitles, "ترجمه زیرنویس", showSubtitleTranslation) {
                                 showSubtitleTranslation = !showSubtitleTranslation
+                                prefs.edit().putBoolean("live_subtitle_enabled", showSubtitleTranslation).apply()
                             }
                             PlayerTool(Icons.Default.RecordVoiceOver, "ترجمه گفتار", showLiveSpeechTranslation) {
                                 showLiveSpeechTranslation = !showLiveSpeechTranslation
@@ -1398,6 +1432,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                             Text("زیرنویس هوشمند فارسی", modifier = Modifier.weight(1f))
                                             Switch(checked = menuSubtitleEnabled, onCheckedChange = {
                                                 menuSubtitleEnabled = it
+                                                showSubtitleTranslation = it
                                                 prefs.edit().putBoolean("live_subtitle_enabled", it).apply()
                                             })
                                         }
@@ -1493,7 +1528,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onPilgrimage = { page = "زیارت آنلاین" },
                     )
                     "چندنمایی" -> MultiViewPage(
-                        channels = channels.filter { it.kind == "تلویزیون" && it.url !in lockedChannelUrls }
+                        channels = channels.filter { it.kind == "تلویزیون" && it.url !in lockedChannelUrls },
+                        themeMode = themeMode
                     )
                     "زیارت آنلاین" -> PilgrimagePage(
                         savedChannels = channels,
@@ -1506,6 +1542,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onWeakInternetModeChange = { enabled ->
                             weakInternetMode = enabled
                             prefs.edit().putBoolean("weak_internet_mode", enabled).apply()
+                        },
+                        appLanguage = appLanguage,
+                        onAppLanguageChange = { code ->
+                            appLanguage = code
+                            prefs.edit().putString("app_language", code).apply()
                         },
                         themeMode = themeMode,
                         onThemeModeChange = { mode ->
@@ -2734,7 +2775,7 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
 }
 
 @Composable
-fun MultiViewPage(channels: List<Channel>) {
+fun MultiViewPage(channels: List<Channel>, themeMode: String) {
     val context = LocalContext.current
     val activity = context as? Activity
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
@@ -2746,7 +2787,33 @@ fun MultiViewPage(channels: List<Channel>) {
             repeat(9) { index -> add(channels.getOrNull(index)) }
         }
     }
-    val players = remember { List(9) { ExoPlayer.Builder(context).build() } }
+    // The channel catalogue can arrive asynchronously after this screen is first composed.
+    // Fill only empty slots so late loading does not erase the user's existing selections.
+    LaunchedEffect(channels) {
+        for (index in 0 until 9) {
+            if (selectedChannels[index] == null) {
+                selectedChannels[index] = channels.getOrNull(index)
+            }
+        }
+    }
+    val players = remember {
+        List(9) {
+            ExoPlayer.Builder(context)
+                // Apply the same MEDIA usage as the primary player so Android's
+                // playback-capture path can also hear whichever multiview slot is audible.
+                .setAudioAttributes(
+                    androidx.media3.common.AudioAttributes.Builder()
+                        .setUsage(C.USAGE_MEDIA)
+                        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                        .build(),
+                    false
+                )
+                .build()
+        }
+    }
+    var audioMixMode by remember { mutableStateOf(false) }
+    var primaryAudioSlot by remember { mutableIntStateOf(0) }
+    val slotVolumes = remember { mutableStateListOf<Float>().apply { repeat(9) { add(1f) } } }
 
     DisposableEffect(activity, players) {
         val previousOrientation = activity?.requestedOrientation
@@ -2794,6 +2861,14 @@ fun MultiViewPage(channels: List<Channel>) {
                     selected = selectedChannels[fullScreenSlot],
                     onSelect = { selectedChannels[fullScreenSlot] = it },
                     player = players[fullScreenSlot],
+                    slotIndex = fullScreenSlot,
+                    rainbowTheme = themeMode == "rainbow",
+                    audioMixMode = audioMixMode,
+                    primaryAudioSlot = primaryAudioSlot,
+                    slotVolume = slotVolumes[fullScreenSlot],
+                    onVolumeChange = { slotVolumes[fullScreenSlot] = it },
+                    onChoosePrimaryAudio = { primaryAudioSlot = fullScreenSlot; audioMixMode = false },
+                    onEnableAudioMix = { audioMixMode = true },
                     onFullscreen = { fullScreenSlot = -1 },
                     modifier = Modifier.fillMaxSize(),
                     compact = false,
@@ -2827,6 +2902,14 @@ fun MultiViewPage(channels: List<Channel>) {
                                 selected = selectedChannels[slotIndex],
                                 onSelect = { selectedChannels[slotIndex] = it },
                                 player = players[slotIndex],
+                                slotIndex = slotIndex,
+                                rainbowTheme = themeMode == "rainbow",
+                                audioMixMode = audioMixMode,
+                                primaryAudioSlot = primaryAudioSlot,
+                                slotVolume = slotVolumes[slotIndex],
+                                onVolumeChange = { slotVolumes[slotIndex] = it },
+                                onChoosePrimaryAudio = { primaryAudioSlot = slotIndex; audioMixMode = false },
+                                onEnableAudioMix = { audioMixMode = true },
                                 onFullscreen = { fullScreenSlot = slotIndex },
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
                                 compact = layoutCount == 9
@@ -2846,13 +2929,25 @@ private fun MultiViewSlot(
     selected: Channel?,
     onSelect: (Channel?) -> Unit,
     player: ExoPlayer,
+    slotIndex: Int,
+    rainbowTheme: Boolean,
+    audioMixMode: Boolean,
+    primaryAudioSlot: Int,
+    slotVolume: Float,
+    onVolumeChange: (Float) -> Unit,
+    onChoosePrimaryAudio: () -> Unit,
+    onEnableAudioMix: () -> Unit,
     onFullscreen: () -> Unit,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
     fullScreen: Boolean = false
 ) {
     var showPicker by remember { mutableStateOf(false) }
+    var showCardMenu by remember { mutableStateOf(false) }
+    var showQualityMenu by remember { mutableStateOf(false) }
+    var isMuted by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    val context = LocalContext.current
     val filteredChannels = remember(channels, searchQuery) {
         channels.filter {
             it.name.contains(searchQuery.trim(), ignoreCase = true) ||
@@ -2864,7 +2959,9 @@ private fun MultiViewSlot(
         colors = CardDefaults.cardColors(containerColor = Panel),
         modifier = modifier,
         shape = RoundedCornerShape(if (fullScreen) 0.dp else if (compact) 7.dp else 12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.42f))
+        border = androidx.compose.foundation.BorderStroke(1.dp,
+            if (rainbowTheme && !fullScreen) listOf(Color(0xFFFF647C), Color(0xFFFFB45C), Color(0xFFFFE36E), Color(0xFF62D99B), Color(0xFF58C9FF), Color(0xFF9B83FF), Color(0xFFE783D5), Color(0xFF70D6D0), Color(0xFFB6C5FF))[slotIndex % 9].copy(alpha = 0.82f)
+            else Gold.copy(alpha = 0.42f))
     ) {
         Column(Modifier.fillMaxSize().padding(
             if (fullScreen) 0.dp else if (compact) 3.dp else 6.dp
@@ -2900,9 +2997,71 @@ private fun MultiViewSlot(
                     if (view.player !== player) view.player = player
                     view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
                 },
-                modifier = Modifier.fillMaxSize()
+                modifier = if (fullScreen) Modifier.fillMaxSize() else Modifier.weight(1f).fillMaxWidth()
             )
+            if (!fullScreen) {
+                Row(Modifier.fillMaxWidth().height(if (compact) 30.dp else 38.dp)
+                    .background(Panel, RoundedCornerShape(8.dp)).padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(if (audioMixMode) "میکس صدا" else if (primaryAudioSlot == slotIndex) "صدای اصلی" else "بی‌صدا",
+                        color = if (audioMixMode || primaryAudioSlot == slotIndex) Gold else SecondaryText,
+                        fontSize = if (compact) 8.sp else 10.sp, modifier = Modifier.weight(1f), maxLines = 1)
+                    IconButton(onClick = { showCardMenu = true }, modifier = Modifier.size(if (compact) 26.dp else 32.dp)) {
+                        Icon(Icons.Default.MoreVert, "امکانات شبکه", tint = Gold,
+                            modifier = Modifier.size(if (compact) 15.dp else 19.dp))
+                    }
+                    DropdownMenu(expanded = showCardMenu, onDismissRequest = { showCardMenu = false }) {
+                        DropdownMenuItem(text = { Text(if (isMuted) "وصل کردن صدای این شبکه" else "قطع صدای این شبکه") },
+                            leadingIcon = { Icon(if (isMuted) Icons.Default.VolumeUp else Icons.Default.VolumeOff, null) },
+                            onClick = { isMuted = !isMuted; showCardMenu = false })
+                        DropdownMenuItem(text = { Text("انتخاب به‌عنوان صدای اصلی") },
+                            leadingIcon = { Icon(Icons.Default.VolumeUp, null) },
+                            onClick = { onChoosePrimaryAudio(); isMuted = false; showCardMenu = false })
+                        DropdownMenuItem(text = { Text("ترکیب صدای چند شبکه") },
+                            leadingIcon = { Icon(Icons.Default.GraphicEq, null) },
+                            onClick = { onEnableAudioMix(); isMuted = false; showCardMenu = false })
+                        DropdownMenuItem(text = { Text("ضبط همین شبکه (۶۰ دقیقه)") },
+                            leadingIcon = { Icon(Icons.Default.FiberManualRecord, null, tint = Gold) },
+                            onClick = {
+                                val channel = selected; showCardMenu = false
+                                if (channel == null) android.widget.Toast.makeText(context, "ابتدا یک شبکه انتخاب کنید.", android.widget.Toast.LENGTH_SHORT).show()
+                                else runCatching {
+                                    val intent = Intent(context, HlsRecorderService::class.java)
+                                        .putExtra("name", channel.name).putExtra("url", channel.url).putExtra("duration", 60)
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent) else context.startService(intent)
+                                }.onFailure { android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: ${it.message}", android.widget.Toast.LENGTH_LONG).show() }
+                            })
+                        DropdownMenuItem(text = { Text("کیفیت پخش") },
+                            leadingIcon = { Icon(Icons.Default.HighQuality, null) },
+                            onClick = { showCardMenu = false; showQualityMenu = true })
+                    }
+                    if (audioMixMode) {
+                        Text("صدا", color = SecondaryText, fontSize = if (compact) 8.sp else 10.sp)
+                        Slider(value = slotVolume, onValueChange = onVolumeChange,
+                            modifier = Modifier.width(if (compact) 54.dp else 90.dp), valueRange = 0f..1f)
+                    }
+                }
+            }
         }
+    }
+    LaunchedEffect(audioMixMode, primaryAudioSlot, slotIndex, slotVolume, isMuted) {
+        player.volume = when { isMuted -> 0f; audioMixMode -> slotVolume; primaryAudioSlot == slotIndex -> slotVolume; else -> 0f }
+    }
+    if (showQualityMenu) {
+        AlertDialog(onDismissRequest = { showQualityMenu = false },
+            title = { Text("کیفیت پخش • ${selected?.name ?: title}") },
+            text = {
+                Column {
+                    listOf("خودکار" to Int.MAX_VALUE, "کم (حدود ۴۸۰p)" to 900_000,
+                        "متوسط (حدود ۷۲۰p)" to 2_000_000, "بالا (حدود ۱۰۸۰p)" to 5_000_000).forEach { (label, bitrate) ->
+                        TextButton(onClick = {
+                            runCatching { player.trackSelectionParameters = player.trackSelectionParameters.buildUpon().setMaxVideoBitrate(bitrate).build() }
+                            showQualityMenu = false
+                        }, modifier = Modifier.fillMaxWidth()) { Text(label, modifier = Modifier.fillMaxWidth()) }
+                    }
+                    Text("کیفیت‌های قابل انتخاب به نسخه‌های ارائه‌شده توسط منبع پخش بستگی دارد.", color = SecondaryText, fontSize = 11.sp)
+                }
+            }, confirmButton = { TextButton(onClick = { showQualityMenu = false }) { Text("بستن") } })
     }
     LaunchedEffect(selected?.url, selected?.httpHeaders) {
         if (selected == null) {
@@ -3187,12 +3346,43 @@ fun ChildLockPage(
 
 @Composable
 fun SettingsPage(weakInternetMode: Boolean, onWeakInternetModeChange: (Boolean) -> Unit,
+                 appLanguage: String, onAppLanguageChange: (String) -> Unit,
                  themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit,
                  fontScale: Float, onFontScaleChange: (Float) -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var confirmDelete by remember { mutableStateOf(prefs.getBoolean("confirm_before_delete", true)) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("زبان برنامه", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        val languageOptions = listOf(
+            "fa" to "فارسی", "en" to "English", "ar" to "العربية",
+            "tr" to "Türkçe", "ku" to "کوردی"
+        )
+        var languageMenuExpanded by remember { mutableStateOf(false) }
+        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
+            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("زبان دلخواه", color = TextMain, fontWeight = FontWeight.SemiBold)
+                Box {
+                    OutlinedButton(onClick = { languageMenuExpanded = true }, modifier = Modifier.fillMaxWidth()) {
+                        Text(languageOptions.firstOrNull { it.first == appLanguage }?.second ?: "فارسی",
+                            modifier = Modifier.weight(1f), color = TextMain)
+                        Icon(Icons.Default.ArrowDropDown, null, tint = Gold)
+                    }
+                    DropdownMenu(expanded = languageMenuExpanded, onDismissRequest = { languageMenuExpanded = false }) {
+                        languageOptions.forEach { (code, label) ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                leadingIcon = { if (appLanguage == code) Icon(Icons.Default.Check, null, tint = Gold) },
+                                onClick = { onAppLanguageChange(code); languageMenuExpanded = false }
+                            )
+                        }
+                    }
+                }
+                Text("انتخاب زبان ذخیره می‌شود. ترجمه کامل همه صفحه‌ها و چینش راست‌به‌چپ/چپ‌به‌راست باید در مرحله بومی‌سازی جداگانه تکمیل شود.",
+                    color = SecondaryText, fontSize = 10.sp)
+            }
+        }
+        Divider(color = Gold.copy(alpha = 0.3f))
         Text("اتصال اینترنت", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -3232,7 +3422,8 @@ fun SettingsPage(weakInternetMode: Boolean, onWeakInternetModeChange: (Boolean) 
             ThemeChoice("purple", "بنفش کهکشانی", listOf(Color(0xFFB99AFF), Color(0xFF130D22), Color(0xFF251936))),
             ThemeChoice("ruby", "یاقوتی", listOf(Color(0xFFFF718B), Color(0xFF200D15), Color(0xFF351923))),
             ThemeChoice("sunset", "غروب آفتاب", listOf(Color(0xFFFFA45B), Color(0xFF21130D), Color(0xFF382216))),
-            ThemeChoice("graphite", "گرافیتی", listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832)))
+            ThemeChoice("graphite", "گرافیتی", listOf(Color(0xFFB7C3D0), Color(0xFF101419), Color(0xFF202832))),
+            ThemeChoice("rainbow", "رنگین‌کمان", listOf(Color(0xFF64D8FF), Color(0xFF090D18), Color(0xFF151B2B)))
         )
         colorThemes.chunked(2).forEach { rowThemes ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
@@ -3252,7 +3443,7 @@ fun SettingsPage(weakInternetMode: Boolean, onWeakInternetModeChange: (Boolean) 
                                 }
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(choice.title, color = Color.White, fontSize = 12.sp,
+                                Text(choice.title, color = if (choice.id == "light") Color(0xFF20232A) else Color(0xFFF5F5F5), fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                                 if (themeMode == choice.id) Icon(Icons.Default.CheckCircle, null,
                                     tint = choice.colors[0], modifier = Modifier.size(18.dp))
