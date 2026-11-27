@@ -926,7 +926,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                     } else if (!useExternalPlayer) {
                         var playerMenuExpanded by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerFullscreen by remember(selected!!.url) { mutableStateOf(false) }
-                        var recordingActive by remember(selected!!.url) { mutableStateOf(false) }
+                        val recordingId = selected!!.url.hashCode()\n                        var recordingActive by remember(selected!!.url) { mutableStateOf(prefs.getStringSet("active_recording_ids", emptySet())?.contains(recordingId.toString()) == true) }
                         var playerLandscape by remember(selected!!.url) { mutableStateOf(false) }
                         var showLiveSpeechTranslation by remember { mutableStateOf(prefs.getBoolean("live_speech_translation_enabled", true)) }
                         var liveSpeechSubtitle by remember(selected!!.url) { mutableStateOf("") }
@@ -1017,22 +1017,32 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                             leadingIcon = { Icon(if (recordingActive) Icons.Default.Stop else Icons.Default.FiberManualRecord, null) },
                                             onClick = {
                                                 if (recordingActive) {
-                                                    context.stopService(Intent(context, HlsRecorderService::class.java))
-                                                    recordingActive = false
-                                                    android.widget.Toast.makeText(context, "درخواست توقف ضبط ارسال شد.", android.widget.Toast.LENGTH_SHORT).show()
-                                                } else {
-                                                    val recordIntent = Intent(context, HlsRecorderService::class.java).apply {
-                                                        putExtra("name", selected!!.name)
-                                                        putExtra("url", selected!!.url)
-                                                        putExtra("duration", 360)
+                                                    val stopIntent = Intent(context, HlsRecorderService::class.java).apply {
+                                                        action = HlsRecorderService.ACTION_STOP
+                                                        putExtra(HlsRecorderService.EXTRA_RECORDING_ID, recordingId)
                                                     }
-                                                    runCatching {
-                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(recordIntent)
-                                                        else context.startService(recordIntent)
-                                                        recordingActive = true
-                                                        android.widget.Toast.makeText(context, "ضبط شبکه آغاز شد.", android.widget.Toast.LENGTH_LONG).show()
-                                                    }.onFailure {
-                                                        android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطای سرویس"), android.widget.Toast.LENGTH_LONG).show()
+                                                    context.startService(stopIntent)
+                                                    recordingActive = false
+                                                    android.widget.Toast.makeText(context, "درخواست توقف ضبط همین شبکه ارسال شد.", android.widget.Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    val activeIds = prefs.getStringSet("active_recording_ids", emptySet()).orEmpty()
+                                                    if (activeIds.size >= HlsRecorderService.MAX_SIMULTANEOUS_RECORDINGS) {
+                                                        android.widget.Toast.makeText(context, "حداکثر دو شبکه را می‌توان هم‌زمان ضبط کرد.", android.widget.Toast.LENGTH_LONG).show()
+                                                    } else {
+                                                        val recordIntent = Intent(context, HlsRecorderService::class.java).apply {
+                                                            putExtra("name", selected!!.name)
+                                                            putExtra("url", selected!!.url)
+                                                            putExtra("duration", 360)
+                                                            putExtra(HlsRecorderService.EXTRA_RECORDING_ID, recordingId)
+                                                        }
+                                                        runCatching {
+                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(recordIntent)
+                                                            else context.startService(recordIntent)
+                                                            recordingActive = true
+                                                            android.widget.Toast.makeText(context, "ضبط شبکه آغاز شد.", android.widget.Toast.LENGTH_LONG).show()
+                                                        }.onFailure {
+                                                            android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطای سرویس"), android.widget.Toast.LENGTH_LONG).show()
+                                                        }
                                                     }
                                                 }
                                                 playerMenuExpanded = false
@@ -1243,20 +1253,30 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                                     leadingIcon = { Icon(if (recordingActive) Icons.Default.Stop else Icons.Default.FiberManualRecord, null) },
                                                     onClick = {
                                                         if (recordingActive) {
-                                                            context.stopService(Intent(context, HlsRecorderService::class.java))
+                                                            val stopIntent = Intent(context, HlsRecorderService::class.java).apply {
+                                                                action = HlsRecorderService.ACTION_STOP
+                                                                putExtra(HlsRecorderService.EXTRA_RECORDING_ID, recordingId)
+                                                            }
+                                                            context.startService(stopIntent)
                                                             recordingActive = false
                                                         } else {
-                                                            val intent = Intent(context, HlsRecorderService::class.java).apply {
-                                                                putExtra("name", selected!!.name)
-                                                                putExtra("url", selected!!.url)
-                                                                putExtra("duration", 360)
-                                                            }
-                                                            runCatching {
-                                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent)
-                                                                else context.startService(intent)
-                                                                recordingActive = true
-                                                            }.onFailure {
-                                                                android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطا"), android.widget.Toast.LENGTH_LONG).show()
+                                                            val activeIds = prefs.getStringSet("active_recording_ids", emptySet()).orEmpty()
+                                                            if (activeIds.size >= HlsRecorderService.MAX_SIMULTANEOUS_RECORDINGS) {
+                                                                android.widget.Toast.makeText(context, "حداکثر دو شبکه را می‌توان هم‌زمان ضبط کرد.", android.widget.Toast.LENGTH_LONG).show()
+                                                            } else {
+                                                                val intent = Intent(context, HlsRecorderService::class.java).apply {
+                                                                    putExtra("name", selected!!.name)
+                                                                    putExtra("url", selected!!.url)
+                                                                    putExtra("duration", 360)
+                                                                    putExtra(HlsRecorderService.EXTRA_RECORDING_ID, recordingId)
+                                                                }
+                                                                runCatching {
+                                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent)
+                                                                    else context.startService(intent)
+                                                                    recordingActive = true
+                                                                }.onFailure {
+                                                                    android.widget.Toast.makeText(context, "شروع ضبط ممکن نشد: " + (it.message ?: "خطا"), android.widget.Toast.LENGTH_LONG).show()
+                                                                }
                                                             }
                                                         }
                                                         playerMenuExpanded = false
