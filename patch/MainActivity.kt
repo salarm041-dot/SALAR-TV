@@ -2785,7 +2785,7 @@ fun MultiViewPage(channels: List<Channel>, themeMode: String) {
                         .setUsage(C.USAGE_MEDIA)
                         .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
                         .build(),
-                    true
+                    false
                 )
                 .build()
         }
