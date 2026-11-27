@@ -58,7 +58,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
     val running = remember { AtomicBoolean(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var ttsReady by remember { mutableStateOf(false) }
-    var ttsPending by remember { mutableIntStateOf(0) }
+    var ttsPending by remember { mutableStateOf(0) }
     var status by remember { mutableStateOf("مترجم چندزبانه آماده است.") }
     var translated by remember { mutableStateOf("") }
     var preparing by remember { mutableStateOf(false) }
@@ -98,7 +98,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
 
     fun stopCapture() {
         running.set(false)
-        runCatching { tts?.stop() }
+        runCatching { tts?.stop() }; ttsPending = 0
         val audio = recorder; recorder = null
         runCatching { audio?.stop() }; runCatching { audio?.release() }
         val screen = projection; projection = null
