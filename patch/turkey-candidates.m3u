@@ -1,0 +1,33 @@
+#EXTM3U
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Kanal D 720p alternate
+https://demiroren.daioncdn.net/kanald/kanald_720p.m3u8?app=kanald_web&ce=3
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Kanal D live alternate
+https://demiroren-live.daioncdn.net/kanald/kanald.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Star TV adaptive alternate
+https://dogus-live.daioncdn.net/startv/playlist.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",ATV HD alternate
+https://trkvz-live.ercdn.net/atvhd/atvhd_720p.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",ATV Daion alternate
+https://trkvz-live.daioncdn.net/atv/atv.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",ATV Turknet current fallback
+https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/atv/atv.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",NOW TV Turknet alternate
+https://uycyyuuzyh.turknet.ercdn.net/nphindgytw/nowtv/nowtv.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",NOW TV live alternate
+https://nowtv-live-ad.ercdn.net/nowtv/nowtv_720p.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",360 TV 1080p alternate
+https://turkmedya-live.ercdn.net/tv360/tv360_1080p.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",360 TV master alternate
+https://turkmedya-live.ercdn.net/tv360/tv360.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Kanal 7 Daion 720p
+https://kanal7-live.daioncdn.net/kanal7/kanal7_720p.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Kanal 7 Daion master
+https://kanal7-live.daioncdn.net/kanal7/kanal7.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Kanal 7 official live
+https://live.kanal7.com/live/kanal7LiveDesktop/index.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Show TV Ciner live
+https://ciner-live.daioncdn.net/showtv/showtv.m3u8
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Show TV Daion live
+https://ciner.daioncdn.net/showtv/showtv.m3u8?app=showtv_web
+#EXTINF:-1 group-title="ترکیه / نامزد جایگزین",Show TV Ciner
+https://ciner.daioncdn.net/showtv/showtv.m3u8?ce=3&app=4bc856ef-4c68-4a94-bc87-37dfaaa66558
