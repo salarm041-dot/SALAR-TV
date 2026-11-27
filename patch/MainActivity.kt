@@ -193,16 +193,25 @@ private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
         }
     }
     if (showSplash) {
-        val pulse = rememberInfiniteTransition(label = "salarSplash")
-            .animateFloat(
-                initialValue = 0.96f,
-                targetValue = 1.04f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1050),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "logoPulse"
-            )
+        val splashMotion = rememberInfiniteTransition(label = "salarSplash")
+        val pulse = splashMotion.animateFloat(
+            initialValue = 0.86f,
+            targetValue = 1.12f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 780),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "logoPulse"
+        )
+        val tilt = splashMotion.animateFloat(
+            initialValue = -5f,
+            targetValue = 5f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1500),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "logoTilt"
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -223,6 +232,7 @@ private fun SalarTvLaunch(isInPip: Boolean, content: @Composable () -> Unit) {
                         .graphicsLayer {
                             scaleX = pulse.value
                             scaleY = pulse.value
+                            rotationZ = tilt.value
                         }
                 )
                 Spacer(modifier = Modifier.height(22.dp))
