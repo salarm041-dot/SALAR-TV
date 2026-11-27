@@ -3419,6 +3419,7 @@ private fun parseM3u(text: String): List<Channel> {
     var kind = "تلویزیون"
     var logoUrl = ""
     var groupTitle = ""
+    var vpnRequired = false
     text.lineSequence().forEach { raw ->
         val line = raw.trim()
         if (line.startsWith("#EXTINF", true)) {
@@ -3430,7 +3431,7 @@ private fun parseM3u(text: String): List<Channel> {
                 .find(line)?.groupValues?.getOrNull(1).orEmpty()
             val group = groupTitle.lowercase()
             val meta = "$lower $group"
-            val vpnRequired = Regex("""vpn-required\s*=\s*["']?(true|1|yes)["']?""", RegexOption.IGNORE_CASE)
+            vpnRequired = Regex("""vpn-required\s*=\s*["']?(true|1|yes)["']?""", RegexOption.IGNORE_CASE)
                 .containsMatchIn(line)
             country = when {
                 "زبان کردی" in group -> "زبان کردی"
@@ -3475,7 +3476,7 @@ private fun parseM3u(text: String): List<Channel> {
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
             result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle,
                 vpnRequired = vpnRequired))
-            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""
+            title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""; vpnRequired = false
         }
     }
     return result.distinctBy { it.url }
