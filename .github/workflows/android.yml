@@ -593,7 +593,7 @@ jobs:
                   return r.status, r.geturl(), r.headers.get("Content-Type",""), data
 
           def audit(x):
-              out={**x,"manifest_ok":False,"adaptive":False,"variants":[],"segment_ok":False}
+              out={**x,"manifest_ok":False,"adaptive":False,"adaptive_playable":False,"variants":[],"segment_ok":False,"playable_variants":0}
               try:
                   status,base,ctype,data=fetch(x["url"])
                   body=data.decode("utf-8","replace")
@@ -607,8 +607,10 @@ jobs:
                           if uri:
                               m=re.search(r"RESOLUTION=(\d+x\d+)",line)
                               variants.append({"resolution":m.group(1) if m else "unspecified","url":urljoin(base,uri)})
-                  out["adaptive"]=len(variants)>0
-                  targets=variants[:4] if variants else [{"resolution":"single-rendition","url":base}]
+                  # A single variant is NOT multi-quality. Require at least two distinct renditions.
+                  distinct={v["resolution"] for v in variants}
+                  out["adaptive"]=len(distinct)>=2
+                  targets=variants[:8] if variants else [{"resolution":"single-rendition","url":base}]
                   for v in targets:
                       try:
                           st,vbase,_,vb=fetch(v["url"])
@@ -622,21 +624,23 @@ jobs:
                               with urllib.request.urlopen(req,timeout=18) as sr:
                                   chunk=sr.read(2048); seg_ok=sr.status in (200,206) and len(chunk)>0
                           out["variants"].append({"resolution":v["resolution"],"manifest_ok":True,"segment_ok":seg_ok})
-                          out["segment_ok"]=out["segment_ok"] or seg_ok
+                          if seg_ok: out["playable_variants"]+=1
                       except Exception as e:
                           out["variants"].append({"resolution":v["resolution"],"manifest_ok":False,"segment_ok":False,"error":type(e).__name__+": "+str(e)[:120]})
+                  out["segment_ok"]=out["playable_variants"]>0
                   out["playable_segment_verified"]=out["segment_ok"]
+                  out["adaptive_playable"]=out["adaptive"] and out["playable_variants"]>=2
               except Exception as e:
                   out["error"]=type(e).__name__+": "+str(e)[:180]
               return out
 
           with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool: results=list(pool.map(audit,items))
           passed=sum(1 for x in results if x.get("playable_segment_verified"))
-          adaptive=sum(1 for x in results if x.get("adaptive"))
+          adaptive=sum(1 for x in results if x.get("adaptive_playable"))
           report={"checked_at_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"total":len(results),"manifest_ok":sum(1 for x in results if x["manifest_ok"]),"adaptive_master_playlists":adaptive,"with_verified_media_segment":passed,"results":results}
           pathlib.Path("turkey-azerbaijan-adaptive-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
           print(f"TR/AZ/FILM audit: {report['manifest_ok']}/{len(results)} manifests; {adaptive} adaptive masters; {passed} with at least one real media segment")
-          for x in results: print(("PLAYABLE " if x.get("playable_segment_verified") else "CHECK   ")+x["name"]+" | "+x["group"]+" | adaptive="+str(x["adaptive"])+" | "+x["url"])
+          for x in results: print(("PLAYABLE " if x.get("playable_segment_verified") else "CHECK   ")+x["name"]+" | "+x["group"]+" | adaptive_playable="+str(x.get("adaptive_playable",False))+" | playable_variants="+str(x.get("playable_variants",0))+" | "+x["url"])
           PY
 
       - name: Upload Turkey Azerbaijan and film-series adaptive audit
