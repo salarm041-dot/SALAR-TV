@@ -102,7 +102,8 @@ data class Channel(
     val kind: String = "تلویزیون",
     val favorite: Boolean = false,
     val logoUrl: String = "",
-    val groupTitle: String = ""
+    val groupTitle: String = "",
+    val vpnRequired: Boolean = false
 )
 
 data class SubtitleChoice(val groupIndex: Int, val trackIndex: Int, val label: String)
@@ -246,7 +247,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
                     add(Channel(o.optString("name"), o.optString("url"), o.optString("country"),
-                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle")))
+                        o.optString("kind"), o.optBoolean("favorite"), o.optString("logoUrl"), o.optString("groupTitle"),
+                        o.optBoolean("vpnRequired", false)))
                 }
             }
         }
@@ -256,7 +258,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
         channels.forEach { c ->
             arr.put(JSONObject().put("name", c.name).put("url", c.url)
                 .put("country", c.country).put("kind", c.kind).put("favorite", c.favorite)
-                .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle))
+                .put("logoUrl", c.logoUrl).put("groupTitle", c.groupTitle)
+                .put("vpnRequired", c.vpnRequired))
         }
         prefs.edit().putString("channels", arr.toString()).apply()
     }
@@ -482,7 +485,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         country = latest.country,
                                         logoUrl = latest.logoUrl,
                                         groupTitle = latest.groupTitle,
-                                        favorite = current.favorite
+                                        favorite = current.favorite,
+                                        vpnRequired = latest.vpnRequired
                                     )
                                     updated++
                                 }
@@ -2145,6 +2149,23 @@ private fun ChannelLogo(logoUrl: String, kind: String, size: androidx.compose.ui
 }
 
 @Composable
+private fun VpnBadge() {
+    Surface(
+        color = Color(0xFF3A2D1A),
+        shape = RoundedCornerShape(5.dp),
+        modifier = Modifier.padding(start = 5.dp)
+    ) {
+        Text(
+            "VPN",
+            color = Color(0xFFFFD27A),
+            fontSize = 8.sp,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+        )
+    }
+}
+
+@Composable
 fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite: (Channel) -> Unit,
                 onEdit: (Channel) -> Unit = {}, onDelete: (Channel) -> Unit = {},
                 onRefresh: (() -> Unit)? = null, isRefreshing: Boolean = false, lastRefresh: String = "",
@@ -2237,14 +2258,21 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                                         verticalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         ChannelLogo(c.logoUrl, c.kind, size = 86.dp)
-                                        Text(
-                                            c.name,
-                                            color = TextMain,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp,
-                                            maxLines = 2,
-                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.Center,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                c.name,
+                                                color = TextMain,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp,
+                                                maxLines = 2,
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                                modifier = Modifier.weight(1f, fill = false)
+                                            )
+                                            if (c.vpnRequired) VpnBadge()
+                                        }
                                         Row(
                                             Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -2273,7 +2301,11 @@ fun ChannelList(channels: List<Channel>, onSelect: (Channel) -> Unit, onFavorite
                                         ChannelLogo(c.logoUrl, c.kind)
                                         Spacer(Modifier.width(12.dp))
                                         Column(Modifier.weight(1f)) {
-                                            Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold)
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(c.name, color = TextMain, fontWeight = FontWeight.SemiBold,
+                                                    modifier = Modifier.weight(1f))
+                                                if (c.vpnRequired) VpnBadge()
+                                            }
                                             Text("${c.country} • ${c.kind}", color = MutedText, fontSize = 11.sp)
                                         }
                                         IconButton(onClick = { onFavorite(c) }) {
@@ -2303,6 +2335,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
     var password by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("ایران") }
     var kind by remember { mutableStateOf("تلویزیون") }
+    var vpnRequired by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -2317,6 +2350,13 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
             "url" -> {
                 OutlinedTextField(name, { name = it }, label = { Text("نام شبکه / ایستگاه") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                 OutlinedTextField(url, { url = it }, label = { Text("آدرس مستقیم پخش") }, placeholder = { Text("https://example.com/live.m3u8") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true)
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("این لینک به VPN نیاز دارد", color = TextMain, fontSize = 13.sp)
+                        Text("فقط اگر نیاز آن را آزمایش و تأیید کرده‌اید فعال کنید.", color = MutedText, fontSize = 10.sp)
+                    }
+                    Switch(checked = vpnRequired, onCheckedChange = { vpnRequired = it })
+                }
                 Button(enabled = !busy, onClick = {
                     val clean = url.trim()
                     if (!(clean.startsWith("https://") || clean.startsWith("http://"))) status = "آدرس معتبر http/https را وارد کنید."
@@ -2335,7 +2375,7 @@ fun AddSourcesPage(selectedM3uName: String, onAdd: (Channel) -> Unit, onImport: 
                             busy = false
                         }
                     } else if (name.isNotBlank()) {
-                        onAdd(Channel(name.trim(), clean, country, kind)); name = ""; url = ""; status = "لینک شبکه ذخیره شد."
+                        onAdd(Channel(name.trim(), clean, country, kind, vpnRequired = vpnRequired)); name = ""; url = ""; vpnRequired = false; status = "لینک شبکه ذخیره شد."
                     } else status = "برای لینک پخش مستقیم، نام شبکه را وارد کنید."
                 }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Gold)) { Text(if (busy) "در حال دریافت…" else "ذخیره لینک / دریافت فهرست", color = Color.Black) }
             }
@@ -3390,6 +3430,8 @@ private fun parseM3u(text: String): List<Channel> {
                 .find(line)?.groupValues?.getOrNull(1).orEmpty()
             val group = groupTitle.lowercase()
             val meta = "$lower $group"
+            val vpnRequired = Regex("""vpn-required\s*=\s*["']?(true|1|yes)["']?""", RegexOption.IGNORE_CASE)
+                .containsMatchIn(line)
             country = when {
                 "زبان کردی" in group -> "زبان کردی"
                 "زبان روسی" in group -> "زبان روسی"
@@ -3431,7 +3473,8 @@ private fun parseM3u(text: String): List<Channel> {
             }
             kind = if ("radio" in meta || "رادیو" in meta) "رادیو" else "تلویزیون"
         } else if (line.startsWith("http://") || line.startsWith("https://")) {
-            result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle))
+            result.add(Channel(title, line, country, kind, logoUrl = logoUrl, groupTitle = groupTitle,
+                vpnRequired = vpnRequired))
             title = "شبکه بدون نام"; country = "سایر"; kind = "تلویزیون"; logoUrl = ""; groupTitle = ""
         }
     }
