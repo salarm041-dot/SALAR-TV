@@ -68,6 +68,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -646,6 +647,14 @@ fun SalarTvApp(isInPip: Boolean = false) {
             }
         }
         ExoPlayer.Builder(context)
+            // Explicit MEDIA usage is required for reliable Android playback-capture matching.
+            .setAudioAttributes(
+                androidx.media3.common.AudioAttributes.Builder()
+                    .setUsage(C.USAGE_MEDIA)
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .build(),
+                true
+            )
             .setTrackSelector(trackSelector)
             .setMediaSourceFactory(DefaultMediaSourceFactory(resolvingFactory))
             // Keep a useful reserve of media data for brief drops in bandwidth.
