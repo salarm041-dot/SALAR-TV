@@ -1436,7 +1436,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                             }
                         }
                     }
-                    LaunchedEffect(selected!!.url, useExternalPlayer, selected!!.kind) {
+                    LaunchedEffect(selected!!.url, selected!!.httpHeaders, useExternalPlayer, selected!!.kind) {
                         val streamAddress = selected!!.url
                         val officialWebPage = streamAddress.contains("ott.iranintl.com", ignoreCase = true) ||
                             streamAddress.contains("iranintl.com/live", ignoreCase = true)
