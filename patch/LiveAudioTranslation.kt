@@ -15,6 +15,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Process
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -57,6 +58,7 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
     val running = remember { AtomicBoolean(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var ttsReady by remember { mutableStateOf(false) }
+    var ttsPending by remember { mutableIntStateOf(0) }
     var status by remember { mutableStateOf("مترجم چندزبانه آماده است.") }
     var translated by remember { mutableStateOf("") }
     var preparing by remember { mutableStateOf(false) }
@@ -78,7 +80,20 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
             }
         }
         tts = engine
-        onDispose { runCatching { engine.stop() }; runCatching { engine.shutdown() }; tts = null; ttsReady = false }
+        engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) = Unit
+            override fun onDone(utteranceId: String?) {
+                handler.post { ttsPending = (ttsPending - 1).coerceAtLeast(0) }
+            }
+            @Deprecated("Deprecated in Java")
+            override fun onError(utteranceId: String?) {
+                handler.post {
+                    ttsPending = (ttsPending - 1).coerceAtLeast(0)
+                    status = "موتور دوبله هنگام تولید صدا خطا داد."
+                }
+            }
+        })
+        onDispose { runCatching { engine.stop() }; runCatching { engine.shutdown() }; tts = null; ttsReady = false; ttsPending = 0 }
     }
 
     fun stopCapture() {
@@ -112,9 +127,16 @@ internal fun LiveAudioTranslationOverlay(modifier: Modifier = Modifier, onTransl
         val params = Bundle().apply {
             putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, prefs.getFloat("live_dubbing_volume", 1f).coerceIn(0f, 1f))
         }
-        // QUEUE_ADD prevents every newly recognized chunk from cutting off the previous sentence.
+        // Keep a short bounded speech backlog. An unlimited QUEUE_ADD would make
+        // translated dubbing drift farther behind live video when ASR is slower.
+        if (ttsPending >= 3) {
+            engine.stop()
+            ttsPending = 0
+            status = "برای همگام‌ماندن دوبله با پخش زنده، گفتار عقب‌افتاده حذف شد."
+        }
         val result = engine.speak(text, TextToSpeech.QUEUE_ADD, params, "salar-live-" + System.currentTimeMillis())
         if (result == TextToSpeech.ERROR) status = "تولید صدای دوبله ناموفق بود؛ موتور گفتار گوشی را بررسی کنید."
+        else ttsPending += 1
     }
 
     fun translateText(text: String) {
