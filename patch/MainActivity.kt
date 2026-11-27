@@ -1494,7 +1494,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onPilgrimage = { page = "زیارت آنلاین" },
                     )
                     "چندنمایی" -> MultiViewPage(
-                        channels = channels.filter { it.kind == "تلویزیون" && it.url !in lockedChannelUrls }
+                        channels = channels.filter { it.kind == "تلویزیون" && it.url !in lockedChannelUrls },
+                        themeMode = themeMode
                     )
                     "زیارت آنلاین" -> PilgrimagePage(
                         savedChannels = channels,
@@ -2735,7 +2736,7 @@ private fun LiveSubtitleTranslationOverlay(player: ExoPlayer, modifier: Modifier
 }
 
 @Composable
-fun MultiViewPage(channels: List<Channel>) {
+fun MultiViewPage(channels: List<Channel>, themeMode: String) {
     val context = LocalContext.current
     val activity = context as? Activity
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
@@ -2799,6 +2800,7 @@ fun MultiViewPage(channels: List<Channel>) {
                     onSelect = { selectedChannels[fullScreenSlot] = it },
                     player = players[fullScreenSlot],
                     slotIndex = fullScreenSlot,
+                    rainbowTheme = themeMode == "rainbow",
                     audioMixMode = audioMixMode,
                     primaryAudioSlot = primaryAudioSlot,
                     slotVolume = slotVolumes[fullScreenSlot],
@@ -2839,6 +2841,7 @@ fun MultiViewPage(channels: List<Channel>) {
                                 onSelect = { selectedChannels[slotIndex] = it },
                                 player = players[slotIndex],
                                 slotIndex = slotIndex,
+                                rainbowTheme = themeMode == "rainbow",
                                 audioMixMode = audioMixMode,
                                 primaryAudioSlot = primaryAudioSlot,
                                 slotVolume = slotVolumes[slotIndex],
@@ -2865,6 +2868,7 @@ private fun MultiViewSlot(
     onSelect: (Channel?) -> Unit,
     player: ExoPlayer,
     slotIndex: Int,
+    rainbowTheme: Boolean,
     audioMixMode: Boolean,
     primaryAudioSlot: Int,
     slotVolume: Float,
@@ -2894,7 +2898,7 @@ private fun MultiViewSlot(
         modifier = modifier,
         shape = RoundedCornerShape(if (fullScreen) 0.dp else if (compact) 7.dp else 12.dp),
         border = androidx.compose.foundation.BorderStroke(1.dp,
-            if (themeMode == "rainbow" && !fullScreen) listOf(Color(0xFFFF647C), Color(0xFFFFB45C), Color(0xFFFFE36E), Color(0xFF62D99B), Color(0xFF58C9FF), Color(0xFF9B83FF), Color(0xFFE783D5), Color(0xFF70D6D0), Color(0xFFB6C5FF))[slotIndex % 9].copy(alpha = 0.82f)
+            if (rainbowTheme && !fullScreen) listOf(Color(0xFFFF647C), Color(0xFFFFB45C), Color(0xFFFFE36E), Color(0xFF62D99B), Color(0xFF58C9FF), Color(0xFF9B83FF), Color(0xFFE783D5), Color(0xFF70D6D0), Color(0xFFB6C5FF))[slotIndex % 9].copy(alpha = 0.82f)
             else Gold.copy(alpha = 0.42f))
     ) {
         Column(Modifier.fillMaxSize().padding(
