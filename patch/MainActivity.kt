@@ -398,6 +398,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
     var rememberPlayerChoice by remember { mutableStateOf(false) }
     var schedules by remember { mutableStateOf(prefs.getString("schedules", "") ?: "") }
     var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "dark") ?: "dark") }
+    var appLanguage by remember { mutableStateOf(prefs.getString("app_language", "fa") ?: "fa") }
     var liveDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
     var keepOriginalAudio by remember { mutableStateOf(prefs.getBoolean("live_dubbing_original", true)) }
     DisposableEffect(prefs) {
@@ -1508,6 +1509,11 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         onWeakInternetModeChange = { enabled ->
                             weakInternetMode = enabled
                             prefs.edit().putBoolean("weak_internet_mode", enabled).apply()
+                        },
+                        appLanguage = appLanguage,
+                        onAppLanguageChange = { code ->
+                            appLanguage = code
+                            prefs.edit().putString("app_language", code).apply()
                         },
                         themeMode = themeMode,
                         onThemeModeChange = { mode ->
@@ -3284,12 +3290,43 @@ fun ChildLockPage(
 
 @Composable
 fun SettingsPage(weakInternetMode: Boolean, onWeakInternetModeChange: (Boolean) -> Unit,
+                 appLanguage: String, onAppLanguageChange: (String) -> Unit,
                  themeMode: String, onThemeModeChange: (String) -> Unit, onChildLock: () -> Unit,
                  fontScale: Float, onFontScaleChange: (Float) -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("salar_tv", 0) }
     var confirmDelete by remember { mutableStateOf(prefs.getBoolean("confirm_before_delete", true)) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("زبان برنامه", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        val languageOptions = listOf(
+            "fa" to "فارسی", "en" to "English", "ar" to "العربية",
+            "tr" to "Türkçe", "ku" to "کوردی"
+        )
+        var languageMenuExpanded by remember { mutableStateOf(false) }
+        Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
+            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("زبان دلخواه", color = TextMain, fontWeight = FontWeight.SemiBold)
+                Box {
+                    OutlinedButton(onClick = { languageMenuExpanded = true }, modifier = Modifier.fillMaxWidth()) {
+                        Text(languageOptions.firstOrNull { it.first == appLanguage }?.second ?: "فارسی",
+                            modifier = Modifier.weight(1f), color = TextMain)
+                        Icon(Icons.Default.ArrowDropDown, null, tint = Gold)
+                    }
+                    DropdownMenu(expanded = languageMenuExpanded, onDismissRequest = { languageMenuExpanded = false }) {
+                        languageOptions.forEach { (code, label) ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                leadingIcon = { if (appLanguage == code) Icon(Icons.Default.Check, null, tint = Gold) },
+                                onClick = { onAppLanguageChange(code); languageMenuExpanded = false }
+                            )
+                        }
+                    }
+                }
+                Text("انتخاب زبان ذخیره می‌شود. ترجمه کامل همه صفحه‌ها و چینش راست‌به‌چپ/چپ‌به‌راست باید در مرحله بومی‌سازی جداگانه تکمیل شود.",
+                    color = SecondaryText, fontSize = 10.sp)
+            }
+        }
+        Divider(color = Gold.copy(alpha = 0.3f))
         Text("اتصال اینترنت", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(12.dp)) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
