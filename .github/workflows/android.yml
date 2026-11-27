@@ -882,6 +882,18 @@ jobs:
           gradle -p "$PROJECT_DIR" :app:assembleDebug
           echo "Rebuilt APK after verified Persian channel merge"
 
+      - name: Package exact source snapshot used for APK
+        run: |
+          zip -qr SALAR-TV-source.zip "$PROJECT_DIR" patch verified-persian-candidates.m3u persian-diaspora-stream-audit.json iran-domestic-adaptive-audit.json -x "*/build/*" "*/.gradle/*"
+          ls -lh SALAR-TV-source.zip
+
+      - name: Upload exact source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: SALAR-TV-Source
+          path: SALAR-TV-source.zip
+          if-no-files-found: error
+
       - name: Upload Iranian domestic adaptive audit
         if: always()
         uses: actions/upload-artifact@v4
