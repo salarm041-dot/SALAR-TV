@@ -2775,6 +2775,15 @@ fun MultiViewPage(channels: List<Channel>, themeMode: String) {
             repeat(9) { index -> add(channels.getOrNull(index)) }
         }
     }
+    // The channel catalogue can arrive asynchronously after this screen is first composed.
+    // Fill only empty slots so late loading does not erase the user's existing selections.
+    LaunchedEffect(channels) {
+        for (index in 0 until 9) {
+            if (selectedChannels[index] == null) {
+                selectedChannels[index] = channels.getOrNull(index)
+            }
+        }
+    }
     val players = remember {
         List(9) {
             ExoPlayer.Builder(context)
