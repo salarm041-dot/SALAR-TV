@@ -102,6 +102,17 @@ private const val REMOTE_RADIO_PLAYLIST = "https://raw.githubusercontent.com/sal
 private const val REMOTE_TELEWEBION_AUTH_PLAYLIST = "https://raw.githubusercontent.com/kgkaku/IRIB-Live-Channels-Playlist/main/irib-extvlcopt.m3u"
 // Per-channel Telewebion auth headers are refreshed from the public VLC-compatible playlist.
 
+private fun navigationLabel(persian: String, language: String): String {
+    val labels = mapOf(
+        "خانه" to mapOf("en" to "Home", "ar" to "الرئيسية", "tr" to "Ana sayfa", "ku" to "ماڵەوە"),
+        "تلویزیون" to mapOf("en" to "TV", "ar" to "التلفزيون", "tr" to "Televizyon", "ku" to "تەلەفزیۆن"),
+        "رادیو" to mapOf("en" to "Radio", "ar" to "الراديو", "tr" to "Radyo", "ku" to "ڕادیۆ"),
+        "علاقه‌مندی‌ها" to mapOf("en" to "Favorites", "ar" to "المفضلة", "tr" to "Favoriler", "ku" to "دڵخوازەکان"),
+        "بیشتر" to mapOf("en" to "More", "ar" to "المزيد", "tr" to "Daha fazla", "ku" to "زیاتر")
+    )
+    return labels[persian]?.get(language) ?: persian
+}
+
 data class Channel(
     val name: String,
     val url: String,
@@ -792,11 +803,12 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         listOf("خانه" to Icons.Default.Home, "تلویزیون" to Icons.Default.Tv,
                             "رادیو" to Icons.Default.Radio, "علاقه‌مندی‌ها" to Icons.Default.Favorite,
                             "بیشتر" to Icons.Default.MoreHoriz).forEach { (label, icon) ->
+                            val shownLabel = navigationLabel(label, appLanguage)
                             NavigationBarItem(
                                 selected = page == label,
                                 onClick = { page = label },
-                                icon = { Icon(icon, label) },
-                                label = { Text(label, fontSize = 10.sp) },
+                                icon = { Icon(icon, shownLabel) },
+                                label = { Text(shownLabel, fontSize = 10.sp) },
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor = Gold, selectedTextColor = Gold,
                                     indicatorColor = Color(0xFF343020), unselectedIconColor = MutedText
