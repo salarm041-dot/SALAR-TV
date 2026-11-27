@@ -2932,7 +2932,7 @@ private fun MultiViewSlot(
             )
             if (!fullScreen) {
                 Row(Modifier.fillMaxWidth().height(if (compact) 30.dp else 38.dp)
-                    .background(Color(0xFF10131B), RoundedCornerShape(8.dp)).padding(horizontal = 4.dp),
+                    .background(Panel, RoundedCornerShape(8.dp)).padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                     Text(if (audioMixMode) "میکس صدا" else if (primaryAudioSlot == slotIndex) "صدای اصلی" else "بی‌صدا",
                         color = if (audioMixMode || primaryAudioSlot == slotIndex) Gold else SecondaryText,
@@ -2952,7 +2952,7 @@ private fun MultiViewSlot(
                             leadingIcon = { Icon(Icons.Default.GraphicEq, null) },
                             onClick = { onEnableAudioMix(); isMuted = false; showCardMenu = false })
                         DropdownMenuItem(text = { Text("ضبط همین شبکه (۶۰ دقیقه)") },
-                            leadingIcon = { Icon(Icons.Default.FiberManualRecord, null, tint = Color.Red) },
+                            leadingIcon = { Icon(Icons.Default.FiberManualRecord, null, tint = Gold) },
                             onClick = {
                                 val channel = selected; showCardMenu = false
                                 if (channel == null) android.widget.Toast.makeText(context, "ابتدا یک شبکه انتخاب کنید.", android.widget.Toast.LENGTH_SHORT).show()
@@ -3342,7 +3342,7 @@ fun SettingsPage(weakInternetMode: Boolean, onWeakInternetModeChange: (Boolean) 
                                 }
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(choice.title, color = Color.White, fontSize = 12.sp,
+                                Text(choice.title, color = if (choice.id == "light") Color(0xFF20232A) else Color(0xFFF5F5F5), fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                                 if (themeMode == choice.id) Icon(Icons.Default.CheckCircle, null,
                                     tint = choice.colors[0], modifier = Modifier.size(18.dp))
