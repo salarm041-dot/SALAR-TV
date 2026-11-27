@@ -557,11 +557,24 @@ fun SalarTvApp(isInPip: Boolean = false) {
         val baseFactory = DefaultDataSource.Factory(context, httpFactory)
         val resolvingFactory = ResolvingDataSource.Factory(baseFactory) { dataSpec ->
             val host = dataSpec.uri.host?.lowercase().orEmpty()
+            val path = dataSpec.uri.path.orEmpty().lowercase()
             val referer = when {
                 host == "tvstream.az" || host.endsWith(".tvstream.az") -> "https://tvstream.az/"
                 host == "atv.az" || host.endsWith(".atv.az") -> "https://atv.az/"
                 host == "itv.az" || host.endsWith(".itv.az") || host.endsWith(".connect.az") -> "https://itv.az/"
                 host == "operativmm.az" || host.endsWith(".operativmm.az") -> "https://operativmm.az/"
+                // Turkish broadcaster CDNs may reject non-browser media requests
+                // unless the channel's own website is supplied as Referer/Origin.
+                host.contains("demiroren") && host.endsWith(".daioncdn.net") -> "https://www.kanald.com.tr/"
+                host.contains("dogus") && host.endsWith(".daioncdn.net") -> "https://www.startv.com.tr/"
+                host.contains("ciner") && host.endsWith(".daioncdn.net") -> "https://www.showtv.com.tr/"
+                host.startsWith("kanal7-live.") && host.endsWith(".daioncdn.net") -> "https://www.kanal7.com/"
+                host.endsWith(".turknet.ercdn.net") && path.contains("/nowtv/") -> "https://www.nowtv.com.tr/"
+                host.endsWith(".turknet.ercdn.net") && path.contains("/atv/") -> "https://www.atv.com.tr/"
+                host.endsWith(".turknet.ercdn.net") && path.contains("/ahaber/") -> "https://www.ahaber.com.tr/"
+                host.endsWith(".turknet.ercdn.net") && path.contains("/aspor/") -> "https://www.aspor.com.tr/"
+                host.endsWith(".turknet.ercdn.net") && path.contains("/a2tv/") -> "https://www.a2tv.com.tr/"
+                host == "turkmedya-live.ercdn.net" -> "https://www.tv360.com.tr/"
                 else -> null
             }
             if (referer == null) dataSpec else {
