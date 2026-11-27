@@ -68,6 +68,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.ResolvingDataSource
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Player
 import androidx.media3.common.text.CueGroup
@@ -544,8 +548,32 @@ fun SalarTvApp(isInPip: Boolean = false) {
 
     val trackSelector = remember { DefaultTrackSelector(context) }
     val player = remember {
+        // Some Azerbaijani providers require a browser-like User-Agent and a
+        // channel-site Referer. Apply these only to the matching hosts so
+        // unrelated channels keep their normal request behavior.
+        val httpFactory = DefaultHttpDataSource.Factory()
+            .setUserAgent("Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36")
+            .setAllowCrossProtocolRedirects(true)
+        val baseFactory = DefaultDataSource.Factory(context, httpFactory)
+        val resolvingFactory = ResolvingDataSource.Factory(baseFactory) { dataSpec ->
+            val host = dataSpec.uri.host?.lowercase().orEmpty()
+            val referer = when {
+                host == "tvstream.az" || host.endsWith(".tvstream.az") -> "https://tvstream.az/"
+                host == "atv.az" || host.endsWith(".atv.az") -> "https://atv.az/"
+                host == "itv.az" || host.endsWith(".itv.az") || host.endsWith(".connect.az") -> "https://itv.az/"
+                host == "operativmm.az" || host.endsWith(".operativmm.az") -> "https://operativmm.az/"
+                else -> null
+            }
+            if (referer == null) dataSpec else {
+                val headers = dataSpec.httpRequestHeaders.toMutableMap()
+                headers["Referer"] = referer
+                headers["Origin"] = referer.trimEnd('/')
+                dataSpec.buildUpon().setHttpRequestHeaders(headers).build()
+            }
+        }
         ExoPlayer.Builder(context)
             .setTrackSelector(trackSelector)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(resolvingFactory))
             // Keep a useful reserve of media data for brief drops in bandwidth.
             .setLoadControl(
                 DefaultLoadControl.Builder()
