@@ -1889,11 +1889,12 @@ fun HomePage(channels: List<Channel>, onSelect: (Channel) -> Unit, onAdd: () -> 
         Color(0xFFFFC247), Color(0xFF28C9E8), Color(0xFF9BA9C5), Color(0xFFFF6E9A))
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(17.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(54.dp).background(
-                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Gold.copy(alpha = .98f), Gold.copy(alpha = .42f), Background)),
-                RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.LiveTv, null, tint = Background, modifier = Modifier.size(35.dp))
-            }
+            Image(
+                painter = painterResource(id = R.drawable.ic_salar_tv),
+                contentDescription = "لوگوی SALAR TV",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(54.dp)
+            )
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
