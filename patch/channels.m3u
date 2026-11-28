@@ -24,7 +24,7 @@ https://live.itv.az/itv.m3u8
 #EXTINF:-1 tvg-id="IctimaiTV.az" tvg-logo="https://i.imgur.com/HzY4VMo.png" group-title="آذربایجان / تلویزیون",İctimai TV
 https://str.yodacdn.net/ictimaitele/tracks-v1a1/mono.ts.m3u8
 #EXTINF:-1 tvg-id="IdmanTV.az" tvg-logo="https://i.imgur.com/fM9FOrZ.png" group-title="آذربایجان / ورزشی",İdman TV
-https://str.yodacdn.net/idman/index.m3u8
+https://operativmm.az/tvs/idman/stream4/stream.m3u8
 
 #EXTINF:-1 tvg-logo="https://atv.az/assets/images/logo_white.png" group-title="آذربایجان / تلویزیون",ATV Azərbaycan
 https://lives.atv.az:5443/ATV_TV_STREAM/streams/atvcanli.m3u8
