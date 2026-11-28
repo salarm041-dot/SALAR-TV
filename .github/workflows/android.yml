@@ -45,7 +45,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools'
+          packages: 'platform-tools;build-tools;35.0.0'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -1074,6 +1074,24 @@ jobs:
           cp "$SALAR_TV_APK_PATH" "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
           cp "$SALAR_TV_EMULATOR_APK_PATH" "$GITHUB_WORKSPACE/SALAR-TV-emulator.apk"
           ls -lh "$GITHUB_WORKSPACE/SALAR-TV-debug.apk" "$GITHUB_WORKSPACE/SALAR-TV-emulator.apk"
+
+      - name: Verify phone APK signature and Android install metadata
+        run: |
+          set -euo pipefail
+          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          test -x "$APKSIGNER"
+          test -x "$AAPT"
+          echo "=== APK SIGNATURE VERIFICATION ==="
+          "$APKSIGNER" verify --verbose --print-certs "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+          echo "=== APK PACKAGE METADATA ==="
+          "$AAPT" dump badging "$GITHUB_WORKSPACE/SALAR-TV-debug.apk" | head -n 8
+          echo "=== APK FILE HASH AND SIZE ==="
+          sha256sum "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+          stat -c 'APK_BYTES=%s' "$GITHUB_WORKSPACE/SALAR-TV-debug.apk"
+          echo "=== ABI CONTENTS ==="
+          unzip -Z1 "$GITHUB_WORKSPACE/SALAR-TV-debug.apk" | grep '^lib/' | sort -u
+          echo "Phone APK signature and metadata verification passed."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
