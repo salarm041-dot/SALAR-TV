@@ -967,6 +967,31 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var showSubtitleDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showQualityDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var qualityChoices by remember(selected!!.url) { mutableStateOf(emptyList<VideoQualityChoice>()) }
+                        DisposableEffect(player, selected!!.url) {
+                            fun readVideoQualities(): List<VideoQualityChoice> = buildList {
+                                player.currentTracks.groups.forEachIndexed { groupIndex, group ->
+                                    if (group.type == androidx.media3.common.C.TRACK_TYPE_VIDEO) {
+                                        for (trackIndex in 0 until group.length) {
+                                            if (group.isTrackSupported(trackIndex)) {
+                                                val format = group.getTrackFormat(trackIndex)
+                                                val label = if (format.height > 0) "${format.height}p"
+                                                    else if (format.width > 0) "${format.width}p" else "کیفیت نامشخص"
+                                                add(VideoQualityChoice(groupIndex, trackIndex, label))
+                                            }
+                                        }
+                                    }
+                                }
+                            }.distinctBy { it.label }
+                                .sortedByDescending { it.label.removeSuffix("p").toIntOrNull() ?: 0 }
+                            val listener = object : Player.Listener {
+                                override fun onTracksChanged(tracks: androidx.media3.common.Tracks) {
+                                    qualityChoices = readVideoQualities()
+                                }
+                            }
+                            player.addListener(listener)
+                            qualityChoices = readVideoQualities()
+                            onDispose { player.removeListener(listener) }
+                        }
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerHelp by remember(selected!!.url) { mutableStateOf(false) }
                         var playbackError by remember(selected!!.url) { mutableStateOf("") }
@@ -1086,15 +1111,16 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         text = { Text("کیفیت تصویر") },
                                         leadingIcon = { Icon(Icons.Default.HighQuality, null) },
                                         onClick = {
+                                            // Refresh immediately as a safeguard; tracks may have arrived
+                                            // after the menu's last composition.
                                             qualityChoices = buildList {
                                                 player.currentTracks.groups.forEachIndexed { groupIndex, group ->
                                                     if (group.type == androidx.media3.common.C.TRACK_TYPE_VIDEO) {
                                                         for (trackIndex in 0 until group.length) {
                                                             if (group.isTrackSupported(trackIndex)) {
                                                                 val format = group.getTrackFormat(trackIndex)
-                                                                val height = format.height
-                                                                val width = format.width
-                                                                val label = if (height > 0) "${height}p" else if (width > 0) "${width}p" else "کیفیت نامشخص"
+                                                                val label = if (format.height > 0) "${format.height}p"
+                                                                    else if (format.width > 0) "${format.width}p" else "کیفیت نامشخص"
                                                                 add(VideoQualityChoice(groupIndex, trackIndex, label))
                                                             }
                                                         }
@@ -1333,6 +1359,8 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                         Text("خودکار (پیشنهادی)", modifier = Modifier.fillMaxWidth().clickable {
                                             player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
                                                 .clearOverridesOfType(androidx.media3.common.C.TRACK_TYPE_VIDEO)
+                                                .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, false)
+                                                .setMaxVideoBitrate(if (weakInternetMode) 700_000 else Int.MAX_VALUE)
                                                 .build()
                                             showQualityDialog = false
                                         }.padding(vertical = 9.dp))
@@ -1344,7 +1372,10 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                                 val group = player.currentTracks.groups.getOrNull(choice.groupIndex)
                                                 if (group != null) {
                                                     player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                                                        .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, false)
                                                         .clearOverridesOfType(androidx.media3.common.C.TRACK_TYPE_VIDEO)
+                                                        // A manual resolution must not be blocked by weak-network bitrate caps.
+                                                        .setMaxVideoBitrate(Int.MAX_VALUE)
                                                         .addOverride(androidx.media3.common.TrackSelectionOverride(
                                                             group.mediaTrackGroup, listOf(choice.trackIndex)
                                                         )).build()
