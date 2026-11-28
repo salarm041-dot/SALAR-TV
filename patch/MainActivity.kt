@@ -3594,14 +3594,55 @@ fun MoreButton(label: String, icon: androidx.compose.ui.graphics.vector.ImageVec
 
 @Composable
 fun AboutPage() {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Icon(Icons.Default.Tv, null, tint = Gold, modifier = Modifier.size(64.dp))
-        Text("SALAR TV", color = Gold, fontSize = 28.sp, fontWeight = FontWeight.Black)
-        Text("سازنده و مالک: سید سالار موسوی ملکی", color = TextMain)
-        Text("ایمیل: Salar.m041@gmail.com", color = SecondaryText)
-        Text("اینستاگرام: Salar_mousavi_41", color = SecondaryText)
-        Text("نسخه ۱٫۰", color = MutedText)
+    Column(
+        Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(26.dp),
+            colors = CardDefaults.cardColors(containerColor = Panel),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.55f))
+        ) {
+            Column(
+                Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_salar_tv),
+                    contentDescription = "لوگوی SALAR TV",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(112.dp)
+                )
+                Text("SALAR TV", color = Gold, fontSize = 27.sp, fontWeight = FontWeight.Black)
+                Text("تلویزیون و رادیوی اینترنتی", color = SecondaryText, fontSize = 13.sp)
+                Box(
+                    Modifier
+                        .background(Gold.copy(alpha = 0.14f), RoundedCornerShape(50))
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Text("نسخه ۱٫۰", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Panel)
+        ) {
+            Column(
+                Modifier.fillMaxWidth().padding(18.dp),
+                verticalArrangement = Arrangement.spacedBy(13.dp)
+            ) {
+                Text("اطلاعات سازنده", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text("سید سالار موسوی ملکی", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                androidx.compose.material3.HorizontalDivider(color = Gold.copy(alpha = 0.22f))
+                Text("ایمیل: Salar.m041@gmail.com", color = SecondaryText, fontSize = 12.sp)
+                Text("اینستاگرام: Salar_mousavi_41", color = SecondaryText, fontSize = 12.sp)
+            }
+        }
     }
 }
 
