@@ -995,6 +995,7 @@ fun SalarTvApp(isInPip: Boolean = false) {
                         var showDubbingDialog by remember(selected!!.url) { mutableStateOf(false) }
                         var showPlayerHelp by remember(selected!!.url) { mutableStateOf(false) }
                         var playbackError by remember(selected!!.url) { mutableStateOf("") }
+                        var internalVideoAspectRatio by remember(selected!!.url) { mutableFloatStateOf(16f / 9f) }
                         DisposableEffect(player, selected!!.url) {
                             val listener = object : Player.Listener {
                                 override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
@@ -1003,15 +1004,28 @@ fun SalarTvApp(isInPip: Boolean = false) {
                                 override fun onPlaybackStateChanged(playbackState: Int) {
                                     if (playbackState == Player.STATE_READY) playbackError = ""
                                 }
+                                override fun onVideoSizeChanged(videoSize: androidx.media3.common.VideoSize) {
+                                    if (videoSize.width > 0 && videoSize.height > 0) {
+                                        val ratio = (videoSize.width * videoSize.pixelWidthHeightRatio) / videoSize.height.toFloat()
+                                        if (ratio.isFinite() && ratio in 0.6f..2.4f) {
+                                            internalVideoAspectRatio = ratio
+                                        }
+                                    }
+                                }
                             }
                             player.addListener(listener)
+                            val size = player.videoSize
+                            if (size.width > 0 && size.height > 0) {
+                                val ratio = (size.width * size.pixelWidthHeightRatio) / size.height.toFloat()
+                                if (ratio.isFinite() && ratio in 0.6f..2.4f) internalVideoAspectRatio = ratio
+                            }
                             onDispose { player.removeListener(listener) }
                         }
                         var subtitleChoices by remember(selected!!.url) { mutableStateOf(emptyList<SubtitleChoice>()) }
                         var menuDubbingEnabled by remember { mutableStateOf(prefs.getBoolean("live_dubbing_enabled", true)) }
                         var menuSubtitleEnabled by remember { mutableStateOf(prefs.getBoolean("live_subtitle_enabled", true)) }
                         var menuDubbingVoice by remember { mutableStateOf(if (prefs.getString("live_dubbing_voice", "زیر") == "بم" || prefs.getString("live_dubbing_voice", "") == "مرد") "بم" else "زیر") }
-                        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
+                        Box(Modifier.fillMaxWidth().aspectRatio(internalVideoAspectRatio)) {
                             AndroidView(
                                 factory = { ctx -> PlayerView(ctx).apply {
                                     this.player = player
